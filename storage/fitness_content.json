@@ -1,0 +1,18 @@
+{
+  "guides": [
+    {"id":101, "title":"Fat Loss Basics", "level":"beginner", "tags":["lose_weight","home_minimal","none"]},
+    {"id":102, "title":"Hypertrophy 101", "level":"intermediate", "tags":["build_muscle","gym_access"]},
+    {"id":103, "title":"Running Form Essentials", "level":"beginner", "tags":["endurance","none"]},
+    {"id":104, "title":"Core & Mobility Routine", "level":"all", "tags":["general_health","home_minimal","none"]}
+  ],
+  "choreography": [
+    {"id":201, "title":"Low Impact Cardio Dance", "level":"beginner", "tags":["lose_weight","general_health"]},
+    {"id":202, "title":"HIIT Dance Burn", "level":"intermediate", "tags":["lose_weight","build_muscle"]},
+    {"id":203, "title":"Endurance Cardio Flow", "level":"intermediate", "tags":["endurance"]}
+  ],
+  "gym": [
+    {"id":301, "title":"Upper/Lower Split", "level":"intermediate", "equipment":"gym_access", "tags":["build_muscle"]},
+    {"id":302, "title":"Full-body Dumbbell", "level":"beginner", "equipment":"home_minimal", "tags":["general_health","lose_weight","build_muscle"]},
+    {"id":303, "title":"Treadmill Endurance", "level":"beginner", "equipment":"gym_access", "tags":["endurance"]}
+  ]
+}

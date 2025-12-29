@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# PHP/XAMPP
+config/config.php
+uploads/
+storage/orders.json
+
+# Node/Composer (if added later)
+node_modules/
+vendor/
+composer.lock
+package-lock.json
+
+# Logs
+*.log

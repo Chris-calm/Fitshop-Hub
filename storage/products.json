@@ -1,0 +1,8 @@
+[
+  {"id":1,"title":"Adjustable Dumbbells 20kg","brand":"FitPro","price":2999.00,"category":"equipment","tags":["gym","weights"]},
+  {"id":2,"title":"Yoga Mat Non-Slip","brand":"ZenFlex","price":899.00,"category":"equipment","tags":["gym"]},
+  {"id":3,"title":"Whey Protein 1kg","brand":"PowerFuel","price":1599.00,"category":"supplements","tags":["nutrients"]},
+  {"id":4,"title":"Herbal Green Tea","brand":"Naturale","price":249.00,"category":"supplements","tags":["herbal","drinks"]},
+  {"id":5,"title":"Protein Bar 6-Pack","brand":"SnackFit","price":499.00,"category":"snacks","tags":["bars"]},
+  {"id":6,"title":"Dry-Fit Shirt","brand":"AirMove","price":699.00,"category":"equipment","tags":["clothes"]}
+]
