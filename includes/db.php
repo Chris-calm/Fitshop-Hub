@@ -128,7 +128,14 @@ try {
         die(nl2br(htmlspecialchars($errorMessage)));
     } else {
         // Generic error for production
-        error_log('Database Error: ' . $e->getMessage());
+        $ctx = [
+            'driver' => $dbConfig['DB_DRIVER'] ?: 'mysql',
+            'host' => $dbConfig['DB_HOST'] ?: null,
+            'port' => $dbConfig['DB_PORT'] ?: null,
+            'db' => $dbConfig['DB_NAME'] ?: null,
+            'sslmode' => $dbConfig['DB_SSLMODE'] ?: null,
+        ];
+        error_log('Database Error: ' . $e->getMessage() . ' | ctx=' . json_encode($ctx));
         die('Database connection error. Please try again later.');
     }
 }
