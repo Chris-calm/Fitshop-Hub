@@ -1,22 +1,31 @@
 <?php
 // Environment detection
-function isLocalEnvironment() {
+$isVercel = (getenv('VERCEL') === '1') || (getenv('VERCEL_ENV') !== false) || (getenv('VERCEL_URL') !== false);
+
+function isLocalEnvironment($isVercel) {
+    if ($isVercel) {
+        return false;
+    }
     // Check for common local development server indicators
+    $serverName = $_SERVER['SERVER_NAME'] ?? '';
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+    $httpHost = $_SERVER['HTTP_HOST'] ?? '';
+
     return 
-        $_SERVER['SERVER_NAME'] === 'localhost' || 
-        in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']) ||
-        strpos($_SERVER['HTTP_HOST'], '.local') !== false ||
+        $serverName === 'localhost' || 
+        in_array($remoteAddr, ['127.0.0.1', '::1'], true) ||
+        strpos($httpHost, '.local') !== false ||
         getenv('LOCAL_DEVELOPMENT') === 'true';
 }
 
 // Set environment constants
-define('IS_LOCAL', isLocalEnvironment());
-define('IS_VERCEL', !IS_LOCAL && getenv('VERCEL') === '1');
+define('IS_VERCEL', $isVercel);
+define('IS_LOCAL', isLocalEnvironment($isVercel));
 
 // Set base URL
 define('BASE_URL', IS_LOCAL 
     ? 'http://localhost/Health&Fitness' 
-    : 'https://' . $_SERVER['HTTP_HOST']);
+    : 'https://' . ($_SERVER['HTTP_HOST'] ?? getenv('VERCEL_URL')));
 
 // Set environment-specific database configuration
 if (IS_LOCAL) {
