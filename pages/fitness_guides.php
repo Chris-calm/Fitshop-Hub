@@ -26,7 +26,7 @@ $recommended = array_values(array_filter($guides, function($g) use ($goal,$equip
       <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
         <div class="text-sm text-neutral-400">Level: <?= htmlspecialchars($g['level']) ?></div>
         <div class="font-semibold mb-2"><?= htmlspecialchars($g['title']) ?></div>
-        <a class="text-brand text-sm" href="#">Open Guide →</a>
+        <a class="text-brand text-sm" href="index.php?page=guide_detail&id=<?= urlencode($g['id']) ?>">Open Guide →</a>
       </div>
     <?php endforeach; ?>
   </div>

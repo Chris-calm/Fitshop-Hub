@@ -22,8 +22,9 @@
     <a href="index.php?page=choreography" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50">Choreography</a>
     <a href="index.php?page=guides" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50">Guides</a>
   </div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 mt-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 mt-6 gap-6">
     <a href="index.php?page=gym" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50">Gym Programs</a>
+    <a href="index.php?page=fitness_history" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50">My Fitness History</a>
   </div>
   <div class="mt-8 text-sm text-neutral-400">For your personalized plan, visit <a class="text-brand" href="index.php?page=profile">your Profile</a>.</div>
 </section>
@@ -35,6 +36,8 @@
   const tGoal = document.getElementById('stepsGoal');
   const input = document.getElementById('stepsInput');
   const btn = document.getElementById('saveStepsBtn');
+  const elStreak = document.getElementById('streak');
+  const elMinutes = document.getElementById('minutes');
   const R = 52, C = 2*Math.PI*R;
   let goal = 10000; // default; could be loaded from server later
   tGoal.textContent = `of ${goal.toLocaleString()} steps`;
@@ -44,6 +47,21 @@
     tToday.textContent = steps.toLocaleString();
   }
   setProgress(0);
+  // Auto-load stats for today
+  try {
+    fetch('pages/api_fitness_stats.php')
+      .then(r=>r.ok?r.json():null)
+      .then(data=>{
+        if (!data || !data.ok) return;
+        goal = Math.max(1, parseInt(data.steps_goal||goal,10));
+        tGoal.textContent = `of ${goal.toLocaleString()} steps`;
+        const today = Math.max(0, parseInt(data.today_steps||0,10));
+        setProgress(today);
+        if (input) input.value = today;
+        if (elStreak) elStreak.textContent = String(data.streak||0);
+        if (elMinutes) elMinutes.textContent = String(data.minutes_week||0);
+      }).catch(()=>{});
+  } catch(e) {}
   if (btn) btn.addEventListener('click', async ()=>{
     const steps = Math.max(0, parseInt(input.value||'0',10));
     setProgress(steps);

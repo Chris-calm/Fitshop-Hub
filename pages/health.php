@@ -10,5 +10,7 @@
     <a class="px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800" href="index.php?page=catalog&cat=clothes">Dry-Fit Clothes</a>
     <a class="px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800" href="index.php?page=catalog&cat=nutrients">Nutrients</a>
     <a class="px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800" href="index.php?page=catalog&cat=drinks">Drinks</a>
+    <a class="px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800" href="index.php?page=food_scan">Food Scan (Camera)</a>
+    <a class="px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800" href="index.php?page=food_history">Food History</a>
   </div>
 </section>

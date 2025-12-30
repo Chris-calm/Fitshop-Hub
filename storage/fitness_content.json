@@ -1,18 +1,85 @@
 {
   "guides": [
-    {"id":101, "title":"Fat Loss Basics", "level":"beginner", "tags":["lose_weight","home_minimal","none"]},
-    {"id":102, "title":"Hypertrophy 101", "level":"intermediate", "tags":["build_muscle","gym_access"]},
-    {"id":103, "title":"Running Form Essentials", "level":"beginner", "tags":["endurance","none"]},
-    {"id":104, "title":"Core & Mobility Routine", "level":"all", "tags":["general_health","home_minimal","none"]}
+    {"id":101, "title":"Fat Loss Basics", "level":"beginner", "tags":["lose_weight","home_minimal","none"],
+      "media_url":"assets/media/guides/fat_loss_basics.mp4",
+      "cues": [
+        {"title":"Caloric deficit overview"},
+        {"title":"Protein and fiber focus"},
+        {"title":"NEAT and step goals"}
+      ]
+    },
+    {"id":102, "title":"Hypertrophy 101", "level":"intermediate", "tags":["build_muscle","gym_access"],
+      "media_url":"assets/media/guides/hypertrophy_101.mp4",
+      "cues": [
+        {"title":"Progressive overload basics"},
+        {"title":"Intensity (RPE/RIR)"},
+        {"title":"Volume and recovery"}
+      ]
+    },
+    {"id":103, "title":"Running Form Essentials", "level":"beginner", "tags":["endurance","none"],
+      "media_url":"assets/media/guides/running_form.jpg",
+      "cues": [
+        {"title":"Posture and cadence"},
+        {"title":"Foot strike and stride"},
+        {"title":"Breathing"}
+      ]
+    },
+    {"id":104, "title":"Core & Mobility Routine", "level":"all", "tags":["general_health","home_minimal","none"],
+      "media_url":"assets/media/guides/core_mobility.mp4",
+      "cues": [
+        {"title":"Pelvic tilt awareness"},
+        {"title":"Bracing and breathing"},
+        {"title":"Hip/shoulder mobility"}
+      ]
+    }
   ],
   "choreography": [
-    {"id":201, "title":"Low Impact Cardio Dance", "level":"beginner", "tags":["lose_weight","general_health"]},
-    {"id":202, "title":"HIIT Dance Burn", "level":"intermediate", "tags":["lose_weight","build_muscle"]},
-    {"id":203, "title":"Endurance Cardio Flow", "level":"intermediate", "tags":["endurance"]}
+    {"id":201, "title":"Low Impact Cardio Dance", "level":"beginner", "tags":["lose_weight","general_health"],
+      "media_url":"assets/media/choreo/low_impact_cardio.mp4",
+      "sections": [
+        {"name":"Warm-up", "duration_sec":180},
+        {"name":"Combo A", "duration_sec":240},
+        {"name":"Combo B", "duration_sec":240},
+        {"name":"Cool-down", "duration_sec":180}
+      ]
+    },
+    {"id":202, "title":"HIIT Dance Burn", "level":"intermediate", "tags":["lose_weight","build_muscle"],
+      "media_url":"assets/media/choreo/hiit_dance_burn.mp4",
+      "sections": [
+        {"name":"Warm-up", "duration_sec":120},
+        {"name":"HIIT Block 1", "duration_sec":300},
+        {"name":"HIIT Block 2", "duration_sec":300},
+        {"name":"Cool-down", "duration_sec":180}
+      ]
+    },
+    {"id":203, "title":"Endurance Cardio Flow", "level":"intermediate", "tags":["endurance"],
+      "media_url":"assets/media/choreo/endurance_flow.jpg",
+      "sections": [
+        {"name":"Warm-up", "duration_sec":180},
+        {"name":"Steady Flow", "duration_sec":1200},
+        {"name":"Cool-down", "duration_sec":180}
+      ]
+    }
   ],
   "gym": [
-    {"id":301, "title":"Upper/Lower Split", "level":"intermediate", "equipment":"gym_access", "tags":["build_muscle"]},
-    {"id":302, "title":"Full-body Dumbbell", "level":"beginner", "equipment":"home_minimal", "tags":["general_health","lose_weight","build_muscle"]},
-    {"id":303, "title":"Treadmill Endurance", "level":"beginner", "equipment":"gym_access", "tags":["endurance"]}
+    {"id":301, "title":"Upper/Lower Split", "level":"intermediate", "equipment":"gym_access", "tags":["build_muscle"],
+      "exercises": [
+        {"name":"Barbell Back Squat", "sets":4, "reps":8, "rest_sec":120, "media_url":"https://youtu.be/vMGpBAOD2CI?si=MYx2mKaOHedrDruy"},
+        {"name":"Romanian Deadlift", "sets":3, "reps":10, "rest_sec":90, "media_url":"assets/media/exercises/romanian_deadlift.mp4"},
+        {"name":"Leg Press", "sets":3, "reps":12, "rest_sec":90, "media_url":"assets/media/exercises/leg_press.jpg"}
+      ]
+    },
+    {"id":302, "title":"Full-body Dumbbell", "level":"beginner", "equipment":"home_minimal", "tags":["general_health","lose_weight","build_muscle"],
+      "exercises": [
+        {"name":"Goblet Squat", "sets":3, "reps":12, "rest_sec":75, "media_url":"assets/media/exercises/goblet_squat.jpg"},
+        {"name":"DB Bench Press", "sets":3, "reps":10, "rest_sec":90, "media_url":"assets/media/exercises/db_bench_press.mp4"},
+        {"name":"One-arm DB Row", "sets":3, "reps":12, "rest_sec":75, "media_url":"assets/media/exercises/one_arm_row.jpg"}
+      ]
+    },
+    {"id":303, "title":"Treadmill Endurance", "level":"beginner", "equipment":"gym_access", "tags":["endurance"],
+      "exercises": [
+        {"name":"Treadmill Run", "sets":1, "reps":0, "rest_sec":0, "media_url":"assets/media/exercises/treadmill_run.jpg"}
+      ]
+    }
   ]
 }

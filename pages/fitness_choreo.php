@@ -22,7 +22,7 @@ $recommended = array_values(array_filter($items, function($g) use ($goal){
       <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
         <div class="text-sm text-neutral-400">Level: <?= htmlspecialchars($g['level']) ?></div>
         <div class="font-semibold mb-2"><?= htmlspecialchars($g['title']) ?></div>
-        <a class="text-brand text-sm" href="#">Start Routine →</a>
+        <a class="text-brand text-sm" href="index.php?page=choreo_detail&id=<?= urlencode($g['id']) ?>">Start Routine →</a>
       </div>
     <?php endforeach; ?>
   </div>

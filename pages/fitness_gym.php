@@ -30,7 +30,7 @@ usort($recommended, function($a,$b){ return ($b['score']??0) <=> ($a['score']??0
         <div class="text-sm text-neutral-400">Level: <?= htmlspecialchars($g['level']) ?></div>
         <div class="font-semibold mb-2"><?= htmlspecialchars($g['title']) ?></div>
         <?php if (($g['score']??0) >= 2): ?><div class="text-xs inline-block px-2 py-1 rounded bg-brand/20 text-brand mb-2">Best for you</div><?php endif; ?>
-        <a class="text-brand text-sm" href="#">View Program →</a>
+        <a class="text-brand text-sm" href="index.php?page=gym_detail&id=<?= urlencode($g['id']) ?>">View Program →</a>
       </div>
     <?php endforeach; ?>
   </div>
