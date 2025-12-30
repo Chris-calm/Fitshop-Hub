@@ -31,6 +31,10 @@ $allowed = [
 ];
 $page = $_GET['page'] ?? 'landing';
 if (!isset($allowed[$page])) { $page = 'landing'; }
-require __DIR__ . '/includes/header.php';
-require __DIR__ . '/' . $allowed[$page];
-require __DIR__ . '/includes/footer.php';
+// Get the root directory path
+$rootPath = dirname(__DIR__);
+
+// Include files using the root path
+require $rootPath . '/includes/header.php';
+require $rootPath . '/' . $allowed[$page];
+require $rootPath . '/includes/footer.php';
