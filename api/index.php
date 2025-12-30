@@ -69,8 +69,16 @@ $allowed = [
 ];
 
 // Get the requested page from query parameters
-$page = $_GET['page'] ?? 'landing';
-if (!isset($allowed[$page])) {
+$page = $_GET['page'] ?? '';
+if ($page === '' || !isset($allowed[$page])) {
+    $page = empty($_SESSION['user']) ? 'login' : 'landing';
+}
+
+if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
+    $page = 'login';
+}
+
+if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
     $page = 'landing';
 }
 

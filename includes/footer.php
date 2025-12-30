@@ -9,7 +9,7 @@
       </div>
     </div>
   </footer>
-  <script src="/Health&Fitness/assets/js/app.js"></script>
+  <script src="<?= defined('BASE_URL') ? htmlspecialchars(BASE_URL, ENT_QUOTES) : '' ?>/assets/js/app.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>

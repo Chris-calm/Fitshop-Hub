@@ -1,8 +1,9 @@
 // Basic client behaviors: cart count, fake fitness metrics, Google Sign-In placeholder
 (function(){
+  const BASE = (typeof window !== 'undefined' && window.__BASE_URL__) ? window.__BASE_URL__ : '';
   const navCart = document.getElementById('navCartCount');
   if (navCart) {
-    fetch('/Health&Fitness/api/cart_count.php').then(r=>r.json()).then(d=>{ navCart.textContent = d.count ? d.count : ''; });
+    fetch(BASE + '/api/cart_count.php').then(r=>r.json()).then(d=>{ navCart.textContent = d.count ? d.count : ''; });
   }
   const streak = document.getElementById('streak');
   if (streak) {
@@ -28,7 +29,17 @@
   if (backBtn) {
     backBtn.addEventListener('click', ()=>{
       if (window.history.length > 1) window.history.back();
-      else window.location.href = '/Health&Fitness/index.php';
+      else window.location.href = 'index.php';
+    });
+  }
+  // Mobile menu
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', ()=>{
+      const isHidden = mobileMenu.classList.contains('hidden');
+      mobileMenu.classList.toggle('hidden');
+      mobileMenuBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
     });
   }
   // Password visibility toggles
