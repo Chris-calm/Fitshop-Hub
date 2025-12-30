@@ -33,6 +33,7 @@ if (IS_LOCAL) {
 } else {
     // Vercel environment - uses environment variables from Vercel
     // These will be automatically loaded from vercel.json and Vercel's environment
-    error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    // E_DEPRECATED is kept as it's still valid
+    error_reporting(E_ALL & ~E_DEPRECATED);
     ini_set('display_errors', 0);
 }
