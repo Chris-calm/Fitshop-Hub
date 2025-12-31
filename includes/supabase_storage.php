@@ -14,6 +14,10 @@ function supabase_base_url() {
     if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {
         return $raw;
     }
+    $host = strtolower($parts['host']);
+    if ($host === 'supabase.com' || str_ends_with($host, '.supabase.com')) {
+        throw new RuntimeException('SUPABASE_URL is misconfigured. It must be your project URL like https://<project-ref>.supabase.co (not https://supabase.com).');
+    }
     return $parts['scheme'] . '://' . $parts['host'];
 }
 
