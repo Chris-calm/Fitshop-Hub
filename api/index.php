@@ -120,6 +120,8 @@ if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
 // Set the page file path
 $pageFile = $rootPath . '/' . $allowed[$page];
 
+error_log('RESOLVED pageFile=' . $pageFile . ' exists=' . (file_exists($pageFile) ? '1' : '0') . ' size=' . (file_exists($pageFile) ? (string)filesize($pageFile) : '0'));
+
 // Check if the requested page exists
 if (!file_exists($pageFile)) {
     http_response_code(404);
@@ -134,7 +136,9 @@ if (in_array($page, $actionPages, true)) {
 
 // Include the header
 try {
+    error_log('STAGE header:start');
     require $rootPath . '/includes/header.php';
+    error_log('STAGE header:ok');
 } catch (Throwable $e) {
     http_response_code(500);
     error_log('Error loading header: ' . $e->getMessage());
@@ -144,7 +148,9 @@ try {
 
 // Include the requested page
 try {
+    error_log('STAGE page:start');
     require $pageFile;
+    error_log('STAGE page:ok');
 } catch (Throwable $e) {
     http_response_code(500);
     if (getenv('VERCEL_ENV') === 'production') {
@@ -157,7 +163,9 @@ try {
 
 // Include the footer
 try {
+    error_log('STAGE footer:start');
     require $rootPath . '/includes/footer.php';
+    error_log('STAGE footer:ok');
 } catch (Throwable $e) {
     http_response_code(500);
     error_log('Error loading footer: ' . $e->getMessage());
