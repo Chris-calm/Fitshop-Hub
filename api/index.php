@@ -1,17 +1,20 @@
 <?php
+// Start session with secure settings
+$sessionParams = [
+    'cookie_httponly' => true,
+    'cookie_secure' => (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? true : false,
+    'cookie_samesite' => 'Lax'
+];
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start($sessionParams);
+}
+
 // Set base path for includes
 $rootPath = dirname(__DIR__);
 
 // Load environment configuration
 require_once $rootPath . '/includes/env.php';
-
-require_once $rootPath . '/includes/session.php';
-fh_boot_session();
-
-// Buffer output so redirects can still set headers even if the layout is included
-if (!ob_get_level()) {
-    ob_start();
-}
 
 // Load .env.local if it exists (local development only)
 if (IS_LOCAL && file_exists($rootPath . '/.env.local')) {
@@ -83,12 +86,7 @@ if ($page === '' || !isset($allowed[$page])) {
 }
 
 if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
-    $qs = $_GET;
-    unset($qs['page']);
-    $extra = $qs ? ('&' . http_build_query($qs)) : '';
-    $_SESSION['after_login'] = 'index.php?page=' . $page . $extra;
-    header('Location: index.php?page=login');
-    exit;
+    $page = 'login';
 }
 
 if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
@@ -127,7 +125,3 @@ try {
 
 // Include the footer
 require $rootPath . '/includes/footer.php';
-
-if (ob_get_level()) {
-    ob_end_flush();
-}

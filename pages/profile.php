@@ -17,8 +17,7 @@ $userOrders = $oStmt->fetchAll();
 <section class="max-w-4xl mx-auto">
   <h2 class="text-2xl font-bold mb-4">Your Profile</h2>
   <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 flex items-center gap-3">
-    <?php $avatarSeed = urlencode((string)($u['email'] ?? ($u['id'] ?? 'user'))); ?>
-    <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: ('https://i.pravatar.cc/80?u=' . $avatarSeed)) ?>" class="w-12 h-12 rounded-full" alt="avatar"/>
+    <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: 'https://i.pravatar.cc/80') ?>" class="w-12 h-12 rounded-full" alt="avatar"/>
     <div>
       <div class="font-semibold text-lg"><?= htmlspecialchars($u['name']) ?></div>
       <div class="text-neutral-400 text-sm"><?= htmlspecialchars($u['email']) ?></div>

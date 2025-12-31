@@ -32,8 +32,7 @@
         <a href="index.php?page=cart" class="px-3 py-2 rounded-md hover:bg-neutral-900">Cart<span id="navCartCount" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"></span></a>
         <?php if (!empty($_SESSION['user'])): $u=$_SESSION['user']; ?>
           <a href="index.php?page=profile" class="flex items-center gap-2 px-2 py-1 rounded-md bg-neutral-900 border border-neutral-800">
-            <?php $avatarSeed = urlencode((string)($u['email'] ?? ($u['id'] ?? 'user'))); ?>
-            <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: ('https://i.pravatar.cc/40?u=' . $avatarSeed)) ?>" class="w-6 h-6 rounded-full" alt="avatar"/>
+            <img src="<?= htmlspecialchars($u['photo_url'] ?? 'https://i.pravatar.cc/40') ?>" class="w-6 h-6 rounded-full" alt="avatar"/>
             <span class="text-sm hidden sm:block"><?= htmlspecialchars($u['name']) ?></span>
           </a>
           <a href="index.php?page=logout" class="px-3 py-2 rounded-md bg-brand/20 text-brand hover:bg-brand/30">Logout</a>

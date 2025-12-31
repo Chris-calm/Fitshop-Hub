@@ -1,6 +1,5 @@
 <?php
-require __DIR__ . '/../includes/session.php';
-fh_boot_session();
+session_start();
 require __DIR__ . '/../includes/db.php';
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $cart = $_SESSION['cart'] ?? [];

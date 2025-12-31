@@ -1,6 +1,5 @@
 <?php
-require __DIR__ . '/../includes/session.php';
-fh_boot_session();
+session_start();
 header('Content-Type: application/json');
 if (empty($_SESSION['user'])) { http_response_code(401); echo json_encode(['ok'=>false,'error'=>'unauthorized']); exit; }
 require __DIR__ . '/../includes/db.php';
