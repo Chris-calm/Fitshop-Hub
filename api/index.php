@@ -86,7 +86,12 @@ if ($page === '' || !isset($allowed[$page])) {
 }
 
 if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
-    $page = 'login';
+    $qs = $_GET;
+    unset($qs['page']);
+    $extra = $qs ? ('&' . http_build_query($qs)) : '';
+    $_SESSION['after_login'] = 'index.php?page=' . $page . $extra;
+    header('Location: index.php?page=login');
+    exit;
 }
 
 if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
