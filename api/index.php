@@ -7,6 +7,13 @@ if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
     $isHttps = true;
 }
 
+// Revision marker to confirm which code version is running in Vercel Runtime Logs / Network headers
+$__fh_rev = 'fh-rev-2025-12-31-02';
+if (!headers_sent()) {
+    header('X-FH-Rev: ' . $__fh_rev);
+}
+error_log('BOOT ' . $__fh_rev);
+
 register_shutdown_function(function () {
     $err = error_get_last();
     if (!$err) {
