@@ -3,7 +3,7 @@ session_start();
 require __DIR__ . '/../includes/db.php';
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $cart = $_SESSION['cart'] ?? [];
-if (!$cart) { header('Location: /Health&Fitness/index.php?page=cart'); exit; }
+if (!$cart) { header('Location: index.php?page=cart'); exit; }
 $name = trim($_POST['name'] ?? '');
 $address = trim($_POST['address'] ?? '');
 $payment = $_POST['payment'] ?? 'gcash';
@@ -16,9 +16,16 @@ foreach ($cart as $id=>$qty) {
 // Create order within a transaction
 $pdo->beginTransaction();
 try {
-  $stmt = $pdo->prepare('INSERT INTO orders(user_id,name,address,payment,total) VALUES (?,?,?,?,?)');
-  $stmt->execute([$user_id,$name,$address,$payment,$total]);
-  $order_id = (int)$pdo->lastInsertId();
+  $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+  if ($driver === 'pgsql') {
+    $stmt = $pdo->prepare('INSERT INTO orders(user_id,name,address,payment,total) VALUES (?,?,?,?,?) RETURNING id');
+    $stmt->execute([$user_id,$name,$address,$payment,$total]);
+    $order_id = (int)$stmt->fetchColumn();
+  } else {
+    $stmt = $pdo->prepare('INSERT INTO orders(user_id,name,address,payment,total) VALUES (?,?,?,?,?)');
+    $stmt->execute([$user_id,$name,$address,$payment,$total]);
+    $order_id = (int)$pdo->lastInsertId();
+  }
 
   $oi = $pdo->prepare('INSERT INTO order_items(order_id,product_id,title,qty,price) VALUES (?,?,?,?,?)');
   foreach ($order_items as $it) { $oi->execute([$order_id,$it['product_id'],$it['title'],$it['qty'],$it['price']]); }
@@ -38,4 +45,4 @@ try {
 }
 
 $_SESSION['cart']=[];
-header('Location: /Health&Fitness/index.php?page=order&id='.$order_id);
+header('Location: index.php?page=order&id='.$order_id);

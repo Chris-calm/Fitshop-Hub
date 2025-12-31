@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       $filename = 'avatar_'.time().'_'.bin2hex(random_bytes(3)).'.'.$ext;
       $dest = $targetDir.$filename;
       if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-        $photoPath = '/Health&Fitness/uploads/avatars/'.$filename;
+        $photoPath = 'uploads/avatars/'.$filename;
       } else {
         $err = 'Failed to upload image.';
       }

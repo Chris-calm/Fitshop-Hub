@@ -65,7 +65,18 @@ $allowed = [
     'guide_summary' => 'pages/fitness_guides_summary.php',
     'food_scan' => 'pages/food_scan.php',
     'food_history' => 'pages/food_history.php',
-    'fitness_history' => 'pages/fitness_history.php'
+    'fitness_history' => 'pages/fitness_history.php',
+    'post_add_to_cart' => 'pages/post_add_to_cart.php',
+    'post_checkout' => 'pages/post_checkout.php',
+    'api_fitness_stats' => 'pages/api_fitness_stats.php',
+    'api_steps_save' => 'pages/api_steps_save.php'
+];
+
+$rawPages = [
+    'post_add_to_cart',
+    'post_checkout',
+    'api_fitness_stats',
+    'api_steps_save',
 ];
 
 // Get the requested page from query parameters
@@ -89,6 +100,11 @@ $pageFile = $rootPath . '/' . $allowed[$page];
 if (!file_exists($pageFile)) {
     http_response_code(404);
     die('Page not found');
+}
+
+if (in_array($page, $rawPages, true)) {
+    require $pageFile;
+    exit;
 }
 
 // Include the header

@@ -21,9 +21,16 @@ $exercise_order = $_POST['exercise_order'] ?? [];
 $pdo->beginTransaction();
 try {
   // started_at = NOW() - duration, ended_at = NOW()
-  $stmt = $pdo->prepare("INSERT INTO workout_sessions (user_id, program_id, program_title, started_at, ended_at, total_duration_sec, notes) VALUES (?, ?, ?, DATE_SUB(NOW(), INTERVAL ? SECOND), NOW(), ?, ?)");
-  $stmt->execute([$u['id'], $program_id, $program_title, $total_duration_sec, $total_duration_sec, $notes]);
-  $session_id = $pdo->lastInsertId();
+  $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+  if ($driver === 'pgsql') {
+    $stmt = $pdo->prepare("INSERT INTO workout_sessions (user_id, program_id, program_title, started_at, ended_at, total_duration_sec, notes) VALUES (?, ?, ?, (NOW() - (? * INTERVAL '1 second')), NOW(), ?, ?) RETURNING id");
+    $stmt->execute([$u['id'], $program_id, $program_title, $total_duration_sec, $total_duration_sec, $notes]);
+    $session_id = (int)$stmt->fetchColumn();
+  } else {
+    $stmt = $pdo->prepare("INSERT INTO workout_sessions (user_id, program_id, program_title, started_at, ended_at, total_duration_sec, notes) VALUES (?, ?, ?, DATE_SUB(NOW(), INTERVAL ? SECOND), NOW(), ?, ?)");
+    $stmt->execute([$u['id'], $program_id, $program_title, $total_duration_sec, $total_duration_sec, $notes]);
+    $session_id = (int)$pdo->lastInsertId();
+  }
 
   $total_volume = 0.0;
   // Insert sets per exercise
@@ -65,8 +72,14 @@ try {
   if ($est_steps > 0) {
     $today = date('Y-m-d');
     // Upsert by summing with any existing steps for today
-    $stmt = $pdo->prepare("INSERT INTO steps_logs (user_id, step_date, steps) VALUES (?,?,?) ON DUPLICATE KEY UPDATE steps = steps + VALUES(steps)");
-    $stmt->execute([$u['id'], $today, $est_steps]);
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    if ($driver === 'pgsql') {
+      $stmt = $pdo->prepare("INSERT INTO steps_logs (user_id, step_date, steps) VALUES (?,?,?) ON CONFLICT (user_id, step_date) DO UPDATE SET steps = steps_logs.steps + EXCLUDED.steps");
+      $stmt->execute([$u['id'], $today, $est_steps]);
+    } else {
+      $stmt = $pdo->prepare("INSERT INTO steps_logs (user_id, step_date, steps) VALUES (?,?,?) ON DUPLICATE KEY UPDATE steps = steps + VALUES(steps)");
+      $stmt->execute([$u['id'], $today, $est_steps]);
+    }
   }
 } catch (Throwable $e) { /* non-fatal */ }
 

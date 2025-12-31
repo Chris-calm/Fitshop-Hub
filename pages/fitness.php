@@ -49,7 +49,7 @@
   setProgress(0);
   // Auto-load stats for today
   try {
-    fetch('pages/api_fitness_stats.php')
+    fetch('index.php?page=api_fitness_stats')
       .then(r=>r.ok?r.json():null)
       .then(data=>{
         if (!data || !data.ok) return;
@@ -66,7 +66,7 @@
     const steps = Math.max(0, parseInt(input.value||'0',10));
     setProgress(steps);
     try {
-      const resp = await fetch('pages/api_steps_save.php', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`steps=${encodeURIComponent(steps)}` });
+      const resp = await fetch('index.php?page=api_steps_save', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`steps=${encodeURIComponent(steps)}` });
       await resp.json();
     } catch (e) { /* ignore for demo */ }
   });

@@ -17,9 +17,16 @@ $notes = trim($_POST['notes'] ?? '');
 
 $pdo->beginTransaction();
 try {
-  $stmt = $pdo->prepare("INSERT INTO activity_sessions (user_id, activity_type, item_id, title, started_at, ended_at, duration_sec, completed_steps, notes) VALUES (?,?,?,?, DATE_SUB(NOW(), INTERVAL ? SECOND), NOW(), ?, ?, ?)");
-  $stmt->execute([$u['id'], 'guide', $item_id, $title, $duration_sec, $duration_sec, $completed_steps, $notes]);
-  $session_id = $pdo->lastInsertId();
+  $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+  if ($driver === 'pgsql') {
+    $stmt = $pdo->prepare("INSERT INTO activity_sessions (user_id, activity_type, item_id, title, started_at, ended_at, duration_sec, completed_steps, notes) VALUES (?,?,?,?, (NOW() - (? * INTERVAL '1 second')), NOW(), ?, ?, ?) RETURNING id");
+    $stmt->execute([$u['id'], 'guide', $item_id, $title, $duration_sec, $duration_sec, $completed_steps, $notes]);
+    $session_id = (int)$stmt->fetchColumn();
+  } else {
+    $stmt = $pdo->prepare("INSERT INTO activity_sessions (user_id, activity_type, item_id, title, started_at, ended_at, duration_sec, completed_steps, notes) VALUES (?,?,?,?, DATE_SUB(NOW(), INTERVAL ? SECOND), NOW(), ?, ?, ?)");
+    $stmt->execute([$u['id'], 'guide', $item_id, $title, $duration_sec, $duration_sec, $completed_steps, $notes]);
+    $session_id = (int)$pdo->lastInsertId();
+  }
   $pdo->commit();
 } catch (Throwable $e) {
   $pdo->rollBack();
