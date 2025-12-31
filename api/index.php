@@ -1,4 +1,9 @@
 <?php
+// Buffer output so pages can safely set cookies/redirects even if templates output HTML
+if (!ob_get_level()) {
+    ob_start();
+}
+
 // Start session with secure settings
 $isHttps = false;
 if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
