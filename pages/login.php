@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth_cookie.php';
 $err = '';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
   $email = trim($_POST['email'] ?? '');
@@ -13,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       $err = 'Invalid email or password.';
     } else {
       $_SESSION['user'] = ['id'=>$u['id'],'name'=>$u['name'],'email'=>$u['email'],'photo_url'=>$u['photo_url']];
+      fh_set_auth_cookie($_SESSION['user']);
       header('Location: index.php?page=landing');
       exit;
     }

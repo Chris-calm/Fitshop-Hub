@@ -42,15 +42,12 @@ $sessionParams = [
 // Ensure the session cookie applies to the whole site (important behind rewrites like /api/index.php)
 $sessionParams['cookie_path'] = '/';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start($sessionParams);
-}
-
 // Set base path for includes
 $rootPath = dirname(__DIR__);
 
 // Load environment configuration
 require_once $rootPath . '/includes/env.php';
+require_once $rootPath . '/includes/auth_cookie.php';
 
 // Load .env.local if it exists (local development only)
 if (IS_LOCAL && file_exists($rootPath . '/.env.local')) {
@@ -60,6 +57,13 @@ if (IS_LOCAL && file_exists($rootPath . '/.env.local')) {
         $_ENV[$key] = $value;
     }
 }
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start($sessionParams);
+}
+
+// Restore user session from signed cookie (required for Vercel/serverless where PHP file sessions are not stable)
+fh_restore_user_from_cookie();
 
 // Error handling setup
 if (IS_LOCAL) {
