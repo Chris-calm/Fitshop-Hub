@@ -7,6 +7,25 @@ if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
     $isHttps = true;
 }
 
+register_shutdown_function(function () {
+    $err = error_get_last();
+    if (!$err) {
+        return;
+    }
+
+    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR];
+    if (!in_array($err['type'] ?? 0, $fatalTypes, true)) {
+        return;
+    }
+
+    error_log('FATAL: ' . ($err['message'] ?? 'unknown') . ' in ' . ($err['file'] ?? 'unknown') . ':' . ($err['line'] ?? 0));
+
+    if (!headers_sent()) {
+        http_response_code(500);
+        echo 'An error occurred while loading the page. Please try again later.';
+    }
+});
+
 $sessionParams = [
     'cookie_httponly' => true,
     'cookie_secure' => $isHttps,
@@ -88,6 +107,8 @@ if ($page === '' || !isset($allowed[$page])) {
     $page = empty($_SESSION['user']) ? 'login' : 'landing';
 }
 
+error_log('REQ uri=' . ($_SERVER['REQUEST_URI'] ?? '') . ' page=' . $page . ' user=' . (!empty($_SESSION['user']['id']) ? (string)$_SESSION['user']['id'] : 'guest'));
+
 if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
     $page = 'login';
 }
@@ -112,7 +133,14 @@ if (in_array($page, $actionPages, true)) {
 }
 
 // Include the header
-require $rootPath . '/includes/header.php';
+try {
+    require $rootPath . '/includes/header.php';
+} catch (Throwable $e) {
+    http_response_code(500);
+    error_log('Error loading header: ' . $e->getMessage());
+    echo 'An error occurred while loading the page. Please try again later.';
+    exit;
+}
 
 // Include the requested page
 try {
@@ -128,4 +156,11 @@ try {
 }
 
 // Include the footer
-require $rootPath . '/includes/footer.php';
+try {
+    require $rootPath . '/includes/footer.php';
+} catch (Throwable $e) {
+    http_response_code(500);
+    error_log('Error loading footer: ' . $e->getMessage());
+    echo 'An error occurred while loading the page. Please try again later.';
+    exit;
+}
