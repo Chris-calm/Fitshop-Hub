@@ -1,11 +1,11 @@
 <?php
 // Simple nutrition detection stub. Integrate a real provider later.
-require __DIR__ . '/../includes/db.php'; // loads $config, db not required but config is
+require_once __DIR__ . '/../includes/env.php';
 header('Content-Type: application/json');
 header('Cache-Control: no-store');
 
-$provider = $config['NUTRITION_PROVIDER'] ?? '';
-$apiKey = $config['NUTRITION_API_KEY'] ?? '';
+$provider = getenv('NUTRITION_PROVIDER') ?: '';
+$apiKey = getenv('NUTRITION_API_KEY') ?: '';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);

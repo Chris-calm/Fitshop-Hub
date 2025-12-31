@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/supabase_storage.php';
 require_login();
 $u = $_SESSION['user'];
 
@@ -24,14 +25,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$ext) {
       $err = 'Unsupported image type.';
     } else {
-      $dir = __DIR__ . '/../uploads/food';
-      if (!is_dir($dir)) { @mkdir($dir, 0777, true); }
-      $fname = 'food_' . $u['id'] . '_' . time() . $ext;
-      $dest = $dir . '/' . $fname;
-      if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-        $photoPath = 'uploads/food/' . $fname;
+      if (IS_VERCEL) {
+        try {
+          $bucket = getenv('SUPABASE_FOOD_BUCKET') ?: 'food';
+          $key = 'food_' . $u['id'] . '_' . time() . '_' . bin2hex(random_bytes(6)) . $ext;
+          $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $mime ?: 'application/octet-stream');
+        } catch (Throwable $e) {
+          $err = 'Failed to save uploaded file.';
+          error_log('Food upload failed: ' . $e->getMessage());
+        }
       } else {
-        $err = 'Failed to save uploaded file.';
+        $dir = __DIR__ . '/../uploads/food';
+        if (!is_dir($dir)) { @mkdir($dir, 0777, true); }
+        $fname = 'food_' . $u['id'] . '_' . time() . $ext;
+        $dest = $dir . '/' . $fname;
+        if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+          $photoPath = rtrim(BASE_URL, '/') . '/uploads/food/' . $fname;
+        } else {
+          $err = 'Failed to save uploaded file.';
+        }
       }
     }
   }

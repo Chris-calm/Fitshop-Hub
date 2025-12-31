@@ -16,8 +16,7 @@ foreach ($cart as $id=>$qty) {
 // Create order within a transaction
 $pdo->beginTransaction();
 try {
-  $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-  if ($driver === 'pgsql') {
+  if (defined('IS_VERCEL') && IS_VERCEL) {
     $stmt = $pdo->prepare('INSERT INTO orders(user_id,name,address,payment,total) VALUES (?,?,?,?,?) RETURNING id');
     $stmt->execute([$user_id,$name,$address,$payment,$total]);
     $order_id = (int)$stmt->fetchColumn();

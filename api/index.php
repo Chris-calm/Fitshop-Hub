@@ -51,6 +51,10 @@ $allowed = [
     'register' => 'pages/register.php',
     'profile' => 'pages/profile.php',
     'logout' => 'pages/logout.php',
+    'post_add_to_cart' => 'pages/post_add_to_cart.php',
+    'post_checkout' => 'pages/post_checkout.php',
+    'api_fitness_stats' => 'pages/api_fitness_stats.php',
+    'api_steps_save' => 'pages/api_steps_save.php',
     'choreography' => 'pages/fitness_choreo.php',
     'guides' => 'pages/fitness_guides.php',
     'gym' => 'pages/fitness_gym.php',
@@ -65,18 +69,7 @@ $allowed = [
     'guide_summary' => 'pages/fitness_guides_summary.php',
     'food_scan' => 'pages/food_scan.php',
     'food_history' => 'pages/food_history.php',
-    'fitness_history' => 'pages/fitness_history.php',
-    'post_add_to_cart' => 'pages/post_add_to_cart.php',
-    'post_checkout' => 'pages/post_checkout.php',
-    'api_fitness_stats' => 'pages/api_fitness_stats.php',
-    'api_steps_save' => 'pages/api_steps_save.php'
-];
-
-$rawPages = [
-    'post_add_to_cart',
-    'post_checkout',
-    'api_fitness_stats',
-    'api_steps_save',
+    'fitness_history' => 'pages/fitness_history.php'
 ];
 
 // Get the requested page from query parameters
@@ -102,7 +95,8 @@ if (!file_exists($pageFile)) {
     die('Page not found');
 }
 
-if (in_array($page, $rawPages, true)) {
+$actionPages = ['logout', 'post_add_to_cart', 'post_checkout', 'api_fitness_stats', 'api_steps_save'];
+if (in_array($page, $actionPages, true)) {
     require $pageFile;
     exit;
 }

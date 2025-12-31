@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/../includes/db.php';
 require __DIR__ . '/../includes/plan.php';
+require_once __DIR__ . '/../includes/supabase_storage.php';
 $err = '';$ok='';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
   $name = trim($_POST['name'] ?? '');
@@ -19,12 +20,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     if (!in_array($ext,$allowed)) {
       $err = 'Invalid image type. Allowed: jpg, png, gif, webp.';
     } else {
-      $filename = 'avatar_'.time().'_'.bin2hex(random_bytes(3)).'.'.$ext;
-      if (defined('IS_VERCEL') && IS_VERCEL) {
+      if (IS_VERCEL) {
         try {
-          require_once __DIR__ . '/../includes/supabase_storage.php';
-          $contentType = $_FILES['photo']['type'] ?? null;
-          $photoPath = fh_supabase_storage_upload('avatars', $filename, $_FILES['photo']['tmp_name'], $contentType);
+          $bucket = getenv('SUPABASE_AVATAR_BUCKET') ?: 'avatars';
+          $key = 'avatar_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+          $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $_FILES['photo']['type'] ?? 'application/octet-stream');
         } catch (Throwable $e) {
           $err = 'Failed to upload image.';
           error_log('Avatar upload failed: ' . $e->getMessage());
@@ -32,9 +32,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       } else {
         $targetDir = __DIR__ . '/../uploads/avatars/';
         if (!is_dir($targetDir)) { @mkdir($targetDir, 0777, true); }
+        $filename = 'avatar_'.time().'_'.bin2hex(random_bytes(3)).'.'.$ext;
         $dest = $targetDir.$filename;
         if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-          $photoPath = 'uploads/avatars/'.$filename;
+          $photoPath = rtrim(BASE_URL, '/') . '/uploads/avatars/'.$filename;
         } else {
           $err = 'Failed to upload image.';
         }
