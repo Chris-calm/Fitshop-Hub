@@ -26,8 +26,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
           $key = 'avatar_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
           $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $_FILES['photo']['type'] ?? 'application/octet-stream');
         } catch (Throwable $e) {
-          $err = 'Failed to upload image.';
-          error_log('Avatar upload failed: ' . $e->getMessage());
+          $msg = $e->getMessage();
+          error_log('Avatar upload failed: ' . $msg);
+          if (strpos($msg, 'Supabase Storage not configured') !== false) {
+            $err = 'Avatar upload is not configured on Vercel. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (and ensure the "avatars" bucket exists).';
+          } else {
+            $err = 'Failed to upload image. Please try again (or register without a photo).';
+          }
         }
       } else {
         $targetDir = __DIR__ . '/../uploads/avatars/';
