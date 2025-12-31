@@ -19,7 +19,7 @@
 <body class="bg-neutral-950 text-neutral-100 min-h-screen">
   <header class="border-b border-neutral-800 sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/70">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
-      <a href="index.php" class="text-xl font-bold"><span class="text-neutral-300">Fitshop</span> <span class="text-brand">Hub</span></a>
+      <a href="index.php?page=<?= !empty($_SESSION['user']) ? 'landing' : 'login' ?>" class="text-xl font-bold"><span class="text-neutral-300">Fitshop</span> <span class="text-brand">Hub</span></a>
       <button id="backBtn" type="button" class="ml-2 px-2 py-1 rounded-md hover:bg-neutral-900 text-neutral-300" aria-label="Back">←</button>
       <button id="mobileMenuBtn" type="button" class="ml-auto md:hidden px-3 py-2 rounded-md hover:bg-neutral-900 text-neutral-300" aria-controls="mobileMenu" aria-expanded="false">Menu</button>
       <form action="index.php" method="get" class="hidden md:flex flex-1">

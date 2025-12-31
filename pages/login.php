@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       $err = 'Invalid email or password.';
     } else {
       $_SESSION['user'] = ['id'=>$u['id'],'name'=>$u['name'],'email'=>$u['email'],'photo_url'=>$u['photo_url']];
-      header('Location: index.php');
+      header('Location: index.php?page=landing');
       exit;
     }
   }
