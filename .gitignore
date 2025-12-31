@@ -17,6 +17,22 @@ vendor/
 composer.lock
 package-lock.json
 
+# React Native (FitshopHubMobile)
+FitshopHubMobile/node_modules/
+FitshopHubMobile/.bundle/
+FitshopHubMobile/android/.gradle/
+FitshopHubMobile/android/app/build/
+FitshopHubMobile/ios/Pods/
+FitshopHubMobile/npm-debug.log*
+FitshopHubMobile/yarn-debug.log*
+FitshopHubMobile/yarn-error.log*
+FitshopHubMobile/.idea/
+FitshopHubMobile/.vscode/
+
+# Android signing keys (NEVER COMMIT)
+*.keystore
+*.jks
+
 # Environment files
 .env
 .env.local

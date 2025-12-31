@@ -1,0 +1,8 @@
+{
+  "app": "Fitshop Hub",
+  "platform": "android",
+  "versionCode": 1,
+  "versionName": "1.0.0",
+  "apkUrl": "https://fitshop-hub.vercel.app/assets/apk/FitshopHub.apk",
+  "releaseNotes": "Initial release."
+}

@@ -17,6 +17,7 @@
   <div class="wrap">
     <h1>Fitshop Hub (Android)</h1>
     <div class="card">
+      <div id="meta" class="muted">Checking latest version…</div>
       <p class="muted">
         Download the APK below. If your phone blocks the install, enable <b>Install unknown apps</b> for your browser.
       </p>
@@ -31,3 +32,20 @@
   </div>
 </body>
 </html>
+
+<script>
+(function(){
+  const meta = document.getElementById('meta');
+  fetch('./latest.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(j => {
+      if (!meta) return;
+      if (!j) { meta.textContent = 'Latest version info unavailable.'; return; }
+      const v = (j.versionName ? String(j.versionName) : '');
+      const code = (j.versionCode != null ? String(j.versionCode) : '');
+      const notes = (j.releaseNotes ? String(j.releaseNotes) : '');
+      meta.textContent = `Latest: ${v}${code ? ' (code ' + code + ')' : ''}${notes ? ' • ' + notes : ''}`;
+    })
+    .catch(() => { if (meta) meta.textContent = 'Latest version info unavailable.'; });
+})();
+</script>
