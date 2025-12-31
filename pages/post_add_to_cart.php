@@ -1,5 +1,6 @@
 <?php
-session_start();
+require __DIR__ . '/../includes/session.php';
+fh_boot_session();
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $id = (int)($_POST['id'] ?? 0);
 $qty = max(1, (int)($_POST['qty'] ?? 1));

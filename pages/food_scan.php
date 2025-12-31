@@ -24,14 +24,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$ext) {
       $err = 'Unsupported image type.';
     } else {
-      $dir = __DIR__ . '/../uploads/food';
-      if (!is_dir($dir)) { @mkdir($dir, 0777, true); }
       $fname = 'food_' . $u['id'] . '_' . time() . $ext;
-      $dest = $dir . '/' . $fname;
-      if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-        $photoPath = 'uploads/food/' . $fname;
+      if (defined('IS_VERCEL') && IS_VERCEL) {
+        try {
+          require_once __DIR__ . '/../includes/supabase_storage.php';
+          $contentType = $_FILES['photo']['type'] ?? $mime;
+          $photoPath = fh_supabase_storage_upload('food', $fname, $_FILES['photo']['tmp_name'], $contentType);
+        } catch (Throwable $e) {
+          $err = 'Failed to save uploaded file.';
+          error_log('Food upload failed: ' . $e->getMessage());
+        }
       } else {
-        $err = 'Failed to save uploaded file.';
+        $dir = __DIR__ . '/../uploads/food';
+        if (!is_dir($dir)) { @mkdir($dir, 0777, true); }
+        $dest = $dir . '/' . $fname;
+        if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+          $photoPath = 'uploads/food/' . $fname;
+        } else {
+          $err = 'Failed to save uploaded file.';
+        }
       }
     }
   }

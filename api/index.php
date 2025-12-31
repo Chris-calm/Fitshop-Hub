@@ -1,20 +1,12 @@
 <?php
-// Start session with secure settings
-$sessionParams = [
-    'cookie_httponly' => true,
-    'cookie_secure' => (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? true : false,
-    'cookie_samesite' => 'Lax'
-];
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start($sessionParams);
-}
-
 // Set base path for includes
 $rootPath = dirname(__DIR__);
 
 // Load environment configuration
 require_once $rootPath . '/includes/env.php';
+
+require_once $rootPath . '/includes/session.php';
+fh_boot_session();
 
 // Load .env.local if it exists (local development only)
 if (IS_LOCAL && file_exists($rootPath . '/.env.local')) {
