@@ -2,6 +2,10 @@
   <div class="text-center space-y-4">
     <h1 class="text-4xl sm:text-5xl font-extrabold">Welcome to <span class="text-brand">Fitshop Hub</span></h1>
     <p class="text-neutral-400 max-w-2xl mx-auto">Your all-in-one health and fitness companion. Choose your path to get started.</p>
+    <div id="apkCta" class="hidden">
+      <a href="/assets/apk/FitshopHub.apk" class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-brand text-white">Download Android App (APK)</a>
+      <div class="mt-2 text-xs text-neutral-500">Android only. You may need to allow installs from unknown sources.</div>
+    </div>
   </div>
   <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
     <a href="index.php?page=health" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50 transition">
@@ -18,3 +22,13 @@
     </a>
   </div>
 </section>
+<script>
+(function(){
+  try {
+    const ua = (navigator.userAgent || '').toLowerCase();
+    const isAndroid = ua.includes('android');
+    const el = document.getElementById('apkCta');
+    if (isAndroid && el) el.classList.remove('hidden');
+  } catch(e) {}
+})();
+</script>

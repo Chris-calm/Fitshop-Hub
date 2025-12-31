@@ -9,18 +9,18 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
   return $ok; }));
 ?>
 <section>
-  <div class="flex items-center justify-between mb-4">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
     <h2 class="text-2xl font-bold">Shop</h2>
-    <form class="flex gap-2" method="get" action="index.php">
+    <form class="w-full sm:w-auto flex flex-col sm:flex-row gap-2" method="get" action="index.php">
       <input type="hidden" name="page" value="catalog" />
-      <input name="q" value="<?=htmlspecialchars($q)?>" placeholder="Search..." class="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
-      <select name="cat" class="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
+      <input name="q" value="<?=htmlspecialchars($q)?>" placeholder="Search..." class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      <select name="cat" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
         <option value="">All</option>
         <option <?= $cat==='equipment'?'selected':'' ?> value="equipment">Equipment</option>
         <option <?= $cat==='supplements'?'selected':'' ?> value="supplements">Supplements</option>
         <option <?= $cat==='snacks'?'selected':'' ?> value="snacks">Healthy Snacks</option>
       </select>
-      <button class="px-3 py-2 rounded-lg bg-brand/20 text-brand">Filter</button>
+      <button class="w-full sm:w-auto px-3 py-2 rounded-lg bg-brand/20 text-brand">Filter</button>
     </form>
   </div>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
