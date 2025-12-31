@@ -1,10 +1,20 @@
 <?php
 // Start session with secure settings
+$isHttps = false;
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    $isHttps = true;
+} elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+    $isHttps = true;
+}
+
 $sessionParams = [
     'cookie_httponly' => true,
-    'cookie_secure' => (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? true : false,
+    'cookie_secure' => $isHttps,
     'cookie_samesite' => 'Lax'
 ];
+
+// Ensure the session cookie applies to the whole site (important behind rewrites like /api/index.php)
+$sessionParams['cookie_path'] = '/';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start($sessionParams);
@@ -107,7 +117,7 @@ require $rootPath . '/includes/header.php';
 // Include the requested page
 try {
     require $pageFile;
-} catch (Exception $e) {
+} catch (Throwable $e) {
     http_response_code(500);
     if (getenv('VERCEL_ENV') === 'production') {
         error_log('Error loading page: ' . $e->getMessage());
