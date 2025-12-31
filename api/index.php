@@ -54,6 +54,16 @@ $rootPath = dirname(__DIR__);
 require_once $rootPath . '/includes/env.php';
 require_once $rootPath . '/includes/auth_cookie.php';
 
+// Enforce canonical domain so auth cookies remain consistent (preview deployment domains won't share cookies)
+$canonicalHost = getenv('CANONICAL_HOST') ?: '';
+$currentHost = $_SERVER['HTTP_HOST'] ?? '';
+if ($canonicalHost && $currentHost && strcasecmp($currentHost, $canonicalHost) !== 0) {
+    $scheme = $isHttps ? 'https' : 'http';
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    header('Location: ' . $scheme . '://' . $canonicalHost . $uri, true, 302);
+    exit;
+}
+
 // Load .env.local if it exists (local development only)
 if (IS_LOCAL && file_exists($rootPath . '/.env.local')) {
     $envVars = parse_ini_file($rootPath . '/.env.local');
@@ -130,7 +140,8 @@ if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
 }
 
 if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
-    $page = 'landing';
+    header('Location: index.php?page=landing', true, 302);
+    exit;
 }
 
 // Set the page file path
