@@ -8,6 +8,11 @@ require_once $rootPath . '/includes/env.php';
 require_once $rootPath . '/includes/session.php';
 fh_boot_session();
 
+// Buffer output so redirects can still set headers even if the layout is included
+if (!ob_get_level()) {
+    ob_start();
+}
+
 // Load .env.local if it exists (local development only)
 if (IS_LOCAL && file_exists($rootPath . '/.env.local')) {
     $envVars = parse_ini_file($rootPath . '/.env.local');
@@ -122,3 +127,7 @@ try {
 
 // Include the footer
 require $rootPath . '/includes/footer.php';
+
+if (ob_get_level()) {
+    ob_end_flush();
+}
