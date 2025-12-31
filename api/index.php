@@ -87,7 +87,8 @@ if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
 }
 
 if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
-    $page = 'landing';
+    header('Location: index.php');
+    exit;
 }
 
 // Set the page file path
