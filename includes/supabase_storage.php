@@ -20,7 +20,7 @@ function supabase_storage_upload_tmpfile($bucket, $path, $tmpFilePath, $contentT
     $url = $base . '/storage/v1/object/' . rawurlencode($bucket) . '/' . str_replace('%2F', '/', rawurlencode($path));
 
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Authorization: Bearer ' . $serviceKey,
         'apikey: ' . $serviceKey,
@@ -33,7 +33,7 @@ function supabase_storage_upload_tmpfile($bucket, $path, $tmpFilePath, $contentT
     $resp = curl_exec($ch);
     $err = curl_error($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    $ch = null;
 
     if ($resp === false) {
         throw new RuntimeException('Supabase upload failed: ' . $err);
