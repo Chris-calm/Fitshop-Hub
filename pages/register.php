@@ -19,14 +19,25 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     if (!in_array($ext,$allowed)) {
       $err = 'Invalid image type. Allowed: jpg, png, gif, webp.';
     } else {
-      $targetDir = __DIR__ . '/../uploads/avatars/';
-      if (!is_dir($targetDir)) { @mkdir($targetDir, 0777, true); }
       $filename = 'avatar_'.time().'_'.bin2hex(random_bytes(3)).'.'.$ext;
-      $dest = $targetDir.$filename;
-      if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-        $photoPath = 'uploads/avatars/'.$filename;
+      if (defined('IS_VERCEL') && IS_VERCEL) {
+        try {
+          require_once __DIR__ . '/../includes/supabase_storage.php';
+          $contentType = $_FILES['photo']['type'] ?? null;
+          $photoPath = fh_supabase_storage_upload('avatars', $filename, $_FILES['photo']['tmp_name'], $contentType);
+        } catch (Throwable $e) {
+          $err = 'Failed to upload image.';
+          error_log('Avatar upload failed: ' . $e->getMessage());
+        }
       } else {
-        $err = 'Failed to upload image.';
+        $targetDir = __DIR__ . '/../uploads/avatars/';
+        if (!is_dir($targetDir)) { @mkdir($targetDir, 0777, true); }
+        $dest = $targetDir.$filename;
+        if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+          $photoPath = 'uploads/avatars/'.$filename;
+        } else {
+          $err = 'Failed to upload image.';
+        }
       }
     }
   }
