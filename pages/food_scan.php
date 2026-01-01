@@ -119,6 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!resp.ok){
           msg.textContent = data && data.error ? data.error : 'Detection failed';
         } else {
+          const titleInput = form.querySelector('input[name="title"]');
+          if (data.description) titleInput.value = data.description;
           if (typeof data.calories !== 'undefined') cal.value = Math.max(0, parseInt(data.calories||0,10));
           if (typeof data.protein_g !== 'undefined') p.value = Math.max(0, parseFloat(data.protein_g||0));
           if (typeof data.carbs_g !== 'undefined') c.value = Math.max(0, parseFloat(data.carbs_g||0));
