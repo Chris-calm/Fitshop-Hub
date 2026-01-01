@@ -66,7 +66,7 @@
     const steps = Math.max(0, parseInt(input.value||'0',10));
     setProgress(steps);
     try {
-      const resp = await fetch('index.php?page=api_steps_save', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`steps=${encodeURIComponent(steps)}` });
+      const resp = await fetch('index.php?page=api_steps_save', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`steps=${encodeURIComponent(steps)}&force=1` });
       await resp.json();
     } catch (e) { /* ignore for demo */ }
   });
