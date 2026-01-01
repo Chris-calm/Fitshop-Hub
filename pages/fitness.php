@@ -5,17 +5,20 @@
       <svg viewBox="0 0 120 120" class="w-56 h-56">
         <circle cx="60" cy="60" r="52" stroke="#262626" stroke-width="12" fill="none" />
         <circle id="stepsArc" cx="60" cy="60" r="52" stroke="#6366F1" stroke-width="12" fill="none" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="0 999" />
+        <circle cx="60" cy="8" r="5" fill="#6366F1" />
         <text id="stepsToday" x="60" y="58" text-anchor="middle" fill="#e5e7eb" font-size="28" font-weight="700">0</text>
         <text id="stepsGoal" x="60" y="78" text-anchor="middle" fill="#9ca3af" font-size="10">of 10,000 steps</text>
       </svg>
-      <div class="mt-4 w-full flex items-center gap-2">
-        <input id="stepsInput" type="number" min="0" class="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" placeholder="Enter today's steps" />
-        <button id="saveStepsBtn" class="px-3 py-2 rounded-lg bg-brand text-white">Save</button>
-      </div>
-      <p class="text-xs text-neutral-400 mt-2">Localhost friendly: manual input. We can later integrate device APIs for automatic step counting.</p>
+      <p class="text-xs text-neutral-400 mt-2">Steps are automatically synced from the mobile app.</p>
     </div>
-    <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-4"><div class="text-neutral-400">Streak</div><div id="streak" class="text-4xl font-bold">0</div></div>
-    <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-4"><div class="text-neutral-400">Minutes this week</div><div id="minutes" class="text-4xl font-bold">0</div></div>
+    <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <div class="text-neutral-400">Streak</div>
+      <div id="streak" class="text-4xl font-bold">0</div>
+    </div>
+    <div class="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
+      <div class="text-neutral-400">Minutes this week</div>
+      <div id="minutes" class="text-4xl font-bold">0</div>
+    </div>
   </div>
   <h3 class="text-xl font-semibold mt-8 mb-3">Explore</h3>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -34,8 +37,6 @@
   const arc = document.getElementById('stepsArc');
   const tToday = document.getElementById('stepsToday');
   const tGoal = document.getElementById('stepsGoal');
-  const input = document.getElementById('stepsInput');
-  const btn = document.getElementById('saveStepsBtn');
   const elStreak = document.getElementById('streak');
   const elMinutes = document.getElementById('minutes');
   const R = 52, C = 2*Math.PI*R;
@@ -47,28 +48,22 @@
     tToday.textContent = steps.toLocaleString();
   }
   setProgress(0);
-  // Auto-load stats for today
-  try {
-    fetch('index.php?page=api_fitness_stats')
-      .then(r=>r.ok?r.json():null)
-      .then(data=>{
-        if (!data || !data.ok) return;
-        goal = Math.max(1, parseInt(data.steps_goal||goal,10));
-        tGoal.textContent = `of ${goal.toLocaleString()} steps`;
-        const today = Math.max(0, parseInt(data.today_steps||0,10));
-        setProgress(today);
-        if (input) input.value = today;
-        if (elStreak) elStreak.textContent = String(data.streak||0);
-        if (elMinutes) elMinutes.textContent = String(data.minutes_week||0);
-      }).catch(()=>{});
-  } catch(e) {}
-  if (btn) btn.addEventListener('click', async ()=>{
-    const steps = Math.max(0, parseInt(input.value||'0',10));
-    setProgress(steps);
+
+  async function loadStats(){
     try {
-      const resp = await fetch('index.php?page=api_steps_save', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`steps=${encodeURIComponent(steps)}&force=1` });
-      await resp.json();
-    } catch (e) { /* ignore for demo */ }
-  });
+      const r = await fetch('index.php?page=api_fitness_stats', { headers: { 'Cache-Control': 'no-cache' } });
+      const data = r.ok ? await r.json() : null;
+      if (!data || !data.ok) return;
+      goal = Math.max(1, parseInt(data.steps_goal||goal,10));
+      tGoal.textContent = `of ${goal.toLocaleString()} steps`;
+      const today = Math.max(0, parseInt(data.today_steps||0,10));
+      setProgress(today);
+      if (elStreak) elStreak.textContent = String(data.streak||0);
+      if (elMinutes) elMinutes.textContent = String(data.minutes_week||0);
+    } catch(e) {}
+  }
+
+  loadStats();
+  setInterval(loadStats, 30_000);
 })();
 </script>
