@@ -51,7 +51,8 @@
 
   async function loadStats(){
     try {
-      const r = await fetch('index.php?page=api_fitness_stats', { headers: { 'Cache-Control': 'no-cache' } });
+      const url = `index.php?page=api_fitness_stats&t=${Date.now()}`;
+      const r = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
       const data = r.ok ? await r.json() : null;
       if (!data || !data.ok) return;
       goal = Math.max(1, parseInt(data.steps_goal||goal,10));

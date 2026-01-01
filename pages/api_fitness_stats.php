@@ -1,6 +1,8 @@
 <?php
 session_start();
 header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 if (empty($_SESSION['user'])) { http_response_code(401); echo json_encode(['ok'=>false,'error'=>'unauthorized']); exit; }
 require __DIR__ . '/../includes/db.php';
 $user_id = (int)$_SESSION['user']['id'];
