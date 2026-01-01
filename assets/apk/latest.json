@@ -1,8 +1,8 @@
 {
   "app": "Fitshop Hub",
   "platform": "android",
-  "versionCode": 1,
-  "versionName": "1.0.0",
-  "apkUrl": "https://fitshop-hub.vercel.app/assets/apk/FitshopHub.apk",
-  "releaseNotes": "Initial release."
+  "versionCode": 2,
+  "versionName": "1.1.0",
+  "apkUrl": "https://github.com/Chris-calm/Fitshop-Hub-Mobile/releases/download/v1.1.0/FitshopHub-v1.1.0.apk",
+  "releaseNotes": "- Automatic Health Connect step synchronization.\n- UI improvements and cleanup.\n- Switched to GitHub Releases for APK downloads."
 }
