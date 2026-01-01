@@ -13,6 +13,7 @@ $weekStart = date('Y-m-d', strtotime('monday this week'));
 try {
   // Steps today and goal
   $stepsToday = 0; $stepsGoal = 10000;
+  $syncing = 0;
   // goal from users
   $stmt = $pdo->prepare('SELECT steps_goal FROM users WHERE id=?');
   $stmt->execute([$user_id]);
@@ -24,13 +25,23 @@ try {
   $s = $stmt->fetchColumn();
   if ($s !== false) { $stepsToday = (int)$s; }
 
+  try {
+    $stmt = $pdo->prepare('SELECT syncing FROM steps_sync_state WHERE user_id=? AND step_date=?');
+    $stmt->execute([$user_id, $today]);
+    $sv = $stmt->fetchColumn();
+    if ($sv !== false) { $syncing = ((int)$sv) ? 1 : 0; }
+  } catch (Throwable $e2) {
+    $syncing = 0;
+  }
+
   // If steps are still syncing (no steps yet for today), keep derived stats at 0.
   // This avoids showing stale streak/minutes until the mobile sync has written data.
-  if ($stepsToday <= 0) {
+  if ($syncing === 1 || $stepsToday <= 0) {
     echo json_encode([
       'ok' => true,
       'today_steps' => 0,
       'steps_goal' => $stepsGoal,
+      'syncing' => 1,
       'streak' => 0,
       'minutes_week' => 0,
     ]);
@@ -75,6 +86,7 @@ try {
     'ok' => true,
     'today_steps' => $stepsToday,
     'steps_goal' => $stepsGoal,
+    'syncing' => 0,
     'streak' => $streak,
     'minutes_week' => $minutesWeek,
   ]);
