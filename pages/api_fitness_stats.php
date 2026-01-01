@@ -22,6 +22,19 @@ try {
   $s = $stmt->fetchColumn();
   if ($s !== false) { $stepsToday = (int)$s; }
 
+  // If steps are still syncing (no steps yet for today), keep derived stats at 0.
+  // This avoids showing stale streak/minutes until the mobile sync has written data.
+  if ($stepsToday <= 0) {
+    echo json_encode([
+      'ok' => true,
+      'today_steps' => 0,
+      'steps_goal' => $stepsGoal,
+      'streak' => 0,
+      'minutes_week' => 0,
+    ]);
+    exit;
+  }
+
   // Streak: a day counts if steps>0 OR any workout/activity exists that day
   $streak = 0; $d = new DateTime($today);
   while (true) {
