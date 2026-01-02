@@ -61,7 +61,7 @@ foreach ($items as $it) { if (intval($it['id']) === $programId) { $program = $it
                 </div>
               <?php elseif ($isVimeo && $vimeoId): ?>
                 <div class="aspect-video w-full rounded overflow-hidden">
-                  <iframe class="w-full h-full" src="https://youtu.be/pyKONWsQ1ek?si=idNqJV7LWM9d4nCl<?= htmlspecialchars($vimeoId) ?>" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                  <iframe class="w-full h-full" src="https://player.vimeo.com/video/<?= htmlspecialchars($vimeoId) ?>" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
                 </div>
               <?php elseif ($isVideo): ?>
                 <video src="<?= htmlspecialchars($m) ?>" class="w-full rounded" playsinline controls muted></video>
