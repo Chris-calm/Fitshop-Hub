@@ -59,8 +59,9 @@
       tGoal.textContent = `of ${goal.toLocaleString()} steps`;
       const today = Math.max(0, parseInt(data.today_steps||0,10));
       setProgress(today);
-      if (elStreak) elStreak.textContent = String(data.streak||0);
-      if (elMinutes) elMinutes.textContent = String(data.minutes_week||0);
+      const syncing = !!data.syncing;
+      if (elStreak) elStreak.textContent = String(syncing ? 0 : (data.streak||0));
+      if (elMinutes) elMinutes.textContent = String(syncing ? 0 : (data.minutes_week||0));
     } catch(e) {}
   }
 
