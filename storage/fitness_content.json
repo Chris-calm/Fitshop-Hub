@@ -34,8 +34,8 @@
     }
   ],
   "choreography": [
-    {"id":201, "title":"Low Impact Cardio Dance", "level":"beginner", "tags":["lose_weight","general_health"],
-      "media_url":"assets/media/choreo/low_impact_cardio.mp4",
+    {"id":201, "title":"Low Impact Cardio Dance", "level":"beginner", "tags":["lose_weight","general_health", "Mobility"],
+      "media_url":"https://youtu.be/G-0YsNI1hI0?si=kZ9V-IFH8KpHCR9d",
       "sections": [
         {"name":"Warm-up", "duration_sec":180},
         {"name":"Combo A", "duration_sec":240},
@@ -43,8 +43,26 @@
         {"name":"Cool-down", "duration_sec":180}
       ]
     },
-    {"id":202, "title":"HIIT Dance Burn", "level":"intermediate", "tags":["lose_weight","build_muscle"],
-      "media_url":"assets/media/choreo/hiit_dance_burn.mp4",
+    {"id":202, "title":"Low Impact Cardio Dance", "level":"beginner", "tags":["lose_weight", "Aero Cardio"],
+      "media_url":"https://www.youtube.com/watch?v=B2jdqDjvPko",
+      "sections": [
+        {"name":"Warm-up", "duration_sec":180},
+        {"name":"Combo A", "duration_sec":240},
+        {"name":"Combo B", "duration_sec":240},
+        {"name":"Cool-down", "duration_sec":180}
+      ]
+    },
+    {"id":203, "title":"Low Impact Cardio Dance", "level":"intermediate", "tags":["lose_weight","general_health", "dance cardio"],
+      "media_url":"https://www.youtube.com/watch?v=afE0IFhg87U",
+      "sections": [
+        {"name":"Warm-up", "duration_sec":180},
+        {"name":"Combo A", "duration_sec":240},
+        {"name":"Combo B", "duration_sec":240},
+        {"name":"Cool-down", "duration_sec":180}
+      ]
+    },
+    {"id":204, "title":"HIIT Dance Burn", "level":"intermediate", "tags":["lose_weight","build_muscle", "Toning"],
+      "media_url":"https://www.youtube.com/watch?v=5SzQT8VQiRA",
       "sections": [
         {"name":"Warm-up", "duration_sec":120},
         {"name":"HIIT Block 1", "duration_sec":300},
@@ -52,8 +70,16 @@
         {"name":"Cool-down", "duration_sec":180}
       ]
     },
-    {"id":203, "title":"Endurance Cardio Flow", "level":"intermediate", "tags":["endurance"],
-      "media_url":"assets/media/choreo/endurance_flow.jpg",
+    {"id":205, "title":"Endurance Cardio Flow", "level":"high impact", "tags":["endurance"],
+      "media_url":"https://www.youtube.com/watch?v=9WvPqUg-VuY",
+      "sections": [
+        {"name":"Warm-up", "duration_sec":180},
+        {"name":"Steady Flow", "duration_sec":1200},
+        {"name":"Cool-down", "duration_sec":180}
+      ]
+    },
+    {"id":206, "title":"High-Intensity Endurance Flow", "level":"high impact", "tags":["endurance","cardio"],
+      "media_url":"https://www.youtube.com/watch?v=9WvPqUg-VuY",
       "sections": [
         {"name":"Warm-up", "duration_sec":180},
         {"name":"Steady Flow", "duration_sec":1200},
