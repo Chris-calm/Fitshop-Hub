@@ -98,6 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     const form = document.querySelector('form');
     if (!form || !msg) return;
 
+    msg.textContent = 'Select or capture a photo to auto-detect nutrition.';
+
     const fileInput = form.querySelector('input[name="photo"]');
     const btnSave = document.getElementById('btnSave');
     const cal = form.querySelector('input[name="calories"]');
@@ -165,6 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (fileInput) {
       fileInput.addEventListener('change', () => { void detect(); });
+    } else {
+      msg.textContent = 'Photo input not found.';
     }
   })();
   </script>
