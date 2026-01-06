@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/env.php';
+require_once __DIR__ . '/../includes/cart_store.php';
 
 $isHttps = false;
 if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
@@ -38,13 +39,14 @@ if ($id <= 0) {
   exit;
 }
 
-$_SESSION['cart'] = $_SESSION['cart'] ?? [];
-unset($_SESSION['cart'][$id]);
+$cart = fh_cart_get();
+unset($cart[$id]);
+$cart = fh_cart_write($cart);
 
 $products = json_decode(file_get_contents(__DIR__ . '/../storage/products.json'), true);
 if (!is_array($products)) { $products = []; }
 
-$cart = $_SESSION['cart'] ?? [];
+$cart = fh_cart_get();
 $total = 0.0;
 $count = 0;
 foreach ($cart as $pid => $q) {

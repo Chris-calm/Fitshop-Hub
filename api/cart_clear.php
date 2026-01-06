@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/env.php';
+require_once __DIR__ . '/../includes/cart_store.php';
 
 $isHttps = false;
 if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
@@ -27,7 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   exit;
 }
 
-$_SESSION['cart'] = [];
+$cart = [];
+fh_cart_write($cart);
 
 echo json_encode([
   'ok' => true,

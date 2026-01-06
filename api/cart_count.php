@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/env.php';
+require_once __DIR__ . '/../includes/cart_store.php';
 
 $isHttps = false;
 if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
@@ -19,12 +20,8 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start($sessionParams);
 }
 
-$count = 0;
-if (!empty($_SESSION['cart'])) {
-  foreach ($_SESSION['cart'] as $q) {
-    $count += (int)$q;
-  }
-}
+$cart = fh_cart_get();
+$count = fh_cart_count($cart);
 header('Content-Type: application/json');
 header('Cache-Control: no-store');
 echo json_encode(['count'=>$count]);

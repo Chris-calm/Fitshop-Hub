@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/env.php';
+require_once __DIR__ . '/../includes/cart_store.php';
 
 $isHttps = false;
 if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
@@ -55,8 +56,8 @@ if (!$product) {
   exit;
 }
 
-$_SESSION['cart'] = $_SESSION['cart'] ?? [];
-$current = isset($_SESSION['cart'][$id]) ? (int)$_SESSION['cart'][$id] : 0;
+$cart = fh_cart_get();
+$current = isset($cart[$id]) ? (int)$cart[$id] : 0;
 
 if ($qty !== null) {
   $newQty = $qty;
@@ -67,10 +68,11 @@ if ($qty !== null) {
 }
 
 $newQty = max(1, min(99, $newQty));
-$_SESSION['cart'][$id] = $newQty;
+$cart[$id] = $newQty;
+$cart = fh_cart_write($cart);
 
 // Recompute totals
-$cart = $_SESSION['cart'] ?? [];
+$cart = fh_cart_get();
 $total = 0.0;
 $count = 0;
 foreach ($cart as $pid => $q) {

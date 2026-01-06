@@ -1,6 +1,7 @@
 <?php
+require_once __DIR__ . '/../includes/cart_store.php';
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
-$cart = $_SESSION['cart'] ?? [];
+$cart = fh_cart_get();
 $total = 0; $items=[];
 foreach ($cart as $id=>$qty) {
   foreach ($products as $p) { if ($p['id']==$id) { $p['qty']=$qty; $p['line']=$qty*$p['price']; $items[]=$p; $total+=$p['line']; break; } }

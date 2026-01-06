@@ -18,12 +18,9 @@
 </head>
 <body class="bg-neutral-950 text-neutral-100 min-h-screen">
   <?php
-    $cartCount = 0;
-    if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-      foreach ($_SESSION['cart'] as $q) {
-        $cartCount += (int)$q;
-      }
-    }
+    require_once __DIR__ . '/cart_store.php';
+    $cart = fh_cart_get();
+    $cartCount = fh_cart_count($cart);
   ?>
   <header class="border-b border-neutral-800 sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/70">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
