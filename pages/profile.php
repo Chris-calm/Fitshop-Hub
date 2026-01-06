@@ -70,6 +70,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $action = $_POST['addr_action'] ?? '';
 
+  if ($action === 'update_address') {
+    $id = (int)($_POST['address_id'] ?? 0);
+    $fullName = trim((string)($_POST['full_name'] ?? ''));
+    $phone = trim((string)($_POST['phone'] ?? ''));
+    $line1 = trim((string)($_POST['line1'] ?? ''));
+    $line2 = trim((string)($_POST['line2'] ?? ''));
+    $city = trim((string)($_POST['city'] ?? ''));
+    $province = trim((string)($_POST['province'] ?? ''));
+    $postal = trim((string)($_POST['postal_code'] ?? ''));
+    $makeDefault = !empty($_POST['is_default']) ? 1 : 0;
+
+    if ($id <= 0) {
+      $addrErr = 'Invalid address.';
+    } elseif ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
+      $addrErr = 'Please fill out all required address fields.';
+    } else {
+      try {
+        $pdo->beginTransaction();
+        if ($makeDefault) {
+          $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([(int)$sessionUser['id']]);
+        }
+        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, is_default=CASE WHEN ?=1 THEN 1 ELSE is_default END WHERE id=? AND user_id=?')
+          ->execute([$fullName, $phone, $line1, ($line2 ?: null), $city, $province, $postal, $makeDefault, $id, (int)$sessionUser['id']]);
+        $pdo->commit();
+        header('Location: index.php?page=profile');
+        exit;
+      } catch (Throwable $e) {
+        $pdo->rollBack();
+        $addrErr = 'Failed to update address.';
+      }
+    }
+  }
+
   if ($action === 'add_address') {
     $fullName = trim((string)($_POST['full_name'] ?? ''));
     $phone = trim((string)($_POST['phone'] ?? ''));
@@ -162,10 +195,13 @@ $userOrders = $oStmt->fetchAll();
     </div>
   </div>
 
-  <h3 class="text-xl font-semibold mt-6 mb-3">Edit Account</h3>
-  <?php if (!empty($acctErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($acctErr) ?></div><?php endif; ?>
-  <?php if (!empty($acctOk)): ?><div class="mb-3 text-emerald-300"><?= htmlspecialchars($acctOk) ?></div><?php endif; ?>
-  <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 space-y-4">
+  <details class="mt-6" open>
+    <summary class="text-xl font-semibold cursor-pointer select-none">Edit Account</summary>
+    <div class="mt-3">
+      <?php if (!empty($acctErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($acctErr) ?></div><?php endif; ?>
+      <?php if (!empty($acctOk)): ?><div class="mb-3 text-emerald-300"><?= htmlspecialchars($acctOk) ?></div><?php endif; ?>
+    </div>
+    <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 space-y-4">
     <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <input type="hidden" name="account_action" value="update_account" />
       <div>
@@ -206,7 +242,8 @@ $userOrders = $oStmt->fetchAll();
         </div>
       </form>
     </div>
-  </div>
+    </div>
+  </details>
 
   <?php if ($plan): ?>
     <h3 class="text-xl font-semibold mt-6 mb-3">Your Personalized Plan</h3>
@@ -243,8 +280,9 @@ $userOrders = $oStmt->fetchAll();
     </div>
   <?php endif; ?>
 
-  <h3 class="text-xl font-semibold mt-6 mb-3">Android Step Sync</h3>
-  <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+  <details class="mt-6">
+    <summary class="text-xl font-semibold cursor-pointer select-none">Android Step Sync</summary>
+    <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 mt-3">
     <div class="text-neutral-400 text-sm">Generate an API token for your Android app to sync steps automatically.</div>
     <div class="mt-3 flex flex-col sm:flex-row gap-2">
       <input id="tokenName" class="w-full sm:flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" placeholder="Token name (optional)" value="Android Step Sync" />
@@ -324,9 +362,14 @@ $userOrders = $oStmt->fetchAll();
   })();
   </script>
 
-  <h3 class="text-xl font-semibold mt-6 mb-3">Address Book</h3>
-  <?php if (!empty($addrErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($addrErr) ?></div><?php endif; ?>
-  <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+  </details>
+
+  <details class="mt-6" open>
+    <summary class="text-xl font-semibold cursor-pointer select-none">Address Book</summary>
+    <div class="mt-3">
+      <?php if (!empty($addrErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($addrErr) ?></div><?php endif; ?>
+    </div>
+    <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
     <?php if (empty($addresses)): ?>
       <div class="text-neutral-400 text-sm">No saved addresses yet. Add one to enable checkout.</div>
     <?php else: ?>
@@ -346,6 +389,52 @@ $userOrders = $oStmt->fetchAll();
                   <button class="px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700">Set default</button>
                 </form>
               <?php endif; ?>
+              <details>
+                <summary class="px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 cursor-pointer select-none inline-block">Edit</summary>
+                <div class="mt-2 rounded-lg border border-neutral-800 bg-neutral-900 p-3">
+                  <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="hidden" name="addr_action" value="update_address" />
+                    <input type="hidden" name="address_id" value="<?= (int)$a['id'] ?>" />
+                    <div>
+                      <label class="block text-sm text-neutral-400 mb-1">Full name</label>
+                      <input name="full_name" required value="<?= htmlspecialchars((string)$a['full_name']) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div>
+                      <label class="block text-sm text-neutral-400 mb-1">Phone</label>
+                      <input name="phone" required value="<?= htmlspecialchars((string)$a['phone']) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-sm text-neutral-400 mb-1">Address line 1</label>
+                      <input name="line1" required value="<?= htmlspecialchars((string)$a['line1']) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-sm text-neutral-400 mb-1">Address line 2 (optional)</label>
+                      <input name="line2" value="<?= htmlspecialchars((string)($a['line2'] ?? '')) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div>
+                      <label class="block text-sm text-neutral-400 mb-1">City</label>
+                      <input name="city" required value="<?= htmlspecialchars((string)$a['city']) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div>
+                      <label class="block text-sm text-neutral-400 mb-1">Province</label>
+                      <input name="province" required value="<?= htmlspecialchars((string)$a['province']) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div>
+                      <label class="block text-sm text-neutral-400 mb-1">Postal code</label>
+                      <input name="postal_code" required value="<?= htmlspecialchars((string)$a['postal_code']) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+                    </div>
+                    <div class="flex items-end">
+                      <label class="inline-flex items-center gap-2 text-sm text-neutral-300">
+                        <input type="checkbox" name="is_default" value="1" class="accent-brand" <?= !empty($a['is_default']) ? 'checked' : '' ?> />
+                        Set as default
+                      </label>
+                    </div>
+                    <div class="md:col-span-2">
+                      <button class="px-4 py-2 rounded-lg bg-brand text-white">Save</button>
+                    </div>
+                  </form>
+                </div>
+              </details>
               <form method="post" class="inline" onsubmit="return confirm('Delete this address?')">
                 <input type="hidden" name="addr_action" value="delete_address" />
                 <input type="hidden" name="address_id" value="<?= (int)$a['id'] ?>" />
@@ -401,6 +490,8 @@ $userOrders = $oStmt->fetchAll();
       </form>
     </div>
   </div>
+
+  </details>
 
   <h3 class="text-xl font-semibold mt-6 mb-3">Your Orders</h3>
   <?php if (!$userOrders): ?>
