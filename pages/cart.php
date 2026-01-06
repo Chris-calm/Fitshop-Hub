@@ -48,7 +48,7 @@ foreach ($cart as $id=>$qty) {
       const clearBtn = document.getElementById('btnClearCart');
 
       const setNavCount = (count) => {
-        const val = count ? String(count) : '';
+        const val = String(Number(count || 0));
         const navCart = document.getElementById('navCartCount');
         const navCartMobile = document.getElementById('navCartCountMobile');
         if (navCart) navCart.textContent = val;

@@ -2,7 +2,7 @@
 (function(){
   const BASE = (typeof window !== 'undefined' && window.__BASE_URL__) ? window.__BASE_URL__ : '';
   function setCartBadges(count){
-    const val = count ? String(count) : '';
+    const val = String(Number(count || 0));
     const a = document.getElementById('navCartCount');
     const b = document.getElementById('navCartCountMobile');
     if (a) a.textContent = val;
@@ -20,9 +20,9 @@
   }
   const streak = document.getElementById('streak');
   if (streak) {
-    const s = Number(localStorage.getItem('fh_streak')||'3');
-    const m = Number(localStorage.getItem('fh_minutes')||'120');
-    const w = Number(localStorage.getItem('fh_workouts')||'5');
+    const s = Number(localStorage.getItem('fh_streak')||'0');
+    const m = Number(localStorage.getItem('fh_minutes')||'0');
+    const w = Number(localStorage.getItem('fh_workouts')||'0');
     streak.textContent=s; (document.getElementById('minutes')||{}).textContent=m; (document.getElementById('workouts')||{}).textContent=w;
   }
   const btn = document.getElementById('googleSignInBtn');
