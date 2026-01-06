@@ -5,6 +5,7 @@ require_login();
 $sessionUser = $_SESSION['user'];
 require_once __DIR__ . '/../includes/api_tokens.php';
 require_once __DIR__ . '/../includes/auth_cookie.php';
+require_once __DIR__ . '/../includes/supabase_storage.php';
 $addrErr = '';
 $acctErr = '';
 $acctOk = '';
@@ -14,11 +15,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($accountAction === 'update_account') {
     $newName = trim((string)($_POST['name'] ?? ''));
     $newEmail = trim((string)($_POST['email'] ?? ''));
-    $newPhoto = trim((string)($_POST['photo_url'] ?? ''));
+    $photoPath = null;
+    if (!empty($_FILES['photo']['name']) && is_uploaded_file($_FILES['photo']['tmp_name'])) {
+      $allowed = ['jpg','jpeg','png','gif','webp'];
+      $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+      if (!in_array($ext, $allowed, true)) {
+        $acctErr = 'Invalid image type. Allowed: jpg, png, gif, webp.';
+      } else {
+        if (defined('IS_VERCEL') && IS_VERCEL) {
+          try {
+            $bucket = getenv('SUPABASE_AVATAR_BUCKET') ?: 'avatars';
+            $key = 'avatar_' . (int)$sessionUser['id'] . '_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+            $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $_FILES['photo']['type'] ?? 'application/octet-stream');
+          } catch (Throwable $e) {
+            $msg = $e->getMessage();
+            error_log('Avatar upload failed: ' . $msg);
+            if (strpos($msg, 'Supabase Storage not configured') !== false) {
+              $acctErr = 'Avatar upload is not configured on Vercel. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (and ensure the "avatars" bucket exists).';
+            } else {
+              $acctErr = 'Failed to upload image. Please try again.';
+            }
+          }
+        } else {
+          $targetDir = __DIR__ . '/../uploads/avatars/';
+          if (!is_dir($targetDir)) { @mkdir($targetDir, 0777, true); }
+          $filename = 'avatar_' . (int)$sessionUser['id'] . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
+          $dest = $targetDir . $filename;
+          if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+            $photoPath = rtrim(BASE_URL, '/') . '/uploads/avatars/' . $filename;
+          } else {
+            $acctErr = 'Failed to upload image.';
+          }
+        }
+      }
+    }
     if ($newName === '' || $newEmail === '') {
       $acctErr = 'Name and email are required.';
     } elseif (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
       $acctErr = 'Please enter a valid email.';
+    } elseif (!empty($acctErr)) {
+      // keep error from photo upload
     } else {
       try {
         $chk = $pdo->prepare('SELECT id FROM users WHERE email=? AND id<>? LIMIT 1');
@@ -26,11 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($chk->fetch()) {
           $acctErr = 'Email already registered.';
         } else {
-          $stmtUp = $pdo->prepare('UPDATE users SET name=?, email=?, photo_url=? WHERE id=?');
-          $stmtUp->execute([$newName, $newEmail, ($newPhoto !== '' ? $newPhoto : null), (int)$sessionUser['id']]);
+          $stmtUp = $pdo->prepare('UPDATE users SET name=?, email=?, photo_url=COALESCE(?, photo_url) WHERE id=?');
+          $stmtUp->execute([$newName, $newEmail, $photoPath, (int)$sessionUser['id']]);
           $_SESSION['user']['name'] = $newName;
           $_SESSION['user']['email'] = $newEmail;
-          $_SESSION['user']['photo_url'] = ($newPhoto !== '' ? $newPhoto : null);
+          if ($photoPath !== null && $photoPath !== '') {
+            $_SESSION['user']['photo_url'] = $photoPath;
+          }
           fh_set_auth_cookie($_SESSION['user']);
           $acctOk = 'Account updated.';
         }
@@ -202,7 +240,7 @@ $userOrders = $oStmt->fetchAll();
       <?php if (!empty($acctOk)): ?><div class="mb-3 text-emerald-300"><?= htmlspecialchars($acctOk) ?></div><?php endif; ?>
     </div>
     <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 space-y-4">
-    <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-3">
       <input type="hidden" name="account_action" value="update_account" />
       <div>
         <label class="block text-sm text-neutral-400 mb-1">Name</label>
@@ -213,8 +251,8 @@ $userOrders = $oStmt->fetchAll();
         <input type="email" name="email" required value="<?= htmlspecialchars((string)($u['email'] ?? '')) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
       <div class="md:col-span-2">
-        <label class="block text-sm text-neutral-400 mb-1">Photo URL (optional)</label>
-        <input name="photo_url" value="<?= htmlspecialchars((string)($u['photo_url'] ?? '')) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <label class="block text-sm text-neutral-400 mb-1">Profile Photo (optional)</label>
+        <input type="file" name="photo" accept="image/*" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
       <div class="md:col-span-2">
         <button class="px-4 py-2 rounded-lg bg-brand text-white">Save Changes</button>
