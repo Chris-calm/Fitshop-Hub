@@ -80,8 +80,6 @@ try {
                 $quality = (int)(getenv('OPENAI_IMAGE_JPEG_QUALITY') ?: 75);
                 imagejpeg($dst, null, $quality);
                 $jpeg = ob_get_clean();
-                imagedestroy($dst);
-                imagedestroy($src);
                 if ($jpeg !== false && strlen($jpeg) > 0) {
                     $imageData = $jpeg;
                     $imageMime = 'image/jpeg';
@@ -135,11 +133,9 @@ try {
     if ($response === false) {
         $errno = curl_errno($ch);
         $err = curl_error($ch);
-        curl_close($ch);
         throw new Exception('Failed to communicate with OpenAI API (cURL ' . $errno . '): ' . $err);
     }
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpCode !== 200) {
         $msg = '';

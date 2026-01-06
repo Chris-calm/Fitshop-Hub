@@ -48,12 +48,8 @@ if ($qty !== null) {
   $newQty = $current;
 }
 
-$newQty = max(0, min(99, $newQty));
-if ($newQty <= 0) {
-  unset($_SESSION['cart'][$id]);
-} else {
-  $_SESSION['cart'][$id] = $newQty;
-}
+$newQty = max(1, min(99, $newQty));
+$_SESSION['cart'][$id] = $newQty;
 
 // Recompute totals
 $cart = $_SESSION['cart'] ?? [];
