@@ -46,7 +46,6 @@ $cart = fh_cart_write($cart);
 $products = json_decode(file_get_contents(__DIR__ . '/../storage/products.json'), true);
 if (!is_array($products)) { $products = []; }
 
-$cart = fh_cart_get();
 $total = 0.0;
 $count = 0;
 foreach ($cart as $pid => $q) {

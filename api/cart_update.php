@@ -72,7 +72,6 @@ $cart[$id] = $newQty;
 $cart = fh_cart_write($cart);
 
 // Recompute totals
-$cart = fh_cart_get();
 $total = 0.0;
 $count = 0;
 foreach ($cart as $pid => $q) {
