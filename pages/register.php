@@ -8,6 +8,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   $email = trim($_POST['email'] ?? '');
   $password = $_POST['password'] ?? '';
   $password2 = $_POST['password2'] ?? '';
+  $phone = trim($_POST['phone'] ?? '');
+  $line1 = trim($_POST['line1'] ?? '');
+  $line2 = trim($_POST['line2'] ?? '');
+  $city = trim($_POST['city'] ?? '');
+  $province = trim($_POST['province'] ?? '');
+  $postal_code = trim($_POST['postal_code'] ?? '');
   $goal = $_POST['goal'] ?? 'general_health';
   $activity_level = $_POST['activity_level'] ?? 'light';
   $equipment = $_POST['equipment'] ?? 'none';
@@ -47,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       }
     }
   }
-  if (!$name || !$email || !$password) { $err='All fields are required.'; }
+  if (!$name || !$email || !$password || !$phone || !$line1 || !$city || !$province || !$postal_code) { $err='All fields are required.'; }
   elseif ($password !== $password2) { $err='Passwords do not match.'; }
   else {
     $stmt = $pdo->prepare('SELECT id FROM users WHERE email=? LIMIT 1');
@@ -57,8 +63,30 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       $hash = password_hash($password, PASSWORD_DEFAULT);
       $profile = compact('goal','activity_level','equipment','diet');
       $plan = fh_build_plan($profile);
-      $stmt = $pdo->prepare('INSERT INTO users(name,email,password_hash,photo_url,goal,activity_level,equipment,diet,plan_json) VALUES (?,?,?,?,?,?,?,?,?)');
-      $stmt->execute([$name,$email,$hash,$photoPath,$goal,$activity_level,$equipment,$diet,json_encode($plan)]);
+      if (defined('IS_VERCEL') && IS_VERCEL) {
+        $stmt = $pdo->prepare('INSERT INTO users(name,email,password_hash,photo_url,goal,activity_level,equipment,diet,plan_json) VALUES (?,?,?,?,?,?,?,?,?) RETURNING id');
+        $stmt->execute([$name,$email,$hash,$photoPath,$goal,$activity_level,$equipment,$diet,json_encode($plan)]);
+        $userId = (int)$stmt->fetchColumn();
+      } else {
+        $stmt = $pdo->prepare('INSERT INTO users(name,email,password_hash,photo_url,goal,activity_level,equipment,diet,plan_json) VALUES (?,?,?,?,?,?,?,?,?)');
+        $stmt->execute([$name,$email,$hash,$photoPath,$goal,$activity_level,$equipment,$diet,json_encode($plan)]);
+        $userId = (int)$pdo->lastInsertId();
+      }
+
+      if ($userId > 0) {
+        try {
+          if (defined('IS_VERCEL') && IS_VERCEL) {
+            $aStmt = $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, is_default) VALUES (?,?,?,?,?,?,?,?,?)');
+            $aStmt->execute([$userId, $name, $phone, $line1, ($line2 !== '' ? $line2 : null), $city, $province, $postal_code, 1]);
+          } else {
+            $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([$userId]);
+            $aStmt = $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, is_default) VALUES (?,?,?,?,?,?,?,?,?)');
+            $aStmt->execute([$userId, $name, $phone, $line1, ($line2 !== '' ? $line2 : null), $city, $province, $postal_code, 1]);
+          }
+        } catch (Throwable $e) {
+          // If the address table isn't set up yet, registration should still succeed.
+        }
+      }
       $ok='Account created with your personalized plan. You can now login.';
     }
   }
@@ -93,6 +121,33 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       <div class="relative">
         <input id="reg_password2" type="password" name="password2" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-10" />
         <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200" data-target="reg_password2" aria-label="Toggle password">👁</button>
+      </div>
+    </div>
+    <hr class="my-4 border-neutral-800" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="sm:col-span-2">
+        <label class="block text-sm text-neutral-400">Phone</label>
+        <input name="phone" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div class="sm:col-span-2">
+        <label class="block text-sm text-neutral-400">Address line 1</label>
+        <input name="line1" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div class="sm:col-span-2">
+        <label class="block text-sm text-neutral-400">Address line 2 (optional)</label>
+        <input name="line2" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm text-neutral-400">City</label>
+        <input name="city" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm text-neutral-400">Province</label>
+        <input name="province" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm text-neutral-400">Postal code</label>
+        <input name="postal_code" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
     </div>
     <hr class="my-4 border-neutral-800" />

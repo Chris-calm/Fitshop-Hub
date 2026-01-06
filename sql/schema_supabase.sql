@@ -58,6 +58,24 @@ begin
 end $$;
 
 
+-- USER ADDRESSES (Address Book)
+create table if not exists public.user_addresses (
+  id bigserial primary key,
+  user_id bigint not null references public.users(id) on delete cascade,
+  full_name varchar(160) not null,
+  phone varchar(40) not null,
+  line1 varchar(255) not null,
+  line2 varchar(255) null,
+  city varchar(120) not null,
+  province varchar(120) not null,
+  postal_code varchar(20) not null,
+  is_default boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_user_addresses_user_id on public.user_addresses(user_id);
+
+
 -- ORDERS
 create table if not exists public.orders (
   id bigserial primary key,
