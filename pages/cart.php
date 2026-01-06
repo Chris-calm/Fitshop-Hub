@@ -48,9 +48,11 @@ foreach ($cart as $id=>$qty) {
       const clearBtn = document.getElementById('btnClearCart');
 
       const setNavCount = (count) => {
+        const val = count ? String(count) : '';
         const navCart = document.getElementById('navCartCount');
-        if (!navCart) return;
-        navCart.textContent = count ? String(count) : '';
+        const navCartMobile = document.getElementById('navCartCountMobile');
+        if (navCart) navCart.textContent = val;
+        if (navCartMobile) navCartMobile.textContent = val;
       };
 
       const formatMoney = (n) => {

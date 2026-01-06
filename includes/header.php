@@ -48,7 +48,7 @@
         <div class="grid grid-cols-2 gap-2">
           <a href="index.php?page=health" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Health</a>
           <a href="index.php?page=fitness" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Fitness</a>
-          <a href="index.php?page=cart" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Cart</a>
+          <a href="index.php?page=cart" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Cart<span id="navCartCountMobile" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"></span></a>
           <?php if (!empty($_SESSION['user'])): ?>
             <a href="index.php?page=profile" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Profile</a>
             <a href="index.php?page=logout" class="px-3 py-2 rounded-md bg-brand/20 text-brand hover:bg-brand/30 border border-neutral-800">Logout</a>

@@ -1,9 +1,22 @@
 // Basic client behaviors: cart count, fake fitness metrics, Google Sign-In placeholder
 (function(){
   const BASE = (typeof window !== 'undefined' && window.__BASE_URL__) ? window.__BASE_URL__ : '';
-  const navCart = document.getElementById('navCartCount');
-  if (navCart) {
-    fetch(BASE + '/api/cart_count.php').then(r=>r.json()).then(d=>{ navCart.textContent = d.count ? d.count : ''; });
+  function setCartBadges(count){
+    const val = count ? String(count) : '';
+    const a = document.getElementById('navCartCount');
+    const b = document.getElementById('navCartCountMobile');
+    if (a) a.textContent = val;
+    if (b) b.textContent = val;
+  }
+  function refreshCartBadges(){
+    fetch(BASE + '/api/cart_count.php', { cache: 'no-store' })
+      .then(r=>r.json())
+      .then(d=>{ setCartBadges(d && d.count ? d.count : 0); })
+      .catch(()=>{});
+  }
+  if (document.getElementById('navCartCount') || document.getElementById('navCartCountMobile')) {
+    refreshCartBadges();
+    window.addEventListener('pageshow', refreshCartBadges);
   }
   const streak = document.getElementById('streak');
   if (streak) {
