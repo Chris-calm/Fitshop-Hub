@@ -1,6 +1,7 @@
 <?php
 $userId = !empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
-$cart = $_SESSION['cart'] ?? [];
+require_once __DIR__ . '/../includes/cart_store.php';
+$cart = fh_cart_get();
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $total = 0; foreach ($cart as $id=>$qty) { foreach ($products as $p) { if ($p['id']==$id) { $total += $qty*$p['price']; } } }
 

@@ -2,8 +2,9 @@
 require __DIR__ . '/../includes/auth.php';
 require_login();
 require __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/cart_store.php';
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
-$cart = $_SESSION['cart'] ?? [];
+$cart = fh_cart_get();
 if (!$cart) { header('Location: index.php?page=cart'); exit; }
 $payment = $_POST['payment'] ?? 'gcash';
 $user_id = !empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
@@ -73,5 +74,5 @@ try {
   exit;
 }
 
-$_SESSION['cart']=[];
+fh_cart_write([]);
 header('Location: index.php?page=order&id='.$order_id);

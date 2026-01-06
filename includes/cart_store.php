@@ -32,12 +32,18 @@ function fh_cart_read_cookie() {
 }
 
 function fh_cart_get() {
+  $cookieCart = fh_cart_read_cookie();
+  if (!empty($cookieCart)) {
+    $_SESSION['cart'] = $cookieCart;
+    return $cookieCart;
+  }
+
   if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     return $_SESSION['cart'];
   }
-  $cookieCart = fh_cart_read_cookie();
-  $_SESSION['cart'] = $cookieCart;
-  return $cookieCart;
+
+  $_SESSION['cart'] = [];
+  return [];
 }
 
 function fh_cart_write($cart) {
