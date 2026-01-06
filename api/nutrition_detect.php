@@ -6,8 +6,8 @@ header('Cache-Control: no-store');
 ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_DEPRECATED);
 
-$provider = getenv('NUTRITION_PROVIDER') ?: '';
-$apiKey = getenv('OPENAI_API_KEY') ?: ''; // Use OpenAI key
+$provider = strtolower(trim(getenv('NUTRITION_PROVIDER') ?: ''));
+$apiKey = getenv('OPENAI_API_KEY') ?: (getenv('OPENAI_API_KEY') ?: '');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
