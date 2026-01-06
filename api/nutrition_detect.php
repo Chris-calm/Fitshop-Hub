@@ -121,20 +121,34 @@ try {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, (int)(getenv('OPENAI_CONNECT_TIMEOUT') ?: 15));
+    curl_setopt($ch, CURLOPT_TIMEOUT, (int)(getenv('OPENAI_TIMEOUT') ?: 60));
+    curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
+        'Accept: application/json',
+        'User-Agent: FitshopHub/1.0 (+https://fitshop-hub.vercel.app)',
         'Authorization: Bearer ' . $apiKey
     ]);
 
     $response = curl_exec($ch);
     if ($response === false) {
+        $errno = curl_errno($ch);
         $err = curl_error($ch);
-        throw new Exception('Failed to communicate with OpenAI API: ' . $err);
+        curl_close($ch);
+        throw new Exception('Failed to communicate with OpenAI API (cURL ' . $errno . '): ' . $err);
     }
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     if ($httpCode !== 200) {
-        throw new Exception('Failed to communicate with OpenAI API. HTTP status: ' . $httpCode . ' Response: ' . $response);
+        $msg = '';
+        $decodedErr = json_decode($response, true);
+        if (is_array($decodedErr)) {
+            $msg = (string)($decodedErr['error']['message'] ?? $decodedErr['message'] ?? '');
+        }
+        $detail = $msg ? (' Message: ' . $msg) : '';
+        throw new Exception('Failed to communicate with OpenAI API. HTTP status: ' . $httpCode . '.' . $detail . ' Response: ' . $response);
     }
 
     $result = json_decode($response, true);
