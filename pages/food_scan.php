@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <h2 class="text-2xl font-bold mb-2">Food Scan</h2>
   <p class="text-neutral-400 mb-4">Capture a meal photo and log basic nutrition. On phones, this will open the camera.</p>
   <?php if (!empty($err)): ?><div class="mb-4 text-red-400"><?= htmlspecialchars($err) ?></div><?php endif; ?>
-  <form method="post" enctype="multipart/form-data" class="space-y-4 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
+  <form id="foodScanForm" method="post" enctype="multipart/form-data" class="space-y-4 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
     <div>
       <label class="block text-sm text-neutral-300 mb-1">Meal title</label>
       <input name="title" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" placeholder="e.g., Chicken rice bowl" />
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script>
   (function(){
     const msg = document.getElementById('detectMsg');
-    const form = document.querySelector('form');
+    const form = document.getElementById('foodScanForm');
     if (!form || !msg) return;
 
     msg.textContent = 'Select or capture a photo to auto-detect nutrition.';
