@@ -4,9 +4,70 @@ require __DIR__ . '/../includes/db.php';
 require_login();
 $sessionUser = $_SESSION['user'];
 require_once __DIR__ . '/../includes/api_tokens.php';
+require_once __DIR__ . '/../includes/auth_cookie.php';
 $addrErr = '';
+$acctErr = '';
+$acctOk = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $accountAction = $_POST['account_action'] ?? '';
+  if ($accountAction === 'update_account') {
+    $newName = trim((string)($_POST['name'] ?? ''));
+    $newEmail = trim((string)($_POST['email'] ?? ''));
+    $newPhoto = trim((string)($_POST['photo_url'] ?? ''));
+    if ($newName === '' || $newEmail === '') {
+      $acctErr = 'Name and email are required.';
+    } elseif (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+      $acctErr = 'Please enter a valid email.';
+    } else {
+      try {
+        $chk = $pdo->prepare('SELECT id FROM users WHERE email=? AND id<>? LIMIT 1');
+        $chk->execute([$newEmail, (int)$sessionUser['id']]);
+        if ($chk->fetch()) {
+          $acctErr = 'Email already registered.';
+        } else {
+          $stmtUp = $pdo->prepare('UPDATE users SET name=?, email=?, photo_url=? WHERE id=?');
+          $stmtUp->execute([$newName, $newEmail, ($newPhoto !== '' ? $newPhoto : null), (int)$sessionUser['id']]);
+          $_SESSION['user']['name'] = $newName;
+          $_SESSION['user']['email'] = $newEmail;
+          $_SESSION['user']['photo_url'] = ($newPhoto !== '' ? $newPhoto : null);
+          fh_set_auth_cookie($_SESSION['user']);
+          $acctOk = 'Account updated.';
+        }
+      } catch (Throwable $e) {
+        $acctErr = 'Failed to update account.';
+      }
+    }
+  }
+
+  if ($accountAction === 'change_password') {
+    $currentPassword = (string)($_POST['current_password'] ?? '');
+    $newPassword = (string)($_POST['new_password'] ?? '');
+    $newPassword2 = (string)($_POST['new_password2'] ?? '');
+    if ($currentPassword === '' || $newPassword === '' || $newPassword2 === '') {
+      $acctErr = 'Please fill out all password fields.';
+    } elseif ($newPassword !== $newPassword2) {
+      $acctErr = 'New passwords do not match.';
+    } else {
+      try {
+        $pStmt = $pdo->prepare('SELECT password_hash FROM users WHERE id=? LIMIT 1');
+        $pStmt->execute([(int)$sessionUser['id']]);
+        $row = $pStmt->fetch();
+        $hash = $row['password_hash'] ?? '';
+        if (!$hash || !password_verify($currentPassword, $hash)) {
+          $acctErr = 'Current password is incorrect.';
+        } else {
+          $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+          $uStmt = $pdo->prepare('UPDATE users SET password_hash=? WHERE id=?');
+          $uStmt->execute([$newHash, (int)$sessionUser['id']]);
+          $acctOk = 'Password updated.';
+        }
+      } catch (Throwable $e) {
+        $acctErr = 'Failed to update password.';
+      }
+    }
+  }
+
   $action = $_POST['addr_action'] ?? '';
 
   if ($action === 'add_address') {
@@ -98,6 +159,52 @@ $userOrders = $oStmt->fetchAll();
     <div>
       <div class="font-semibold text-lg"><?= htmlspecialchars($u['name']) ?></div>
       <div class="text-neutral-400 text-sm"><?= htmlspecialchars($u['email']) ?></div>
+    </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Edit Account</h3>
+  <?php if (!empty($acctErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($acctErr) ?></div><?php endif; ?>
+  <?php if (!empty($acctOk)): ?><div class="mb-3 text-emerald-300"><?= htmlspecialchars($acctOk) ?></div><?php endif; ?>
+  <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 space-y-4">
+    <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <input type="hidden" name="account_action" value="update_account" />
+      <div>
+        <label class="block text-sm text-neutral-400 mb-1">Name</label>
+        <input name="name" required value="<?= htmlspecialchars((string)($u['name'] ?? '')) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm text-neutral-400 mb-1">Email</label>
+        <input type="email" name="email" required value="<?= htmlspecialchars((string)($u['email'] ?? '')) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm text-neutral-400 mb-1">Photo URL (optional)</label>
+        <input name="photo_url" value="<?= htmlspecialchars((string)($u['photo_url'] ?? '')) ?>" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+      <div class="md:col-span-2">
+        <button class="px-4 py-2 rounded-lg bg-brand text-white">Save Changes</button>
+      </div>
+    </form>
+
+    <div class="border-t border-neutral-800 pt-4">
+      <div class="font-semibold mb-2">Change Password</div>
+      <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input type="hidden" name="account_action" value="change_password" />
+        <div class="md:col-span-2">
+          <label class="block text-sm text-neutral-400 mb-1">Current password</label>
+          <input type="password" name="current_password" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">New password</label>
+          <input type="password" name="new_password" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">Confirm new password</label>
+          <input type="password" name="new_password2" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div class="md:col-span-2">
+          <button class="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700">Update Password</button>
+        </div>
+      </form>
     </div>
   </div>
 
