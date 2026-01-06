@@ -1,13 +1,43 @@
 <?php
-session_start();
+require __DIR__ . '/../includes/auth.php';
+require_login();
 require __DIR__ . '/../includes/db.php';
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $cart = $_SESSION['cart'] ?? [];
 if (!$cart) { header('Location: index.php?page=cart'); exit; }
-$name = trim($_POST['name'] ?? '');
-$address = trim($_POST['address'] ?? '');
 $payment = $_POST['payment'] ?? 'gcash';
-$user_id = !empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : null;
+$user_id = !empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
+$addressId = isset($_POST['address_id']) ? (int)$_POST['address_id'] : 0;
+
+if ($user_id <= 0) {
+  header('Location: index.php?page=login');
+  exit;
+}
+
+if ($addressId <= 0) {
+  header('Location: index.php?page=checkout');
+  exit;
+}
+
+$aStmt = $pdo->prepare('SELECT full_name, phone, line1, line2, city, province, postal_code FROM user_addresses WHERE id=? AND user_id=? LIMIT 1');
+$aStmt->execute([$addressId, $user_id]);
+$addr = $aStmt->fetch();
+if (!$addr) {
+  header('Location: index.php?page=checkout');
+  exit;
+}
+
+$name = trim((string)($addr['full_name'] ?? ''));
+$address = trim((string)($addr['phone'] ?? ''));
+$address .= "\n" . trim((string)($addr['line1'] ?? ''));
+if (!empty($addr['line2'])) {
+  $address .= "\n" . trim((string)($addr['line2'] ?? ''));
+}
+$address .= "\n" . trim((string)($addr['city'] ?? '')) . ', ' . trim((string)($addr['province'] ?? '')) . ' ' . trim((string)($addr['postal_code'] ?? ''));
+
+if (!in_array($payment, ['gcash','maya'], true)) {
+  $payment = 'gcash';
+}
 $total = 0; $order_items=[];
 foreach ($cart as $id=>$qty) {
   foreach ($products as $p) { if ($p['id']==$id) { $order_items[]=['product_id'=>$p['id'],'title'=>$p['title'],'qty'=>$qty,'price'=>$p['price']]; $total += $qty*$p['price']; break; } }

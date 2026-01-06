@@ -4,11 +4,86 @@ require __DIR__ . '/../includes/db.php';
 require_login();
 $sessionUser = $_SESSION['user'];
 require_once __DIR__ . '/../includes/api_tokens.php';
+$addrErr = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $action = $_POST['addr_action'] ?? '';
+
+  if ($action === 'add_address') {
+    $fullName = trim((string)($_POST['full_name'] ?? ''));
+    $phone = trim((string)($_POST['phone'] ?? ''));
+    $line1 = trim((string)($_POST['line1'] ?? ''));
+    $line2 = trim((string)($_POST['line2'] ?? ''));
+    $city = trim((string)($_POST['city'] ?? ''));
+    $province = trim((string)($_POST['province'] ?? ''));
+    $postal = trim((string)($_POST['postal_code'] ?? ''));
+    $makeDefault = !empty($_POST['is_default']) ? 1 : 0;
+
+    if ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
+      $addrErr = 'Please fill out all required address fields.';
+    } else {
+      try {
+        $pdo->beginTransaction();
+        if ($makeDefault) {
+          $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([(int)$sessionUser['id']]);
+        }
+        $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, is_default) VALUES (?,?,?,?,?,?,?,?,?)')
+          ->execute([(int)$sessionUser['id'], $fullName, $phone, $line1, $line2 ?: null, $city, $province, $postal, $makeDefault]);
+        $pdo->commit();
+        header('Location: index.php?page=profile');
+        exit;
+      } catch (Throwable $e) {
+        $pdo->rollBack();
+        $addrErr = 'Failed to save address.';
+      }
+    }
+  }
+
+  if ($action === 'delete_address') {
+    $id = (int)($_POST['address_id'] ?? 0);
+    if ($id > 0) {
+      try {
+        $pdo->prepare('DELETE FROM user_addresses WHERE id=? AND user_id=?')->execute([$id, (int)$sessionUser['id']]);
+        header('Location: index.php?page=profile');
+        exit;
+      } catch (Throwable $e) {
+        $addrErr = 'Failed to delete address.';
+      }
+    }
+  }
+
+  if ($action === 'set_default') {
+    $id = (int)($_POST['address_id'] ?? 0);
+    if ($id > 0) {
+      try {
+        $pdo->beginTransaction();
+        $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([(int)$sessionUser['id']]);
+        $pdo->prepare('UPDATE user_addresses SET is_default=1 WHERE id=? AND user_id=?')->execute([$id, (int)$sessionUser['id']]);
+        $pdo->commit();
+        header('Location: index.php?page=profile');
+        exit;
+      } catch (Throwable $e) {
+        $pdo->rollBack();
+        $addrErr = 'Failed to update default address.';
+      }
+    }
+  }
+}
+
 $stmt = $pdo->prepare('SELECT id,name,email,photo_url,goal,activity_level,equipment,diet,plan_json FROM users WHERE id=? LIMIT 1');
 $stmt->execute([$sessionUser['id']]);
 $u = $stmt->fetch();
 $plan = $u && !empty($u['plan_json']) ? json_decode($u['plan_json'], true) : null;
 $tokens = $u ? fh_list_api_tokens($pdo, (int)$u['id']) : [];
+
+$addresses = [];
+try {
+  $aStmt = $pdo->prepare('SELECT id, full_name, phone, line1, line2, city, province, postal_code, is_default FROM user_addresses WHERE user_id=? ORDER BY is_default DESC, id DESC');
+  $aStmt->execute([(int)$sessionUser['id']]);
+  $addresses = $aStmt->fetchAll();
+} catch (Throwable $e) {
+  $addresses = [];
+}
 // Load user orders from DB
 $oStmt = $pdo->prepare('SELECT o.id, o.total, o.created_at,
    (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id=o.id) AS items
@@ -141,6 +216,84 @@ $userOrders = $oStmt->fetchAll();
     });
   })();
   </script>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Address Book</h3>
+  <?php if (!empty($addrErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($addrErr) ?></div><?php endif; ?>
+  <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+    <?php if (empty($addresses)): ?>
+      <div class="text-neutral-400 text-sm">No saved addresses yet. Add one to enable checkout.</div>
+    <?php else: ?>
+      <div class="space-y-2">
+        <?php foreach ($addresses as $a): ?>
+          <div class="rounded-lg border border-neutral-800 bg-neutral-950 p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div>
+              <div class="font-semibold"><?= !empty($a['is_default']) ? 'Default • ' : '' ?><?= htmlspecialchars((string)$a['full_name']) ?> <span class="text-neutral-400 text-sm">• <?= htmlspecialchars((string)$a['phone']) ?></span></div>
+              <div class="text-sm text-neutral-300"><?= htmlspecialchars((string)$a['line1']) ?><?= !empty($a['line2']) ? ', ' . htmlspecialchars((string)$a['line2']) : '' ?></div>
+              <div class="text-xs text-neutral-400"><?= htmlspecialchars((string)$a['city']) ?>, <?= htmlspecialchars((string)$a['province']) ?> <?= htmlspecialchars((string)$a['postal_code']) ?></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <?php if (empty($a['is_default'])): ?>
+                <form method="post" class="inline">
+                  <input type="hidden" name="addr_action" value="set_default" />
+                  <input type="hidden" name="address_id" value="<?= (int)$a['id'] ?>" />
+                  <button class="px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700">Set default</button>
+                </form>
+              <?php endif; ?>
+              <form method="post" class="inline" onsubmit="return confirm('Delete this address?')">
+                <input type="hidden" name="addr_action" value="delete_address" />
+                <input type="hidden" name="address_id" value="<?= (int)$a['id'] ?>" />
+                <button class="px-3 py-2 rounded-lg bg-red-500/15 text-red-300 border border-red-500/30">Delete</button>
+              </form>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
+    <div class="mt-4 border-t border-neutral-800 pt-4">
+      <div class="font-semibold mb-2">Add new address</div>
+      <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input type="hidden" name="addr_action" value="add_address" />
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">Full name</label>
+          <input name="full_name" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">Phone</label>
+          <input name="phone" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm text-neutral-400 mb-1">Address line 1</label>
+          <input name="line1" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm text-neutral-400 mb-1">Address line 2 (optional)</label>
+          <input name="line2" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">City</label>
+          <input name="city" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">Province</label>
+          <input name="province" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">Postal code</label>
+          <input name="postal_code" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div class="flex items-end">
+          <label class="inline-flex items-center gap-2 text-sm text-neutral-300">
+            <input type="checkbox" name="is_default" value="1" class="accent-brand" />
+            Set as default
+          </label>
+        </div>
+        <div class="md:col-span-2">
+          <button class="px-4 py-2 rounded-lg bg-brand text-white">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <h3 class="text-xl font-semibold mt-6 mb-3">Your Orders</h3>
   <?php if (!$userOrders): ?>
