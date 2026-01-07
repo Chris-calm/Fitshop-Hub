@@ -37,17 +37,13 @@
       z-index:-1;
       background:
         linear-gradient(135deg,
-          transparent 0%,
-          transparent 38%,
-          var(--fh-line-1) 44%,
-          var(--fh-line-2) 52%,
-          var(--fh-line-3) 60%,
-          transparent 66%,
-          transparent 100%);
-      background-size: 220% 220%;
-      animation: fhDiagonalFlow 14s linear infinite;
-      filter: blur(0px);
-      transform: translateZ(0);
+          transparent calc(50% - 1px),
+          rgba(99,102,241,.95) 50%,
+          transparent calc(50% + 1px));
+      opacity:.70;
+      filter: drop-shadow(0 0 10px rgba(99,102,241,.18)) drop-shadow(0 0 18px rgba(34,211,238,.10));
+      transform: translateZ(0) scale(1);
+      animation: fhHeartbeat 1.6s ease-in-out infinite;
     }
     #fhSplash{
       position:fixed;
@@ -67,21 +63,23 @@
       inset:-20vh -20vw;
       background:
         linear-gradient(135deg,
-          transparent 0%,
-          transparent 38%,
-          var(--fh-line-1) 44%,
-          var(--fh-line-2) 52%,
-          var(--fh-line-3) 60%,
-          transparent 66%,
-          transparent 100%);
-      background-size: 220% 220%;
-      animation: fhDiagonalFlow 14s linear infinite;
+          transparent calc(50% - 1px),
+          rgba(99,102,241,.95) 50%,
+          transparent calc(50% + 1px));
+      opacity:.75;
+      filter: drop-shadow(0 0 12px rgba(99,102,241,.20)) drop-shadow(0 0 22px rgba(34,211,238,.12));
+      transform: translateZ(0) scale(1);
+      animation: fhHeartbeat 1.6s ease-in-out infinite;
       pointer-events:none;
     }
 
-    @keyframes fhDiagonalFlow{
-      0%{ background-position: 0% 0%; }
-      100%{ background-position: 100% 100%; }
+    @keyframes fhHeartbeat{
+      0%{ opacity:.62; transform: translateZ(0) scale(1); filter: drop-shadow(0 0 10px rgba(99,102,241,.14)) drop-shadow(0 0 18px rgba(34,211,238,.08)); }
+      12%{ opacity:1; transform: translateZ(0) scale(1.03); filter: drop-shadow(0 0 14px rgba(99,102,241,.30)) drop-shadow(0 0 26px rgba(34,211,238,.18)); }
+      24%{ opacity:.70; transform: translateZ(0) scale(1); filter: drop-shadow(0 0 10px rgba(99,102,241,.16)) drop-shadow(0 0 18px rgba(34,211,238,.10)); }
+      34%{ opacity:.94; transform: translateZ(0) scale(1.02); filter: drop-shadow(0 0 12px rgba(99,102,241,.26)) drop-shadow(0 0 22px rgba(34,211,238,.16)); }
+      46%{ opacity:.68; transform: translateZ(0) scale(1); filter: drop-shadow(0 0 10px rgba(99,102,241,.14)) drop-shadow(0 0 18px rgba(34,211,238,.08)); }
+      100%{ opacity:.62; transform: translateZ(0) scale(1); filter: drop-shadow(0 0 10px rgba(99,102,241,.14)) drop-shadow(0 0 18px rgba(34,211,238,.08)); }
     }
     #fhSplash .fh-splash-card{
       position:relative;
