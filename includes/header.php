@@ -39,7 +39,7 @@
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.70)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.55)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.55)'/%3E%3C/svg%3E"),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(34,211,238,0.50)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='6' fill='rgba(34,211,238,0.40)'/%3E%3Ccircle cx='200' cy='40' r='6' fill='rgba(34,211,238,0.40)'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      background-size: 260px 140px;
+      background-size: 200px 110px;
       background-position: 0 0;
       opacity:.44;
       filter: drop-shadow(0 0 10px rgba(99,102,241,.12)) drop-shadow(0 0 16px rgba(34,211,238,.10));
@@ -50,7 +50,7 @@
       mask-size: 220% 100%;
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      animation: fhEcgSweep 2.2s linear infinite;
+      animation: fhEcgSweep 3.6s linear infinite;
     }
 
     body::after{
@@ -63,8 +63,8 @@
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.55)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.38)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.38)'/%3E%3C/svg%3E"),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(34,211,238,0.38)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='6' fill='rgba(34,211,238,0.28)'/%3E%3Ccircle cx='200' cy='40' r='6' fill='rgba(34,211,238,0.28)'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      background-size: 260px 140px;
-      background-position: 130px 70px;
+      background-size: 200px 110px;
+      background-position: 100px 55px;
       opacity:.34;
       filter: drop-shadow(0 0 8px rgba(99,102,241,.10)) drop-shadow(0 0 12px rgba(34,211,238,.08));
       transform: translateZ(0) rotate(140deg);
@@ -74,8 +74,8 @@
       mask-size: 220% 100%;
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      animation: fhEcgSweep 2.2s linear infinite;
-      animation-delay: .55s;
+      animation: fhEcgSweep 4.4s linear infinite;
+      animation-delay: 1.15s;
     }
     #fhSplash{
       position:fixed;
@@ -97,7 +97,7 @@
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.78)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.62)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.62)'/%3E%3C/svg%3E"),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(34,211,238,0.56)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='6' fill='rgba(34,211,238,0.46)'/%3E%3Ccircle cx='200' cy='40' r='6' fill='rgba(34,211,238,0.46)'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      background-size: 260px 140px;
+      background-size: 200px 110px;
       background-position: 0 0;
       opacity:.58;
       filter: drop-shadow(0 0 12px rgba(99,102,241,.16)) drop-shadow(0 0 18px rgba(34,211,238,.12));
@@ -108,7 +108,7 @@
       mask-size: 220% 100%;
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      animation: fhEcgSweep 2.2s linear infinite;
+      animation: fhEcgSweep 3.9s linear infinite;
       pointer-events:none;
     }
 
@@ -120,8 +120,8 @@
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.62)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.46)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.46)'/%3E%3C/svg%3E"),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(34,211,238,0.44)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='6' fill='rgba(34,211,238,0.34)'/%3E%3Ccircle cx='200' cy='40' r='6' fill='rgba(34,211,238,0.34)'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      background-size: 260px 140px;
-      background-position: 130px 70px;
+      background-size: 200px 110px;
+      background-position: 100px 55px;
       opacity:.42;
       filter: drop-shadow(0 0 10px rgba(99,102,241,.12)) drop-shadow(0 0 14px rgba(34,211,238,.10));
       transform: translateZ(0) rotate(140deg);
@@ -131,8 +131,8 @@
       mask-size: 220% 100%;
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
-      animation: fhEcgSweep 2.2s linear infinite;
-      animation-delay: .55s;
+      animation: fhEcgSweep 5.1s linear infinite;
+      animation-delay: 1.65s;
       pointer-events:none;
     }
 
