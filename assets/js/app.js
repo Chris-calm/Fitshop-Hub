@@ -1,6 +1,18 @@
 // Basic client behaviors: cart count, fake fitness metrics, Google Sign-In placeholder
 (function(){
   const BASE = (typeof window !== 'undefined' && window.__BASE_URL__) ? window.__BASE_URL__ : '';
+  function hideSplash(){
+    const el = document.getElementById('fhSplash');
+    if (!el) return;
+    el.classList.add('fh-hide');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideSplash, { once: true });
+  } else {
+    hideSplash();
+  }
+  window.addEventListener('pageshow', hideSplash);
+  setTimeout(hideSplash, 2500);
   function setCartBadges(count){
     const val = String(Number(count || 0));
     const a = document.getElementById('navCartCount');

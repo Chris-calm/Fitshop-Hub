@@ -14,9 +14,129 @@
   <script>
     window.__BASE_URL__ = "<?= defined('BASE_URL') ? htmlspecialchars(BASE_URL, ENT_QUOTES) : '' ?>";
   </script>
-  <style> body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; } </style>
+  <style>
+    :root{
+      --fh-bg-0:#05070b;
+      --fh-bg-1:#070a12;
+      --fh-line-1:rgba(99,102,241,.20);
+      --fh-line-2:rgba(34,211,238,.16);
+      --fh-line-3:rgba(244,114,182,.12);
+    }
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(900px 500px at 15% 20%, rgba(99,102,241,.12), transparent 60%),
+        radial-gradient(700px 420px at 85% 10%, rgba(34,211,238,.10), transparent 60%),
+        linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
+    }
+    body::before{
+      content:'';
+      position:fixed;
+      inset:-20vh -20vw;
+      pointer-events:none;
+      z-index:-1;
+      background:
+        linear-gradient(135deg,
+          transparent 0%,
+          transparent 38%,
+          var(--fh-line-1) 44%,
+          var(--fh-line-2) 52%,
+          var(--fh-line-3) 60%,
+          transparent 66%,
+          transparent 100%);
+      filter: blur(0px);
+      transform: translateZ(0);
+    }
+    #fhSplash{
+      position:fixed;
+      inset:0;
+      z-index:1000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(900px 500px at 15% 20%, rgba(99,102,241,.18), transparent 60%),
+        radial-gradient(700px 420px at 85% 10%, rgba(34,211,238,.14), transparent 60%),
+        linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
+    }
+    #fhSplash::before{
+      content:'';
+      position:absolute;
+      inset:-20vh -20vw;
+      background:
+        linear-gradient(135deg,
+          transparent 0%,
+          transparent 38%,
+          var(--fh-line-1) 44%,
+          var(--fh-line-2) 52%,
+          var(--fh-line-3) 60%,
+          transparent 66%,
+          transparent 100%);
+      pointer-events:none;
+    }
+    #fhSplash .fh-splash-card{
+      position:relative;
+      text-align:center;
+      padding:24px 28px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(10,12,18,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      min-width: 240px;
+    }
+    #fhSplash .fh-logo{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:28px;
+      line-height:1.1;
+    }
+    #fhSplash .fh-sub{
+      margin-top:8px;
+      font-size:12px;
+      color: rgba(255,255,255,.65);
+    }
+    #fhSplash .fh-loader{
+      margin:16px auto 0;
+      width:56px;
+      height:6px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    #fhSplash .fh-loader > span{
+      display:block;
+      height:100%;
+      width:40%;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(99,102,241,.95), rgba(34,211,238,.95));
+      animation: fhLoad 1.05s ease-in-out infinite;
+    }
+    @keyframes fhLoad{
+      0%{ transform: translateX(-120%); opacity:.85; }
+      50%{ opacity:1; }
+      100%{ transform: translateX(260%); opacity:.85; }
+    }
+    #fhSplash.fh-hide{
+      opacity:0;
+      visibility:hidden;
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+    @media (prefers-reduced-motion: reduce){
+      #fhSplash .fh-loader > span{ animation:none; width:100%; }
+      #fhSplash.fh-hide{ transition:none; }
+    }
+  </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100 min-h-screen">
+  <div id="fhSplash" aria-hidden="true">
+    <div class="fh-splash-card" role="status" aria-live="polite">
+      <div class="fh-logo"><span style="color:rgba(255,255,255,.75)">Fitshop</span> <span style="color:#6366F1">Hub</span></div>
+      <div class="fh-sub">Loading…</div>
+      <div class="fh-loader" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
   <?php
     require_once __DIR__ . '/cart_store.php';
     $cart = fh_cart_get();
