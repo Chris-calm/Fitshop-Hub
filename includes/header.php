@@ -44,6 +44,8 @@
           var(--fh-line-3) 60%,
           transparent 66%,
           transparent 100%);
+      background-size: 220% 220%;
+      animation: fhDiagonalFlow 14s linear infinite;
       filter: blur(0px);
       transform: translateZ(0);
     }
@@ -72,7 +74,14 @@
           var(--fh-line-3) 60%,
           transparent 66%,
           transparent 100%);
+      background-size: 220% 220%;
+      animation: fhDiagonalFlow 14s linear infinite;
       pointer-events:none;
+    }
+
+    @keyframes fhDiagonalFlow{
+      0%{ background-position: 0% 0%; }
+      100%{ background-position: 100% 100%; }
     }
     #fhSplash .fh-splash-card{
       position:relative;
@@ -124,6 +133,8 @@
       transition: opacity .28s ease, visibility .28s ease;
     }
     @media (prefers-reduced-motion: reduce){
+      body::before{ animation:none; }
+      #fhSplash::before{ animation:none; }
       #fhSplash .fh-loader > span{ animation:none; width:100%; }
       #fhSplash.fh-hide{ transition:none; }
     }
