@@ -43,8 +43,14 @@
       background-position: 0 0;
       opacity:.44;
       filter: drop-shadow(0 0 10px rgba(99,102,241,.12)) drop-shadow(0 0 16px rgba(34,211,238,.10));
-      transform: translateZ(0) rotate(130deg);
-      animation: fhEcgBlinkA 1.6s steps(1, end) infinite;
+      transform: translateZ(0) rotate(140deg);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      -webkit-mask-size: 220% 100%;
+      mask-size: 220% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      animation: fhEcgSweep 2.2s linear infinite;
     }
 
     body::after{
@@ -61,8 +67,15 @@
       background-position: 130px 70px;
       opacity:.34;
       filter: drop-shadow(0 0 8px rgba(99,102,241,.10)) drop-shadow(0 0 12px rgba(34,211,238,.08));
-      transform: translateZ(0) rotate(130deg);
-      animation: fhEcgBlinkB 1.6s steps(1, end) infinite;
+      transform: translateZ(0) rotate(140deg);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      -webkit-mask-size: 220% 100%;
+      mask-size: 220% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      animation: fhEcgSweep 2.2s linear infinite;
+      animation-delay: .55s;
     }
     #fhSplash{
       position:fixed;
@@ -88,8 +101,14 @@
       background-position: 0 0;
       opacity:.58;
       filter: drop-shadow(0 0 12px rgba(99,102,241,.16)) drop-shadow(0 0 18px rgba(34,211,238,.12));
-      transform: translateZ(0) rotate(130deg);
-      animation: fhEcgBlinkA 1.6s steps(1, end) infinite;
+      transform: translateZ(0) rotate(140deg);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      -webkit-mask-size: 220% 100%;
+      mask-size: 220% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      animation: fhEcgSweep 2.2s linear infinite;
       pointer-events:none;
     }
 
@@ -105,30 +124,22 @@
       background-position: 130px 70px;
       opacity:.42;
       filter: drop-shadow(0 0 10px rgba(99,102,241,.12)) drop-shadow(0 0 14px rgba(34,211,238,.10));
-      transform: translateZ(0) rotate(130deg);
-      animation: fhEcgBlinkB 1.6s steps(1, end) infinite;
+      transform: translateZ(0) rotate(140deg);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
+      -webkit-mask-size: 220% 100%;
+      mask-size: 220% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      animation: fhEcgSweep 2.2s linear infinite;
+      animation-delay: .55s;
       pointer-events:none;
     }
 
-    @keyframes fhEcgBlinkA{
-      0%{ opacity:.44; }
-      10%{ opacity:.62; }
-      18%{ opacity:0; }
-      24%{ opacity:.44; }
-      34%{ opacity:.58; }
-      40%{ opacity:0; }
-      46%{ opacity:.44; }
-      100%{ opacity:.44; }
-    }
-
-    @keyframes fhEcgBlinkB{
-      0%{ opacity:.34; }
-      8%{ opacity:0; }
-      14%{ opacity:.34; }
-      28%{ opacity:.48; }
-      36%{ opacity:0; }
-      44%{ opacity:.34; }
-      100%{ opacity:.34; }
+    @keyframes fhEcgSweep{
+      0%{ -webkit-mask-position: -120% 0%; mask-position: -120% 0%; }
+      72%{ -webkit-mask-position: 120% 0%; mask-position: 120% 0%; }
+      100%{ -webkit-mask-position: 120% 0%; mask-position: 120% 0%; }
     }
     #fhSplash .fh-splash-card{
       position:relative;
