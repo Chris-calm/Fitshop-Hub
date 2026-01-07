@@ -234,6 +234,39 @@ $userOrders = $oStmt->fetchAll();
   </div>
 
   <details class="mt-6" open>
+    <summary class="text-xl font-semibold cursor-pointer select-none">Theme</summary>
+    <div class="rounded-lg border border-neutral-800 bg-neutral-900 p-4 mt-3">
+      <div class="text-neutral-400 text-sm mb-2">Choose a look that fits you. This changes colors across the whole system.</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+        <div>
+          <label class="block text-sm text-neutral-400 mb-1">Theme preset</label>
+          <select id="fhThemeSelect" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
+            <option value="sporty">Sporty (Energetic)</option>
+            <option value="calm">Calm</option>
+            <option value="contrast">High Contrast</option>
+          </select>
+        </div>
+        <div>
+          <button id="fhThemeApply" type="button" class="w-full px-4 py-2 rounded-lg bg-brand text-white">Apply Theme</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const sel = document.getElementById('fhThemeSelect');
+        const btn = document.getElementById('fhThemeApply');
+        if (!sel || !btn) return;
+        try { sel.value = localStorage.getItem('fh_theme') || 'sporty'; } catch(e) { sel.value = 'sporty'; }
+        btn.addEventListener('click', function(){
+          const v = sel.value || 'sporty';
+          try { localStorage.setItem('fh_theme', v); } catch(e) {}
+          window.location.reload();
+        });
+      })();
+    </script>
+  </details>
+
+  <details class="mt-6" open>
     <summary class="text-xl font-semibold cursor-pointer select-none">Edit Account</summary>
     <div class="mt-3">
       <?php if (!empty($acctErr)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($acctErr) ?></div><?php endif; ?>
