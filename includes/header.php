@@ -104,6 +104,7 @@
       --fh-bg-1:#070a12;
       --fh-brand-rgb: 99 102 241;
       --fh-accent-rgb: 34 211 238;
+      --fh-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='white' fill-opacity='.08'%3E%3Ccircle cx='9' cy='12' r='1'/%3E%3Ccircle cx='40' cy='18' r='1'/%3E%3Ccircle cx='70' cy='10' r='1'/%3E%3Ccircle cx='110' cy='22' r='1'/%3E%3Ccircle cx='18' cy='46' r='1'/%3E%3Ccircle cx='56' cy='54' r='1'/%3E%3Ccircle cx='98' cy='52' r='1'/%3E%3Ccircle cx='126' cy='60' r='1'/%3E%3Ccircle cx='12' cy='88' r='1'/%3E%3Ccircle cx='44' cy='96' r='1'/%3E%3Ccircle cx='84' cy='92' r='1'/%3E%3Ccircle cx='118' cy='104' r='1'/%3E%3Ccircle cx='26' cy='126' r='1'/%3E%3Ccircle cx='66' cy='128' r='1'/%3E%3Ccircle cx='104' cy='122' r='1'/%3E%3Ccircle cx='132' cy='130' r='1'/%3E%3C/g%3E%3C/svg%3E");
       --fh-ecg-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.70)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.55)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.55)'/%3E%3C/svg%3E");
       --fh-ecg-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(34,211,238,0.50)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='6' fill='rgba(34,211,238,0.40)'/%3E%3Ccircle cx='200' cy='40' r='6' fill='rgba(34,211,238,0.40)'/%3E%3C/svg%3E");
       --fh-ecg-a2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.55)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.38)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.38)'/%3E%3C/svg%3E");
@@ -116,8 +117,8 @@
     body {
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background:
-        radial-gradient(900px 500px at 15% 20%, rgba(99,102,241,.12), transparent 60%),
-        radial-gradient(700px 420px at 85% 10%, rgba(34,211,238,.10), transparent 60%),
+        radial-gradient(900px 500px at 15% 20%, rgb(var(--fh-brand-rgb) / .14), transparent 60%),
+        radial-gradient(700px 420px at 85% 10%, rgb(var(--fh-accent-rgb) / .10), transparent 60%),
         linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
     }
     body::before{
@@ -126,20 +127,13 @@
       inset:-20vh -20vw;
       pointer-events:none;
       z-index:-1;
-      background-image: var(--fh-ecg-a), var(--fh-ecg-b);
+      background-image: var(--fh-ecg-a), var(--fh-ecg-b), var(--fh-ecg-a2), var(--fh-ecg-b2);
       background-repeat: repeat;
       background-size: 200px 110px;
-      background-position: 0 0;
-      opacity:.44;
-      filter: drop-shadow(0 0 10px rgba(99,102,241,.12)) drop-shadow(0 0 16px rgba(34,211,238,.10));
+      background-position: 0 0, 0 0, 100px 55px, 100px 55px;
+      opacity:.16;
+      filter: drop-shadow(0 0 10px rgb(var(--fh-brand-rgb) / .10)) drop-shadow(0 0 16px rgb(var(--fh-accent-rgb) / .08));
       transform: translateZ(0) rotate(140deg);
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      -webkit-mask-size: 220% 100%;
-      mask-size: 220% 100%;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      animation: fhEcgSweep 3.6s linear infinite;
     }
 
     body::after{
@@ -148,21 +142,12 @@
       inset:-20vh -20vw;
       pointer-events:none;
       z-index:-2;
-      background-image: var(--fh-ecg-a2), var(--fh-ecg-b2);
+      background-image: var(--fh-grain);
       background-repeat: repeat;
-      background-size: 200px 110px;
-      background-position: 100px 55px;
-      opacity:.34;
-      filter: drop-shadow(0 0 8px rgba(99,102,241,.10)) drop-shadow(0 0 12px rgba(34,211,238,.08));
-      transform: translateZ(0) rotate(140deg);
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      -webkit-mask-size: 220% 100%;
-      mask-size: 220% 100%;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      animation: fhEcgSweep 4.4s linear infinite;
-      animation-delay: 1.15s;
+      background-size: 140px 140px;
+      background-position: 0 0;
+      opacity:.06;
+      mix-blend-mode: overlay;
     }
     #fhSplash{
       position:fixed;
@@ -172,28 +157,21 @@
       align-items:center;
       justify-content:center;
       background:
-        radial-gradient(900px 500px at 15% 20%, rgba(99,102,241,.18), transparent 60%),
-        radial-gradient(700px 420px at 85% 10%, rgba(34,211,238,.14), transparent 60%),
+        radial-gradient(900px 500px at 15% 20%, rgb(var(--fh-brand-rgb) / .20), transparent 60%),
+        radial-gradient(700px 420px at 85% 10%, rgb(var(--fh-accent-rgb) / .16), transparent 60%),
         linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
     }
     #fhSplash::before{
       content:'';
       position:absolute;
       inset:-20vh -20vw;
-      background-image: var(--fh-ecg-a3), var(--fh-ecg-b3);
+      background-image: var(--fh-ecg-a3), var(--fh-ecg-b3), var(--fh-ecg-a4), var(--fh-ecg-b4);
       background-repeat: repeat;
       background-size: 200px 110px;
-      background-position: 0 0;
-      opacity:.58;
-      filter: drop-shadow(0 0 12px rgba(99,102,241,.16)) drop-shadow(0 0 18px rgba(34,211,238,.12));
+      background-position: 0 0, 0 0, 100px 55px, 100px 55px;
+      opacity:.24;
+      filter: drop-shadow(0 0 12px rgb(var(--fh-brand-rgb) / .14)) drop-shadow(0 0 18px rgb(var(--fh-accent-rgb) / .12));
       transform: translateZ(0) rotate(140deg);
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      -webkit-mask-size: 220% 100%;
-      mask-size: 220% 100%;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      animation: fhEcgSweep 3.9s linear infinite;
       pointer-events:none;
     }
 
@@ -201,28 +179,13 @@
       content:'';
       position:absolute;
       inset:-20vh -20vw;
-      background-image: var(--fh-ecg-a4), var(--fh-ecg-b4);
+      background-image: var(--fh-grain);
       background-repeat: repeat;
-      background-size: 200px 110px;
-      background-position: 100px 55px;
-      opacity:.42;
-      filter: drop-shadow(0 0 10px rgba(99,102,241,.12)) drop-shadow(0 0 14px rgba(34,211,238,.10));
-      transform: translateZ(0) rotate(140deg);
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      mask-image: linear-gradient(90deg, transparent 0%, transparent 45%, rgba(0,0,0,1) 50%, transparent 55%, transparent 100%);
-      -webkit-mask-size: 220% 100%;
-      mask-size: 220% 100%;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      animation: fhEcgSweep 5.1s linear infinite;
-      animation-delay: 1.65s;
+      background-size: 140px 140px;
+      background-position: 0 0;
+      opacity:.08;
+      mix-blend-mode: overlay;
       pointer-events:none;
-    }
-
-    @keyframes fhEcgSweep{
-      0%{ -webkit-mask-position: -120% 0%; mask-position: -120% 0%; }
-      72%{ -webkit-mask-position: 120% 0%; mask-position: 120% 0%; }
-      100%{ -webkit-mask-position: 120% 0%; mask-position: 120% 0%; }
     }
     #fhSplash .fh-splash-card{
       position:relative;
@@ -274,10 +237,6 @@
       transition: opacity .28s ease, visibility .28s ease;
     }
     @media (prefers-reduced-motion: reduce){
-      body::before{ animation:none; }
-      body::after{ animation:none; }
-      #fhSplash::before{ animation:none; }
-      #fhSplash::after{ animation:none; }
       #fhSplash .fh-loader > span{ animation:none; width:100%; }
       #fhSplash.fh-hide{ transition:none; }
     }
@@ -286,7 +245,7 @@
 <body class="bg-neutral-950 text-neutral-100 min-h-screen">
   <div id="fhSplash" aria-hidden="true">
     <div class="fh-splash-card" role="status" aria-live="polite">
-      <div class="fh-logo"><span style="color:rgba(255,255,255,.75)">Fitshop</span> <span style="color:#6366F1">Hub</span></div>
+      <div class="fh-logo"><span style="color:rgba(255,255,255,.75)">Fitshop</span> <span style="color:rgb(var(--fh-brand-rgb))">Hub</span></div>
       <div class="fh-sub">Loading…</div>
       <div class="fh-loader" aria-hidden="true"><span></span></div>
     </div>
