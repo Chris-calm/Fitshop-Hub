@@ -13,23 +13,23 @@ foreach ($cart as $id=>$qty) {
     <p class="text-neutral-400">Cart is empty.</p>
   <?php else: ?>
     <div class="flex items-center justify-end mb-3">
-      <button type="button" id="btnClearCart" class="px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700">Clear cart</button>
+      <button type="button" id="btnClearCart" class="fh-btn fh-btn-ghost">Clear cart</button>
     </div>
     <div id="cartItems" class="space-y-3">
       <?php foreach ($items as $it): ?>
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-lg border border-neutral-800 bg-neutral-900 p-3" data-cart-item="<?=$it['id']?>">
+        <div class="fh-card p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3" data-cart-item="<?=$it['id']?>">
           <div>
             <div class="font-semibold"><?=htmlspecialchars($it['title'])?></div>
             <div class="text-neutral-400 text-sm">₱<?=number_format((float)$it['price'],2)?> each</div>
           </div>
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
-              <button type="button" class="cart-dec px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700" data-id="<?=$it['id']?>">-</button>
+              <button type="button" class="cart-dec fh-btn fh-btn-ghost" data-id="<?=$it['id']?>">-</button>
               <span class="min-w-10 text-center" data-qty="<?=$it['id']?>"><?=$it['qty']?></span>
-              <button type="button" class="cart-inc px-2 py-1 rounded bg-neutral-800 hover:bg-neutral-700" data-id="<?=$it['id']?>">+</button>
+              <button type="button" class="cart-inc fh-btn fh-btn-ghost" data-id="<?=$it['id']?>">+</button>
             </div>
             <div class="text-brand min-w-28 text-right" data-line="<?=$it['id']?>">₱<?=number_format((float)$it['line'],2)?></div>
-            <button type="button" class="cart-remove px-2 py-1 text-sm rounded bg-neutral-800 hover:bg-neutral-700" data-id="<?=$it['id']?>">Remove</button>
+            <button type="button" class="cart-remove fh-btn fh-btn-ghost" data-id="<?=$it['id']?>">Remove</button>
           </div>
         </div>
       <?php endforeach; ?>
@@ -37,8 +37,8 @@ foreach ($cart as $id=>$qty) {
     <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div class="text-xl">Total: <span id="cartTotal" class="text-brand">₱<?=number_format((float)$total,2)?></span></div>
       <div class="flex items-center gap-2">
-        <a href="index.php?page=catalog" class="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700">Continue shopping</a>
-        <a href="index.php?page=checkout" class="px-4 py-2 rounded-lg bg-brand text-white">Checkout</a>
+        <a href="index.php?page=catalog" class="fh-btn fh-btn-ghost">Continue shopping</a>
+        <a href="index.php?page=checkout" class="fh-btn fh-btn-primary">Checkout</a>
       </div>
     </div>
     <script>

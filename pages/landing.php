@@ -3,19 +3,21 @@
     <h1 class="text-4xl sm:text-5xl font-extrabold">Welcome to <span class="text-brand">Fitshop Hub</span></h1>
     <p class="text-neutral-400 max-w-2xl mx-auto">Your all-in-one health and fitness companion. Choose your path to get started.</p>
     <div id="apkCta" class="hidden">
-      <a href="/assets/apk/" class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-brand text-white">Download Android App (APK)</a>
+      <a href="/assets/apk/" class="fh-btn fh-btn-primary">Download Android App (APK)</a>
       <div class="mt-2 text-xs text-neutral-500">Android only. You may need to allow installs from unknown sources.</div>
     </div>
   </div>
   <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-    <a href="index.php?page=health" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50 transition">
-      <div class="text-3xl">💙</div>
+    <a href="index.php?page=health" class="fh-card p-6 hover:border-white/15 transition relative overflow-hidden">
+      <div class="absolute -inset-16 pointer-events-none" style="background: radial-gradient(380px 260px at 20% 25%, rgb(var(--fh-brand-rgb) / .14), transparent 62%);"></div>
+      <div class="relative text-3xl">💙</div>
       <h3 class="mt-3 text-xl font-semibold">Health</h3>
       <p class="text-neutral-400">Wellness, nutrition, and healthy living. Shop equipment, supplements, snacks.</p>
       <div class="mt-4 text-brand">Choose Health →</div>
     </a>
-    <a href="index.php?page=fitness" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 hover:border-brand/50 transition">
-      <div class="text-3xl">🏃</div>
+    <a href="index.php?page=fitness" class="fh-card p-6 hover:border-white/15 transition relative overflow-hidden">
+      <div class="absolute -inset-16 pointer-events-none" style="background: radial-gradient(380px 260px at 80% 25%, rgb(var(--fh-accent-rgb) / .14), transparent 62%);"></div>
+      <div class="relative text-3xl">🏃</div>
       <h3 class="mt-3 text-xl font-semibold">Fitness</h3>
       <p class="text-neutral-400">Workouts, choreography and guides. Track your journey.</p>
       <div class="mt-4 text-brand">Choose Fitness →</div>

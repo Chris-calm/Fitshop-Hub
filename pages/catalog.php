@@ -13,8 +13,8 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
     <h2 class="text-2xl font-bold">Shop</h2>
     <form id="catalogFilterForm" class="w-full sm:w-auto flex flex-col sm:flex-row gap-2" method="get" action="index.php">
       <input type="hidden" name="page" value="catalog" />
-      <input id="catalogQ" name="q" value="<?=htmlspecialchars($q)?>" placeholder="Search..." class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
-      <select id="catalogCat" name="cat" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
+      <input id="catalogQ" name="q" value="<?=htmlspecialchars($q)?>" placeholder="Search..." class="fh-input w-full" />
+      <select id="catalogCat" name="cat" class="fh-input w-full">
         <option value="">All</option>
         <option <?= $cat==='equipment'?'selected':'' ?> value="equipment">Equipment</option>
         <option <?= $cat==='supplements'?'selected':'' ?> value="supplements">Supplements</option>
@@ -45,8 +45,8 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
   </script>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <?php foreach ($filtered as $p): ?>
-      <a href="index.php?page=product&id=<?=$p['id']?>" class="group rounded-lg border border-neutral-800 bg-neutral-900 overflow-hidden hover:border-brand/50">
-        <div class="aspect-square bg-neutral-800"></div>
+      <a href="index.php?page=product&id=<?=$p['id']?>" class="group fh-card overflow-hidden hover:border-white/15 transition">
+        <div class="aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));"></div>
         <div class="p-3">
           <div class="text-sm text-neutral-400"><?=htmlspecialchars($p['brand'])?></div>
           <div class="font-semibold group-hover:text-brand"><?=htmlspecialchars($p['title'])?></div>
