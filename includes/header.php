@@ -357,6 +357,7 @@
         <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Fitness</a>
         <a href="index.php?page=cart" class="fh-btn fh-btn-ghost">Cart<span id="navCartCount" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
         <?php if (!empty($_SESSION['user'])): $u=$_SESSION['user']; ?>
+          <a href="index.php?page=settings" class="fh-btn fh-btn-ghost">Settings</a>
           <a href="index.php?page=profile" class="fh-btn fh-btn-ghost flex items-center gap-2 px-2 py-1">
             <img src="<?= htmlspecialchars($u['photo_url'] ?? 'https://i.pravatar.cc/40') ?>" class="w-6 h-6 rounded-full" alt="avatar"/>
             <span class="text-sm hidden sm:block"><?= htmlspecialchars($u['name']) ?></span>
@@ -377,6 +378,7 @@
           <a href="index.php?page=cart" class="fh-btn fh-btn-ghost w-full justify-center">Cart<span id="navCartCountMobile" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
           <?php if (!empty($_SESSION['user'])): ?>
             <a href="index.php?page=profile" class="fh-btn fh-btn-ghost w-full justify-center">Profile</a>
+            <a href="index.php?page=settings" class="fh-btn fh-btn-ghost w-full justify-center">Settings</a>
             <a href="index.php?page=logout" class="fh-btn fh-btn-primary w-full justify-center">Logout</a>
           <?php endif; ?>
         </div>

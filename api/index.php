@@ -105,6 +105,7 @@ $allowed = [
     'login' => 'pages/login.php',
     'register' => 'pages/register.php',
     'profile' => 'pages/profile.php',
+    'settings' => 'pages/settings.php',
     'logout' => 'pages/logout.php',
     'post_add_to_cart' => 'pages/post_add_to_cart.php',
     'post_checkout' => 'pages/post_checkout.php',
