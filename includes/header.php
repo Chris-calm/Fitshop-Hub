@@ -121,6 +121,94 @@
         radial-gradient(700px 420px at 85% 10%, rgb(var(--fh-accent-rgb) / .10), transparent 60%),
         linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
     }
+
+    .fh-surface{
+      background: rgba(10,12,18,.55);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .fh-header{
+      background: rgba(7,10,18,.62);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 18px 55px rgba(0,0,0,.30);
+    }
+    .fh-header::after{
+      content:'';
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-1px;
+      height:2px;
+      background: linear-gradient(90deg,
+        rgb(var(--fh-brand-rgb) / .00) 0%,
+        rgb(var(--fh-brand-rgb) / .55) 22%,
+        rgb(var(--fh-accent-rgb) / .40) 55%,
+        rgb(var(--fh-brand-rgb) / .55) 78%,
+        rgb(var(--fh-brand-rgb) / .00) 100%
+      );
+      filter: blur(.2px);
+      pointer-events:none;
+      opacity:.65;
+    }
+    .fh-card{
+      background: rgba(10,12,18,.55);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 18px 55px rgba(0,0,0,.42);
+    }
+    .fh-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      border-radius: 12px;
+      padding: .55rem .8rem;
+      font-weight: 600;
+      line-height: 1;
+      transition: transform .12s ease, background-color .12s ease, border-color .12s ease, box-shadow .12s ease;
+      transform: translateZ(0);
+    }
+    .fh-btn:active{ transform: translateY(1px); }
+    .fh-btn-ghost{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.86);
+    }
+    .fh-btn-ghost:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.12);
+    }
+    .fh-btn-primary{
+      background: linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .30), rgb(var(--fh-accent-rgb) / .22));
+      border: 1px solid rgb(var(--fh-brand-rgb) / .26);
+      color: rgb(255 255 255 / .92);
+      box-shadow: 0 12px 28px rgb(var(--fh-brand-rgb) / .08);
+    }
+    .fh-btn-primary:hover{
+      background: linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .38), rgb(var(--fh-accent-rgb) / .28));
+      border-color: rgb(var(--fh-brand-rgb) / .34);
+      box-shadow: 0 14px 34px rgb(var(--fh-brand-rgb) / .11);
+    }
+    .fh-input{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: .6rem .9rem;
+      color: rgba(255,255,255,.90);
+      outline: none;
+      transition: box-shadow .12s ease, border-color .12s ease, background-color .12s ease;
+    }
+    .fh-input::placeholder{ color: rgba(255,255,255,.46); }
+    .fh-input:focus{
+      border-color: rgb(var(--fh-brand-rgb) / .40);
+      box-shadow: 0 0 0 3px rgb(var(--fh-brand-rgb) / .18);
+      background: rgba(255,255,255,.05);
+    }
     body::before{
       content:'';
       position:fixed;
@@ -255,41 +343,41 @@
     $cart = fh_cart_get();
     $cartCount = fh_cart_count($cart);
   ?>
-  <header class="border-b border-neutral-800 sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/70">
+  <header class="fh-header sticky top-0 z-50 relative">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
       <a href="index.php?page=<?= !empty($_SESSION['user']) ? 'landing' : 'login' ?>" class="text-xl font-bold"><span class="text-neutral-300">Fitshop</span> <span class="text-brand">Hub</span></a>
-      <button id="backBtn" type="button" class="ml-2 px-2 py-1 rounded-md hover:bg-neutral-900 text-neutral-300" aria-label="Back">←</button>
-      <button id="mobileMenuBtn" type="button" class="ml-auto md:hidden px-3 py-2 rounded-md hover:bg-neutral-900 text-neutral-300" aria-controls="mobileMenu" aria-expanded="false">Menu</button>
+      <button id="backBtn" type="button" class="ml-2 fh-btn fh-btn-ghost" aria-label="Back">←</button>
+      <button id="mobileMenuBtn" type="button" class="ml-auto md:hidden fh-btn fh-btn-ghost" aria-controls="mobileMenu" aria-expanded="false">Menu</button>
       <form action="index.php" method="get" class="hidden md:flex flex-1">
         <input type="hidden" name="page" value="catalog" />
-        <input name="q" placeholder="Search products or guides..." class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-brand/60" />
+        <input name="q" placeholder="Search products or guides..." class="fh-input w-full" />
       </form>
       <nav class="hidden md:flex ml-auto items-center gap-2">
-        <a href="index.php?page=health" class="px-3 py-2 rounded-md hover:bg-neutral-900">Health</a>
-        <a href="index.php?page=fitness" class="px-3 py-2 rounded-md hover:bg-neutral-900">Fitness</a>
-        <a href="index.php?page=cart" class="px-3 py-2 rounded-md hover:bg-neutral-900">Cart<span id="navCartCount" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
+        <a href="index.php?page=health" class="fh-btn fh-btn-ghost">Health</a>
+        <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Fitness</a>
+        <a href="index.php?page=cart" class="fh-btn fh-btn-ghost">Cart<span id="navCartCount" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
         <?php if (!empty($_SESSION['user'])): $u=$_SESSION['user']; ?>
-          <a href="index.php?page=profile" class="flex items-center gap-2 px-2 py-1 rounded-md bg-neutral-900 border border-neutral-800">
+          <a href="index.php?page=profile" class="fh-btn fh-btn-ghost flex items-center gap-2 px-2 py-1">
             <img src="<?= htmlspecialchars($u['photo_url'] ?? 'https://i.pravatar.cc/40') ?>" class="w-6 h-6 rounded-full" alt="avatar"/>
             <span class="text-sm hidden sm:block"><?= htmlspecialchars($u['name']) ?></span>
           </a>
-          <a href="index.php?page=logout" class="px-3 py-2 rounded-md bg-brand/20 text-brand hover:bg-brand/30">Logout</a>
+          <a href="index.php?page=logout" class="fh-btn fh-btn-primary">Logout</a>
         <?php endif; ?>
       </nav>
     </div>
-    <div id="mobileMenu" class="md:hidden hidden border-t border-neutral-800">
+    <div id="mobileMenu" class="md:hidden hidden border-t border-white/10">
       <div class="mx-auto max-w-7xl px-4 py-3 space-y-2">
         <form action="index.php" method="get" class="flex">
           <input type="hidden" name="page" value="catalog" />
-          <input name="q" placeholder="Search products or guides..." class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-brand/60" />
+          <input name="q" placeholder="Search products or guides..." class="fh-input w-full" />
         </form>
         <div class="grid grid-cols-2 gap-2">
-          <a href="index.php?page=health" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Health</a>
-          <a href="index.php?page=fitness" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Fitness</a>
-          <a href="index.php?page=cart" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Cart<span id="navCartCountMobile" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
+          <a href="index.php?page=health" class="fh-btn fh-btn-ghost w-full justify-center">Health</a>
+          <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost w-full justify-center">Fitness</a>
+          <a href="index.php?page=cart" class="fh-btn fh-btn-ghost w-full justify-center">Cart<span id="navCartCountMobile" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
           <?php if (!empty($_SESSION['user'])): ?>
-            <a href="index.php?page=profile" class="px-3 py-2 rounded-md hover:bg-neutral-900 border border-neutral-800">Profile</a>
-            <a href="index.php?page=logout" class="px-3 py-2 rounded-md bg-brand/20 text-brand hover:bg-brand/30 border border-neutral-800">Logout</a>
+            <a href="index.php?page=profile" class="fh-btn fh-btn-ghost w-full justify-center">Profile</a>
+            <a href="index.php?page=logout" class="fh-btn fh-btn-primary w-full justify-center">Logout</a>
           <?php endif; ?>
         </div>
       </div>
