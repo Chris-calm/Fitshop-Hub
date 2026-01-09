@@ -45,16 +45,24 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
   </script>
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <?php foreach ($filtered as $p): ?>
+      <?php
+        $titleText = (string)($p['title'] ?? 'Fitshop Hub');
+        $nameImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
+        $img = (string)($p['image_url'] ?? '');
+        if ($img === '' || stripos($img, 'picsum.photos') !== false) {
+          $img = $nameImg;
+        }
+      ?>
       <a href="index.php?page=product&id=<?=$p['id']?>" class="group fh-card overflow-hidden hover:border-white/15 transition">
         <div class="aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));">
           <img
-            src="<?= htmlspecialchars((string)(($p['image_url'] ?? '') ?: 'https://placehold.co/900x900/png?text=Fitshop+Hub')) ?>"
+            src="<?= htmlspecialchars($img) ?>"
             alt="<?= htmlspecialchars((string)($p['title'] ?? 'Product')) ?>"
             class="w-full h-full object-cover"
             loading="lazy"
             decoding="async"
             referrerpolicy="no-referrer"
-            onerror="this.onerror=null;this.src='https://placehold.co/900x900/png?text=Fitshop+Hub';"
+            onerror="this.onerror=null;this.src=<?= json_encode($nameImg) ?>;"
           />
         </div>
         <div class="p-3">

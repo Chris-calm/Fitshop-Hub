@@ -3,17 +3,24 @@ $id = (int)($_GET['id'] ?? 0);
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $product = null; foreach ($products as $p) { if ($p['id']===$id) { $product=$p; break; } }
 if (!$product) { echo '<p>Product not found.</p>'; return; }
+
+$titleText = (string)($product['title'] ?? 'Fitshop Hub');
+$nameImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
+$img = (string)($product['image_url'] ?? '');
+if ($img === '' || stripos($img, 'picsum.photos') !== false) {
+  $img = $nameImg;
+}
 ?>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
   <div class="fh-card overflow-hidden aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));">
     <img
-      src="<?= htmlspecialchars((string)(($product['image_url'] ?? '') ?: 'https://placehold.co/900x900/png?text=Fitshop+Hub')) ?>"
+      src="<?= htmlspecialchars($img) ?>"
       alt="<?= htmlspecialchars((string)($product['title'] ?? 'Product')) ?>"
       class="w-full h-full object-cover"
       loading="lazy"
       decoding="async"
       referrerpolicy="no-referrer"
-      onerror="this.onerror=null;this.src='https://placehold.co/900x900/png?text=Fitshop+Hub';"
+      onerror="this.onerror=null;this.src=<?= json_encode($nameImg) ?>;"
     />
   </div>
   <div>
