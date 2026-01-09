@@ -43,6 +43,7 @@
           bg1: '#070a12',
           brandRgb: '99 102 241',
           accentRgb: '34 211 238',
+          popRgb: '244 114 182',
           ecgA: svgUrl('rgba(99,102,241,0.70)', 6, 'rgba(99,102,241,0.55)'),
           ecgB: svgUrl('rgba(34,211,238,0.50)', 4, 'rgba(34,211,238,0.40)'),
           ecgA2: svgUrl('rgba(99,102,241,0.55)', 6, 'rgba(99,102,241,0.38)'),
@@ -57,6 +58,7 @@
           bg1: '#0a0e18',
           brandRgb: '56 189 248',
           accentRgb: '99 102 241',
+          popRgb: '251 191 36',
           ecgA: svgUrl('rgba(56,189,248,0.62)', 6, 'rgba(56,189,248,0.48)'),
           ecgB: svgUrl('rgba(99,102,241,0.36)', 4, 'rgba(99,102,241,0.28)'),
           ecgA2: svgUrl('rgba(56,189,248,0.46)', 6, 'rgba(56,189,248,0.32)'),
@@ -71,6 +73,7 @@
           bg1: '#0b0b0b',
           brandRgb: '255 255 255',
           accentRgb: '255 215 0',
+          popRgb: '34 211 238',
           ecgA: svgUrl('rgba(255,255,255,0.78)', 6, 'rgba(255,255,255,0.70)'),
           ecgB: svgUrl('rgba(255,215,0,0.60)', 4, 'rgba(255,215,0,0.54)'),
           ecgA2: svgUrl('rgba(255,255,255,0.55)', 6, 'rgba(255,255,255,0.46)'),
@@ -88,6 +91,7 @@
       r.style.setProperty('--fh-bg-1', t.bg1);
       r.style.setProperty('--fh-brand-rgb', t.brandRgb);
       r.style.setProperty('--fh-accent-rgb', t.accentRgb);
+      r.style.setProperty('--fh-pop-rgb', t.popRgb || '244 114 182');
       r.style.setProperty('--fh-ecg-a', t.ecgA);
       r.style.setProperty('--fh-ecg-b', t.ecgB);
       r.style.setProperty('--fh-ecg-a2', t.ecgA2);
@@ -104,6 +108,7 @@
       --fh-bg-1:#070a12;
       --fh-brand-rgb: 99 102 241;
       --fh-accent-rgb: 34 211 238;
+      --fh-pop-rgb: 244 114 182;
       --fh-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='white' fill-opacity='.08'%3E%3Ccircle cx='9' cy='12' r='1'/%3E%3Ccircle cx='40' cy='18' r='1'/%3E%3Ccircle cx='70' cy='10' r='1'/%3E%3Ccircle cx='110' cy='22' r='1'/%3E%3Ccircle cx='18' cy='46' r='1'/%3E%3Ccircle cx='56' cy='54' r='1'/%3E%3Ccircle cx='98' cy='52' r='1'/%3E%3Ccircle cx='126' cy='60' r='1'/%3E%3Ccircle cx='12' cy='88' r='1'/%3E%3Ccircle cx='44' cy='96' r='1'/%3E%3Ccircle cx='84' cy='92' r='1'/%3E%3Ccircle cx='118' cy='104' r='1'/%3E%3Ccircle cx='26' cy='126' r='1'/%3E%3Ccircle cx='66' cy='128' r='1'/%3E%3Ccircle cx='104' cy='122' r='1'/%3E%3Ccircle cx='132' cy='130' r='1'/%3E%3C/g%3E%3C/svg%3E");
       --fh-ecg-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(99,102,241,0.70)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='7' fill='rgba(99,102,241,0.55)'/%3E%3Ccircle cx='200' cy='40' r='7' fill='rgba(99,102,241,0.55)'/%3E%3C/svg%3E");
       --fh-ecg-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80' viewBox='0 0 220 80'%3E%3Cpolyline points='12,40 60,40 70,40 78,20 86,60 94,40 116,40 126,50 136,30 146,40 170,40 200,40' fill='none' stroke='rgba(34,211,238,0.50)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='40' r='6' fill='rgba(34,211,238,0.40)'/%3E%3Ccircle cx='200' cy='40' r='6' fill='rgba(34,211,238,0.40)'/%3E%3C/svg%3E");
@@ -117,8 +122,10 @@
     body {
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background:
-        radial-gradient(900px 500px at 15% 20%, rgb(var(--fh-brand-rgb) / .14), transparent 60%),
-        radial-gradient(700px 420px at 85% 10%, rgb(var(--fh-accent-rgb) / .10), transparent 60%),
+        radial-gradient(900px 520px at 14% 18%, rgb(var(--fh-brand-rgb) / .22), transparent 60%),
+        radial-gradient(780px 460px at 86% 10%, rgb(var(--fh-accent-rgb) / .18), transparent 62%),
+        radial-gradient(520px 520px at 70% 70%, rgb(var(--fh-accent-rgb) / .10), transparent 65%),
+        radial-gradient(520px 520px at 40% 85%, rgb(var(--fh-pop-rgb) / .10), transparent 66%),
         linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
     }
 
@@ -157,10 +164,30 @@
       background: rgba(10,12,18,.55);
       border: 1px solid rgba(255,255,255,.08);
       border-radius: 16px;
+      position: relative;
+      overflow: hidden;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 18px 55px rgba(0,0,0,.42);
+      box-shadow:
+        0 18px 55px rgba(0,0,0,.42),
+        0 0 0 1px rgb(var(--fh-brand-rgb) / .10),
+        0 20px 70px rgb(var(--fh-brand-rgb) / .10);
     }
+    .fh-card::before{
+      content:'';
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(700px 280px at 18% 15%, rgb(var(--fh-brand-rgb) / .30), transparent 60%),
+        radial-gradient(700px 280px at 85% 20%, rgb(var(--fh-accent-rgb) / .24), transparent 62%),
+        radial-gradient(700px 280px at 55% 95%, rgb(var(--fh-pop-rgb) / .16), transparent 62%),
+        linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .16), rgb(var(--fh-accent-rgb) / .14), rgb(var(--fh-pop-rgb) / .12));
+      filter: blur(12px);
+      opacity: .70;
+      pointer-events:none;
+      z-index:0;
+    }
+    .fh-card > *{ position: relative; z-index: 1; }
     .fh-btn{
       display:inline-flex;
       align-items:center;
@@ -184,15 +211,19 @@
       border-color: rgba(255,255,255,.12);
     }
     .fh-btn-primary{
-      background: linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .30), rgb(var(--fh-accent-rgb) / .22));
-      border: 1px solid rgb(var(--fh-brand-rgb) / .26);
+      background: linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .46), rgb(var(--fh-accent-rgb) / .30), rgb(var(--fh-pop-rgb) / .26));
+      border: 1px solid rgb(var(--fh-brand-rgb) / .34);
       color: rgb(255 255 255 / .92);
-      box-shadow: 0 12px 28px rgb(var(--fh-brand-rgb) / .08);
+      box-shadow:
+        0 12px 28px rgb(var(--fh-brand-rgb) / .14),
+        0 0 0 1px rgb(var(--fh-brand-rgb) / .16);
     }
     .fh-btn-primary:hover{
-      background: linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .38), rgb(var(--fh-accent-rgb) / .28));
-      border-color: rgb(var(--fh-brand-rgb) / .34);
-      box-shadow: 0 14px 34px rgb(var(--fh-brand-rgb) / .11);
+      background: linear-gradient(90deg, rgb(var(--fh-brand-rgb) / .56), rgb(var(--fh-accent-rgb) / .38), rgb(var(--fh-pop-rgb) / .34));
+      border-color: rgb(var(--fh-brand-rgb) / .44);
+      box-shadow:
+        0 14px 34px rgb(var(--fh-brand-rgb) / .18),
+        0 0 0 1px rgb(var(--fh-brand-rgb) / .20);
     }
     .fh-input{
       background: rgba(255,255,255,.04);
