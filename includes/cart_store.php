@@ -84,13 +84,8 @@ function fh_cart_write($cart) {
   ];
 
   if (empty($clean)) {
-    setcookie('fh_cart', '', [
-      'expires' => time() - 3600,
-      'path' => '/',
-      'secure' => fh_cart_is_https(),
-      'httponly' => false,
-      'samesite' => 'Lax',
-    ]);
+    $_SESSION['cart'] = [];
+    fh_cart_delete_cookie();
   } else {
     setcookie('fh_cart', $value, $opts);
   }
@@ -107,6 +102,22 @@ function fh_cart_count($cart) {
     $count += (int)$q;
   }
   return $count;
+}
+
+function fh_cart_delete_cookie() {
+  $base = [
+    'expires' => time() - 3600,
+    'path' => '/',
+    'httponly' => false,
+    'samesite' => 'Lax',
+  ];
+
+  // Delete both variants because an old cookie might have been set with a different secure flag
+  setcookie('fh_cart', '', $base + ['secure' => false]);
+  setcookie('fh_cart', '', $base + ['secure' => true]);
+
+  // Also unset the runtime cookie value for the current request
+  unset($_COOKIE['fh_cart']);
 }
 
 function fh_cart_make_key($id, $option) {
