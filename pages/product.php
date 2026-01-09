@@ -5,10 +5,17 @@ $product = null; foreach ($products as $p) { if ($p['id']===$id) { $product=$p; 
 if (!$product) { echo '<p>Product not found.</p>'; return; }
 
 $titleText = (string)($product['title'] ?? 'Fitshop Hub');
-$nameImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
 $img = (string)($product['image_url'] ?? '');
+$keywords = trim($titleText);
+if (!empty($product['category'])) {
+  $keywords .= ' ' . (string)$product['category'];
+}
+
+$queryImg = 'https://source.unsplash.com/900x900/?' . rawurlencode($keywords);
+$fallbackImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
+
 if ($img === '' || stripos($img, 'picsum.photos') !== false) {
-  $img = $nameImg;
+  $img = $queryImg;
 }
 ?>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -20,7 +27,7 @@ if ($img === '' || stripos($img, 'picsum.photos') !== false) {
       loading="lazy"
       decoding="async"
       referrerpolicy="no-referrer"
-      onerror="this.onerror=null;this.src=<?= json_encode($nameImg) ?>;"
+      onerror="this.onerror=null;this.src=<?= json_encode($fallbackImg) ?>;"
     />
   </div>
   <div>

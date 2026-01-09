@@ -47,10 +47,17 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
     <?php foreach ($filtered as $p): ?>
       <?php
         $titleText = (string)($p['title'] ?? 'Fitshop Hub');
-        $nameImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
         $img = (string)($p['image_url'] ?? '');
+        $keywords = trim($titleText);
+        if (!empty($p['category'])) {
+          $keywords .= ' ' . (string)$p['category'];
+        }
+
+        $queryImg = 'https://source.unsplash.com/900x900/?' . rawurlencode($keywords);
+        $fallbackImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
+
         if ($img === '' || stripos($img, 'picsum.photos') !== false) {
-          $img = $nameImg;
+          $img = $queryImg;
         }
       ?>
       <a href="index.php?page=product&id=<?=$p['id']?>" class="group fh-card overflow-hidden hover:border-white/15 transition">
@@ -62,7 +69,7 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
             loading="lazy"
             decoding="async"
             referrerpolicy="no-referrer"
-            onerror="this.onerror=null;this.src=<?= json_encode($nameImg) ?>;"
+            onerror="this.onerror=null;this.src=<?= json_encode($fallbackImg) ?>;"
           />
         </div>
         <div class="p-3">
