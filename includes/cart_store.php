@@ -111,11 +111,23 @@ function fh_cart_delete_cookie() {
 
   $paths = array_values(array_unique(array_filter([
     '/',
+    '/api',
     $p1,
     $p2,
   ], function ($p) {
     return is_string($p) && $p !== '';
   })));
+
+  $paths = array_values(array_unique(array_map(function ($p) {
+    $p = (string)$p;
+    if ($p === '.' || $p === '') {
+      $p = '/';
+    }
+    if ($p[0] !== '/') {
+      $p = '/' . $p;
+    }
+    return rtrim($p, '/') ?: '/';
+  }, $paths)));
 
   foreach ($paths as $path) {
     $base = [
