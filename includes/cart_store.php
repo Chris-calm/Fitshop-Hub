@@ -53,23 +53,7 @@ function fh_cart_get() {
     return $cookieCart;
   }
 
-  if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-    $clean = [];
-    foreach ($_SESSION['cart'] as $k => $v) {
-      $key = (string)$k;
-      $qty = (int)$v;
-      $parsed = fh_cart_parse_key($key);
-      if (!$parsed) {
-        continue;
-      }
-      if ($qty > 0) {
-        $clean[(string)$parsed['key']] = $qty;
-      }
-    }
-    $_SESSION['cart'] = $clean;
-    return $clean;
-  }
-
+  // Cookie is the only source of truth. If it's missing, treat cart as empty.
   $_SESSION['cart'] = [];
   return [];
 }
