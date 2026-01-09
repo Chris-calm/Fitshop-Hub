@@ -40,8 +40,29 @@ if (!in_array($payment, ['gcash','maya'], true)) {
   $payment = 'gcash';
 }
 $total = 0; $order_items=[];
-foreach ($cart as $id=>$qty) {
-  foreach ($products as $p) { if ($p['id']==$id) { $order_items[]=['product_id'=>$p['id'],'title'=>$p['title'],'qty'=>$qty,'price'=>$p['price']]; $total += $qty*$p['price']; break; } }
+foreach ($cart as $key => $qty) {
+  $parsed = fh_cart_parse_key((string)$key);
+  if (!$parsed) {
+    continue;
+  }
+  $id = (int)$parsed['id'];
+  $opt = (string)$parsed['option'];
+  foreach ($products as $p) {
+    if ((int)($p['id'] ?? 0) == $id) {
+      $title = (string)($p['title'] ?? '');
+      if ($opt !== '' && $opt !== 'Default') {
+        $title .= ' • ' . $opt;
+      }
+      $order_items[] = [
+        'product_id' => (int)($p['id'] ?? 0),
+        'title' => $title,
+        'qty' => (int)$qty,
+        'price' => (float)($p['price'] ?? 0),
+      ];
+      $total += ((int)$qty) * ((float)($p['price'] ?? 0));
+      break;
+    }
+  }
 }
 
 // Create order within a transaction

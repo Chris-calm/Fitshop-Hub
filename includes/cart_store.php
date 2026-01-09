@@ -22,10 +22,14 @@ function fh_cart_read_cookie() {
   }
   $out = [];
   foreach ($data as $k => $v) {
-    $id = (int)$k;
+    $key = (string)$k;
     $qty = (int)$v;
-    if ($id > 0 && $qty > 0) {
-      $out[$id] = $qty;
+    $parsed = fh_cart_parse_key($key);
+    if (!$parsed) {
+      continue;
+    }
+    if ($qty > 0) {
+      $out[$key] = $qty;
     }
   }
   return $out;
@@ -53,10 +57,14 @@ function fh_cart_write($cart) {
 
   $clean = [];
   foreach ($cart as $k => $v) {
-    $id = (int)$k;
+    $key = (string)$k;
     $qty = (int)$v;
-    if ($id > 0 && $qty > 0) {
-      $clean[$id] = $qty;
+    $parsed = fh_cart_parse_key($key);
+    if (!$parsed) {
+      continue;
+    }
+    if ($qty > 0) {
+      $clean[$key] = $qty;
     }
   }
 
@@ -99,4 +107,70 @@ function fh_cart_count($cart) {
     $count += (int)$q;
   }
   return $count;
+}
+
+function fh_cart_make_key($id, $option) {
+  $pid = (int)$id;
+  $opt = trim((string)$option);
+  if ($pid <= 0) {
+    return '';
+  }
+  if ($opt === '') {
+    $opt = 'Default';
+  }
+  $opt = preg_replace('/\s+/', ' ', $opt);
+  $opt = mb_substr($opt, 0, 80);
+  return $pid . '::' . $opt;
+}
+
+function fh_cart_parse_key($key) {
+  $key = (string)$key;
+  if ($key === '') {
+    return null;
+  }
+  if (strpos($key, '::') === false) {
+    $id = (int)$key;
+    if ($id <= 0) {
+      return null;
+    }
+    return ['id' => $id, 'option' => 'Default', 'key' => fh_cart_make_key($id, 'Default')];
+  }
+  $parts = explode('::', $key, 2);
+  $id = (int)($parts[0] ?? 0);
+  $opt = trim((string)($parts[1] ?? ''));
+  if ($id <= 0) {
+    return null;
+  }
+  if ($opt === '') {
+    $opt = 'Default';
+  }
+  return ['id' => $id, 'option' => $opt, 'key' => fh_cart_make_key($id, $opt)];
+}
+
+function fh_product_options($product) {
+  if (is_array($product) && !empty($product['options']) && is_array($product['options'])) {
+    $out = [];
+    foreach ($product['options'] as $o) {
+      $t = trim((string)$o);
+      if ($t !== '') {
+        $out[] = $t;
+      }
+    }
+    if (!empty($out)) {
+      return array_values(array_unique($out));
+    }
+  }
+
+  $cat = is_array($product) ? (string)($product['category'] ?? '') : '';
+  $cat = strtolower(trim($cat));
+  if ($cat === 'equipment') {
+    return ['Black', 'Blue', 'Pink'];
+  }
+  if ($cat === 'supplements') {
+    return ['250mg', '500mg', '1000mg'];
+  }
+  if ($cat === 'snacks') {
+    return ['Single', 'Pack of 6', 'Pack of 12'];
+  }
+  return ['Default'];
 }

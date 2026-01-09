@@ -17,23 +17,32 @@ if (!is_array($products)) {
   $products = [];
 }
 
+$cartPreview = [];
 $cartItems = [];
-$cartTotal = 0;
-foreach ($cart as $id => $qty) {
-  foreach ($products as $p) {
-    if ((int)($p['id'] ?? 0) === (int)$id) {
-      $price = (float)($p['price'] ?? 0);
+$cartTotal = 0.0;
+foreach ($cart as $key => $q) {
+  $parsed = fh_cart_parse_key((string)$key);
+  if (!$parsed) {
+    continue;
+  }
+  $pid = (int)$parsed['id'];
+  $opt = (string)$parsed['option'];
+  foreach ($products as $pp) {
+    if ((int)($pp['id'] ?? 0) === $pid) {
+      $title = (string)($pp['title'] ?? '');
+      $cartPreview[] = ['title' => $title, 'qty' => (int)$q, 'opt' => $opt];
       $cartItems[] = [
-        'id' => (int)$id,
-        'title' => (string)($p['title'] ?? 'Item'),
-        'qty' => (int)$qty,
-        'price' => $price,
-        'line' => $price * (int)$qty
+        'title' => $title,
+        'qty' => (int)$q,
+        'opt' => $opt,
+        'price' => (float)($pp['price'] ?? 0),
+        'line' => ((int)$q) * ((float)($pp['price'] ?? 0)),
       ];
-      $cartTotal += $price * (int)$qty;
+      $cartTotal += ((int)$q) * ((float)($pp['price'] ?? 0));
       break;
     }
   }
+  if (count($cartPreview) >= 3) break;
 }
 
 $oStmt = $pdo->prepare('SELECT o.id, o.total, o.created_at,
@@ -127,7 +136,7 @@ $userOrders = $oStmt->fetchAll();
           <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-2">
             <div class="min-w-0">
               <div class="font-semibold truncate"><?= htmlspecialchars((string)$it['title']) ?></div>
-              <div class="text-xs text-neutral-400">Qty: <?= (int)$it['qty'] ?> • ₱<?= number_format((float)$it['price'], 2) ?> each</div>
+              <div class="text-xs text-neutral-400"><?= htmlspecialchars((string)($it['opt'] ?? 'Default')) ?> • Qty: <?= (int)$it['qty'] ?> • ₱<?= number_format((float)$it['price'], 2) ?> each</div>
             </div>
             <div class="text-brand font-semibold">₱<?= number_format((float)$it['line'], 2) ?></div>
           </div>

@@ -21,11 +21,19 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $id = (int)($_POST['id'] ?? 0);
+$option = (string)($_POST['option'] ?? '');
 $qty = max(1, (int)($_POST['qty'] ?? 1));
 $found = null; foreach ($products as $p) { if ($p['id']===$id) { $found=$p; break; } }
 if ($found) {
   $cart = fh_cart_get();
-  $cart[$id] = (isset($cart[$id]) ? (int)$cart[$id] : 0) + $qty;
+  $options = fh_product_options($found);
+  if ($option === '' && !empty($options)) {
+    $option = (string)$options[0];
+  }
+  $key = fh_cart_make_key($id, $option);
+  if ($key !== '') {
+    $cart[$key] = (isset($cart[$key]) ? (int)$cart[$key] : 0) + $qty;
+  }
   fh_cart_write($cart);
 }
 header('Location: index.php?page=cart');

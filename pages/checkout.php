@@ -3,7 +3,20 @@ $userId = !empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
 require_once __DIR__ . '/../includes/cart_store.php';
 $cart = fh_cart_get();
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
-$total = 0; foreach ($cart as $id=>$qty) { foreach ($products as $p) { if ($p['id']==$id) { $total += $qty*$p['price']; } } }
+$total = 0;
+foreach ($cart as $key => $qty) {
+  $parsed = fh_cart_parse_key((string)$key);
+  if (!$parsed) {
+    continue;
+  }
+  $id = (int)$parsed['id'];
+  foreach ($products as $p) {
+    if ((int)($p['id'] ?? 0) === $id) {
+      $total += ((int)$qty) * ((float)($p['price'] ?? 0));
+      break;
+    }
+  }
+}
 
 $addresses = [];
 if ($userId) {

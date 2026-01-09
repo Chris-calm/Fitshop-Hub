@@ -3,8 +3,24 @@ require_once __DIR__ . '/../includes/cart_store.php';
 $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), true);
 $cart = fh_cart_get();
 $total = 0; $items=[];
-foreach ($cart as $id=>$qty) {
-  foreach ($products as $p) { if ($p['id']==$id) { $p['qty']=$qty; $p['line']=$qty*$p['price']; $items[]=$p; $total+=$p['line']; break; } }
+foreach ($cart as $key=>$qty) {
+  $parsed = fh_cart_parse_key((string)$key);
+  if (!$parsed) {
+    continue;
+  }
+  $id = (int)$parsed['id'];
+  $opt = (string)$parsed['option'];
+  foreach ($products as $p) {
+    if ((int)($p['id'] ?? 0) == $id) {
+      $p['qty'] = $qty;
+      $p['line'] = $qty * $p['price'];
+      $p['cart_key'] = (string)$parsed['key'];
+      $p['cart_option'] = $opt;
+      $items[] = $p;
+      $total += $p['line'];
+      break;
+    }
+  }
 }
 ?>
 <section>
@@ -17,19 +33,20 @@ foreach ($cart as $id=>$qty) {
     </div>
     <div id="cartItems" class="space-y-3">
       <?php foreach ($items as $it): ?>
-        <div class="fh-card p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3" data-cart-item="<?=$it['id']?>">
+        <div class="fh-card p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3" data-cart-item="<?=htmlspecialchars((string)$it['cart_key'], ENT_QUOTES)?>">
           <div>
             <div class="font-semibold"><?=htmlspecialchars($it['title'])?></div>
+            <div class="text-neutral-400 text-sm"><?=htmlspecialchars((string)($it['cart_option'] ?? 'Default'))?></div>
             <div class="text-neutral-400 text-sm">₱<?=number_format((float)$it['price'],2)?> each</div>
           </div>
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
-              <button type="button" class="cart-dec fh-btn fh-btn-ghost" data-id="<?=$it['id']?>">-</button>
-              <span class="min-w-10 text-center" data-qty="<?=$it['id']?>"><?=$it['qty']?></span>
-              <button type="button" class="cart-inc fh-btn fh-btn-ghost" data-id="<?=$it['id']?>">+</button>
+              <button type="button" class="cart-dec fh-btn fh-btn-ghost" data-key="<?=htmlspecialchars((string)$it['cart_key'], ENT_QUOTES)?>">-</button>
+              <span class="min-w-10 text-center" data-qty="<?=htmlspecialchars((string)$it['cart_key'], ENT_QUOTES)?>"><?=$it['qty']?></span>
+              <button type="button" class="cart-inc fh-btn fh-btn-ghost" data-key="<?=htmlspecialchars((string)$it['cart_key'], ENT_QUOTES)?>">+</button>
             </div>
-            <div class="text-brand min-w-28 text-right" data-line="<?=$it['id']?>">₱<?=number_format((float)$it['line'],2)?></div>
-            <button type="button" class="cart-remove fh-btn fh-btn-ghost" data-id="<?=$it['id']?>">Remove</button>
+            <div class="text-brand min-w-28 text-right" data-line="<?=htmlspecialchars((string)$it['cart_key'], ENT_QUOTES)?>">₱<?=number_format((float)$it['line'],2)?></div>
+            <button type="button" class="cart-remove fh-btn fh-btn-ghost" data-key="<?=htmlspecialchars((string)$it['cart_key'], ENT_QUOTES)?>">Remove</button>
           </div>
         </div>
       <?php endforeach; ?>
@@ -47,6 +64,11 @@ foreach ($cart as $id=>$qty) {
       const totalEl = document.getElementById('cartTotal');
       const itemsEl = document.getElementById('cartItems');
       const clearBtn = document.getElementById('btnClearCart');
+
+      const cssEscape = (value) => {
+        if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(String(value));
+        return String(value).replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+      };
 
       const setNavCount = (count) => {
         const val = String(Number(count || 0));
@@ -80,14 +102,14 @@ foreach ($cart as $id=>$qty) {
         if (typeof count !== 'undefined') setNavCount(count);
       };
 
-      const removeRow = (id) => {
-        const row = document.querySelector('[data-cart-item="' + id + '"]');
+      const removeRow = (key) => {
+        const row = document.querySelector('[data-cart-item="' + cssEscape(key) + '"]');
         if (row) row.remove();
       };
 
-      const setQtyLine = (id, qty, line) => {
-        const qtyEl = document.querySelector('[data-qty="' + id + '"]');
-        const lineEl = document.querySelector('[data-line="' + id + '"]');
+      const setQtyLine = (key, qty, line) => {
+        const qtyEl = document.querySelector('[data-qty="' + cssEscape(key) + '"]');
+        const lineEl = document.querySelector('[data-line="' + cssEscape(key) + '"]');
         if (qtyEl) qtyEl.textContent = String(qty);
         if (lineEl) lineEl.textContent = formatMoney(line);
       };
@@ -111,24 +133,24 @@ foreach ($cart as $id=>$qty) {
           const rem = t.closest('.cart-remove');
           const btn = inc || dec || rem;
           if (!btn) return;
-          const id = parseInt(btn.getAttribute('data-id') || '0', 10);
-          if (!id) return;
+          const key = btn.getAttribute('data-key') || '';
+          if (!key) return;
 
           try {
             if (rem) {
-              const data = await postJson(BASE + '/api/cart_remove.php', { id });
-              removeRow(id);
+              const data = await postJson(BASE + '/api/cart_remove.php', { key });
+              removeRow(key);
               updateTotals(data.total, data.count);
               ensureNotEmpty(data.empty);
               return;
             }
 
             const delta = inc ? 1 : -1;
-            const data = await postJson(BASE + '/api/cart_update.php', { id, delta });
+            const data = await postJson(BASE + '/api/cart_update.php', { key, delta });
             if (!data.qty) {
-              removeRow(id);
+              removeRow(key);
             } else {
-              setQtyLine(id, data.qty, data.line);
+              setQtyLine(key, data.qty, data.line);
             }
             updateTotals(data.total, data.count);
             ensureNotEmpty(data.empty);

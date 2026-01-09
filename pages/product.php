@@ -4,6 +4,10 @@ $products = json_decode(file_get_contents(__DIR__.'/../storage/products.json'), 
 $product = null; foreach ($products as $p) { if ($p['id']===$id) { $product=$p; break; } }
 if (!$product) { echo '<p>Product not found.</p>'; return; }
 
+require_once __DIR__ . '/../includes/cart_store.php';
+$options = fh_product_options($product);
+$defaultOpt = !empty($options) ? (string)$options[0] : 'Default';
+
 $titleText = (string)($product['title'] ?? 'Fitshop Hub');
 $img = (string)($product['image_url'] ?? '');
 $fallbackImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
@@ -31,6 +35,11 @@ if ($img === '' || stripos($img, 'picsum.photos') !== false) {
     <p class="text-neutral-300 mb-6">High quality product for your fitness journey.</p>
     <form method="post" action="index.php?page=post_add_to_cart" class="flex items-center gap-2">
       <input type="hidden" name="id" value="<?=$product['id']?>" />
+      <select name="option" required class="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
+        <?php foreach ($options as $opt): $opt = (string)$opt; ?>
+          <option value="<?= htmlspecialchars($opt) ?>" <?= $opt === $defaultOpt ? 'selected' : '' ?>><?= htmlspecialchars($opt) ?></option>
+        <?php endforeach; ?>
+      </select>
       <input name="qty" type="number" min="1" value="1" class="w-20 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       <button class="px-4 py-2 rounded-lg bg-brand text-white">Add to Cart</button>
     </form>
