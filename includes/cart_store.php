@@ -105,16 +105,29 @@ function fh_cart_count($cart) {
 }
 
 function fh_cart_delete_cookie() {
-  $base = [
-    'expires' => time() - 3600,
-    'path' => '/',
-    'httponly' => false,
-    'samesite' => 'Lax',
-  ];
+  $script = (string)($_SERVER['SCRIPT_NAME'] ?? '/');
+  $p1 = rtrim((string)dirname($script), '/');
+  $p2 = rtrim((string)dirname($p1 !== '' ? $p1 : '/'), '/');
 
-  // Delete both variants because an old cookie might have been set with a different secure flag
-  setcookie('fh_cart', '', $base + ['secure' => false]);
-  setcookie('fh_cart', '', $base + ['secure' => true]);
+  $paths = array_values(array_unique(array_filter([
+    '/',
+    $p1,
+    $p2,
+  ], function ($p) {
+    return is_string($p) && $p !== '';
+  })));
+
+  foreach ($paths as $path) {
+    $base = [
+      'expires' => time() - 3600,
+      'path' => $path,
+      'httponly' => false,
+      'samesite' => 'Lax',
+    ];
+    // Delete both variants because an old cookie might have been set with a different secure flag
+    setcookie('fh_cart', '', $base + ['secure' => false]);
+    setcookie('fh_cart', '', $base + ['secure' => true]);
+  }
 
   // Also unset the runtime cookie value for the current request
   unset($_COOKIE['fh_cart']);
