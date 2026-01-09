@@ -88,19 +88,11 @@ function fh_cart_write($cart) {
     $value = '{}';
   }
 
-  $opts = [
-    'expires' => time() + 60 * 60 * 24 * 30,
-    'path' => '/',
-    'secure' => fh_cart_is_https(),
-    'httponly' => false,
-    'samesite' => 'Lax',
-  ];
-
   if (empty($clean)) {
     $_SESSION['cart'] = [];
     fh_cart_delete_cookie();
   } else {
-    setcookie('fh_cart', $value, $opts);
+    fh_cart_set_cookie_all($value);
   }
 
   return $clean;
@@ -122,6 +114,21 @@ function fh_cart_count($cart) {
 }
 
 function fh_cart_delete_cookie() {
+  foreach (fh_cart_cookie_paths() as $path) {
+    $base = [
+      'expires' => time() - 3600,
+      'path' => $path,
+      'httponly' => false,
+      'samesite' => 'Lax',
+    ];
+    setcookie('fh_cart', '', $base + ['secure' => false]);
+    setcookie('fh_cart', '', $base + ['secure' => true]);
+  }
+
+  unset($_COOKIE['fh_cart']);
+}
+
+function fh_cart_cookie_paths() {
   $script = (string)($_SERVER['SCRIPT_NAME'] ?? '/');
   $p1 = rtrim((string)dirname($script), '/');
   $p2 = rtrim((string)dirname($p1 !== '' ? $p1 : '/'), '/');
@@ -146,20 +153,22 @@ function fh_cart_delete_cookie() {
     return rtrim($p, '/') ?: '/';
   }, $paths)));
 
-  foreach ($paths as $path) {
+  return $paths;
+}
+
+function fh_cart_set_cookie_all($value) {
+  $expires = time() + 60 * 60 * 24 * 30;
+  foreach (fh_cart_cookie_paths() as $path) {
     $base = [
-      'expires' => time() - 3600,
+      'expires' => $expires,
       'path' => $path,
       'httponly' => false,
       'samesite' => 'Lax',
     ];
-    // Delete both variants because an old cookie might have been set with a different secure flag
-    setcookie('fh_cart', '', $base + ['secure' => false]);
-    setcookie('fh_cart', '', $base + ['secure' => true]);
+    setcookie('fh_cart', $value, $base + ['secure' => false]);
+    setcookie('fh_cart', $value, $base + ['secure' => true]);
   }
-
-  // Also unset the runtime cookie value for the current request
-  unset($_COOKIE['fh_cart']);
+  $_COOKIE['fh_cart'] = (string)$value;
 }
 
 function fh_cart_make_key($id, $option) {
