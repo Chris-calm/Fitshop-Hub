@@ -1,6 +1,14 @@
 <?php
 require_once __DIR__ . '/env.php';
 
+function fh_cart_cookie_name() {
+  return 'fh_cart_v2';
+}
+
+function fh_cart_legacy_cookie_name() {
+  return 'fh_cart';
+}
+
 function fh_cart_is_https() {
   if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
     return true;
@@ -12,7 +20,10 @@ function fh_cart_is_https() {
 }
 
 function fh_cart_read_cookie() {
-  $raw = $_COOKIE['fh_cart'] ?? '';
+  $raw = $_COOKIE[fh_cart_cookie_name()] ?? '';
+  if (!$raw) {
+    $raw = $_COOKIE[fh_cart_legacy_cookie_name()] ?? '';
+  }
   if (!$raw) {
     return [];
   }
@@ -114,18 +125,38 @@ function fh_cart_count($cart) {
 }
 
 function fh_cart_delete_cookie() {
-  foreach (fh_cart_cookie_paths() as $path) {
-    $base = [
-      'expires' => time() - 3600,
-      'path' => $path,
-      'httponly' => false,
-      'samesite' => 'Lax',
-    ];
-    setcookie('fh_cart', '', $base + ['secure' => false]);
-    setcookie('fh_cart', '', $base + ['secure' => true]);
-  }
+  fh_cart_delete_cookie_name(fh_cart_cookie_name());
+  fh_cart_delete_cookie_name(fh_cart_legacy_cookie_name());
 
-  unset($_COOKIE['fh_cart']);
+  unset($_COOKIE[fh_cart_cookie_name()]);
+  unset($_COOKIE[fh_cart_legacy_cookie_name()]);
+}
+
+function fh_cart_delete_cookie_name($cookieName) {
+  $host = (string)($_SERVER['HTTP_HOST'] ?? '');
+  $host = strtolower(trim(explode(':', $host)[0] ?? $host));
+  $domains = [''];
+  if ($host !== '') {
+    $domains[] = $host;
+    $domains[] = '.' . $host;
+  }
+  $domains = array_values(array_unique($domains));
+
+  foreach (fh_cart_cookie_paths() as $path) {
+    foreach ($domains as $domain) {
+      $base = [
+        'expires' => time() - 3600,
+        'path' => $path,
+        'httponly' => false,
+        'samesite' => 'Lax',
+      ];
+      if ($domain !== '') {
+        $base['domain'] = $domain;
+      }
+      setcookie($cookieName, '', $base + ['secure' => false]);
+      setcookie($cookieName, '', $base + ['secure' => true]);
+    }
+  }
 }
 
 function fh_cart_cookie_paths() {
@@ -158,17 +189,35 @@ function fh_cart_cookie_paths() {
 
 function fh_cart_set_cookie_all($value) {
   $expires = time() + 60 * 60 * 24 * 30;
-  foreach (fh_cart_cookie_paths() as $path) {
-    $base = [
-      'expires' => $expires,
-      'path' => $path,
-      'httponly' => false,
-      'samesite' => 'Lax',
-    ];
-    setcookie('fh_cart', $value, $base + ['secure' => false]);
-    setcookie('fh_cart', $value, $base + ['secure' => true]);
+  $host = (string)($_SERVER['HTTP_HOST'] ?? '');
+  $host = strtolower(trim(explode(':', $host)[0] ?? $host));
+  $domains = [''];
+  if ($host !== '') {
+    $domains[] = $host;
+    $domains[] = '.' . $host;
   }
-  $_COOKIE['fh_cart'] = (string)$value;
+  $domains = array_values(array_unique($domains));
+
+  foreach (fh_cart_cookie_paths() as $path) {
+    foreach ($domains as $domain) {
+      $base = [
+        'expires' => $expires,
+        'path' => $path,
+        'httponly' => false,
+        'samesite' => 'Lax',
+      ];
+      if ($domain !== '') {
+        $base['domain'] = $domain;
+      }
+      setcookie(fh_cart_cookie_name(), $value, $base + ['secure' => false]);
+      setcookie(fh_cart_cookie_name(), $value, $base + ['secure' => true]);
+    }
+  }
+  // Ensure legacy cookie can't resurrect cart on refresh/navigation
+  fh_cart_delete_cookie_name(fh_cart_legacy_cookie_name());
+
+  $_COOKIE[fh_cart_cookie_name()] = (string)$value;
+  unset($_COOKIE[fh_cart_legacy_cookie_name()]);
 }
 
 function fh_cart_make_key($id, $option) {
