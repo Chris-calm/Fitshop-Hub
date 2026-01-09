@@ -7,11 +7,13 @@ if (!$product) { echo '<p>Product not found.</p>'; return; }
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
   <div class="fh-card overflow-hidden aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));">
     <img
-      src="<?= htmlspecialchars((string)($product['image_url'] ?? '')) ?>"
+      src="<?= htmlspecialchars((string)(($product['image_url'] ?? '') ?: 'https://placehold.co/900x900/png?text=Fitshop+Hub')) ?>"
       alt="<?= htmlspecialchars((string)($product['title'] ?? 'Product')) ?>"
       class="w-full h-full object-cover"
       loading="lazy"
-      onerror="this.onerror=null;this.src='https://via.placeholder.com/900x900.png?text=Fitshop+Hub';"
+      decoding="async"
+      referrerpolicy="no-referrer"
+      onerror="this.onerror=null;this.src='https://placehold.co/900x900/png?text=Fitshop+Hub';"
     />
   </div>
   <div>
