@@ -217,34 +217,8 @@
       box-shadow: 0 0 0 3px rgb(var(--fh-brand-rgb) / .18);
       background: rgba(255,255,255,.05);
     }
-    body::before{
-      content:'';
-      position:fixed;
-      inset:-20vh -20vw;
-      pointer-events:none;
-      z-index:-1;
-      background-image: var(--fh-ecg-a), var(--fh-ecg-b), var(--fh-ecg-a2), var(--fh-ecg-b2);
-      background-repeat: repeat;
-      background-size: 200px 110px;
-      background-position: 0 0, 0 0, 100px 55px, 100px 55px;
-      opacity:.08;
-      filter: drop-shadow(0 0 10px rgb(var(--fh-brand-rgb) / .08)) drop-shadow(0 0 16px rgb(var(--fh-accent-rgb) / .06));
-      transform: translateZ(0) rotate(125deg);
-    }
-
-    body::after{
-      content:'';
-      position:fixed;
-      inset:-20vh -20vw;
-      pointer-events:none;
-      z-index:-2;
-      background-image: var(--fh-grain);
-      background-repeat: repeat;
-      background-size: 140px 140px;
-      background-position: 0 0;
-      opacity:.045;
-      mix-blend-mode: overlay;
-    }
+    body::before{ content:none; }
+    body::after{ content:none; }
     #fhSplash{
       position:fixed;
       inset:0;
@@ -258,32 +232,8 @@
         radial-gradient(700px 520px at 55% 95%, rgb(var(--fh-warm-rgb) / .16), transparent 66%),
         linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
     }
-    #fhSplash::before{
-      content:'';
-      position:absolute;
-      inset:-20vh -20vw;
-      background-image: var(--fh-ecg-a3), var(--fh-ecg-b3), var(--fh-ecg-a4), var(--fh-ecg-b4);
-      background-repeat: repeat;
-      background-size: 200px 110px;
-      background-position: 0 0, 0 0, 100px 55px, 100px 55px;
-      opacity:.24;
-      filter: drop-shadow(0 0 12px rgb(var(--fh-brand-rgb) / .14)) drop-shadow(0 0 18px rgb(var(--fh-accent-rgb) / .12));
-      transform: translateZ(0) rotate(140deg);
-      pointer-events:none;
-    }
-
-    #fhSplash::after{
-      content:'';
-      position:absolute;
-      inset:-20vh -20vw;
-      background-image: var(--fh-grain);
-      background-repeat: repeat;
-      background-size: 140px 140px;
-      background-position: 0 0;
-      opacity:.08;
-      mix-blend-mode: overlay;
-      pointer-events:none;
-    }
+    #fhSplash::before{ content:none; }
+    #fhSplash::after{ content:none; }
     #fhSplash .fh-splash-card{
       position:relative;
       text-align:center;
