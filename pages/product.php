@@ -6,16 +6,10 @@ if (!$product) { echo '<p>Product not found.</p>'; return; }
 
 $titleText = (string)($product['title'] ?? 'Fitshop Hub');
 $img = (string)($product['image_url'] ?? '');
-$keywords = trim($titleText);
-if (!empty($product['category'])) {
-  $keywords .= ' ' . (string)$product['category'];
-}
-
-$queryImg = 'https://source.unsplash.com/900x900/?' . rawurlencode($keywords);
 $fallbackImg = 'https://placehold.co/900x900/png?text=' . rawurlencode($titleText);
 
 if ($img === '' || stripos($img, 'picsum.photos') !== false) {
-  $img = $queryImg;
+  $img = $fallbackImg;
 }
 ?>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
