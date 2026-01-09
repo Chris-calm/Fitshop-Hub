@@ -43,7 +43,20 @@ function fh_cart_get() {
   }
 
   if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-    return $_SESSION['cart'];
+    $clean = [];
+    foreach ($_SESSION['cart'] as $k => $v) {
+      $key = (string)$k;
+      $qty = (int)$v;
+      $parsed = fh_cart_parse_key($key);
+      if (!$parsed) {
+        continue;
+      }
+      if ($qty > 0) {
+        $clean[(string)$parsed['key']] = $qty;
+      }
+    }
+    $_SESSION['cart'] = $clean;
+    return $clean;
   }
 
   $_SESSION['cart'] = [];
@@ -98,7 +111,11 @@ function fh_cart_count($cart) {
   if (!is_array($cart)) {
     return 0;
   }
-  foreach ($cart as $q) {
+  foreach ($cart as $k => $q) {
+    $parsed = fh_cart_parse_key((string)$k);
+    if (!$parsed) {
+      continue;
+    }
     $count += (int)$q;
   }
   return $count;
