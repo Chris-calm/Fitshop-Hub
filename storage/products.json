@@ -1,8 +1,30 @@
 [
-  {"id":1,"title":"Adjustable Dumbbells 20kg","brand":"FitPro","price":2999.00,"category":"equipment","tags":["gym","weights"]},
-  {"id":2,"title":"Yoga Mat Non-Slip","brand":"ZenFlex","price":899.00,"category":"equipment","tags":["gym"]},
-  {"id":3,"title":"Whey Protein 1kg","brand":"PowerFuel","price":1599.00,"category":"supplements","tags":["nutrients"]},
-  {"id":4,"title":"Herbal Green Tea","brand":"Naturale","price":249.00,"category":"supplements","tags":["herbal","drinks"]},
-  {"id":5,"title":"Protein Bar 6-Pack","brand":"SnackFit","price":499.00,"category":"snacks","tags":["bars"]},
-  {"id":6,"title":"Dry-Fit Shirt","brand":"AirMove","price":699.00,"category":"equipment","tags":["clothes"]}
+  {"id":1,"title":"Adjustable Dumbbells 20kg","brand":"FitPro","price":2999.00,"category":"equipment","tags":["gym","weights"],"image_url":"https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=800&q=80"},
+  {"id":2,"title":"Yoga Mat Non-Slip","brand":"ZenFlex","price":899.00,"category":"equipment","tags":["gym","yoga"],"image_url":"https://images.unsplash.com/photo-1592432678016-e910b452f9a2?auto=format&fit=crop&w=800&q=80"},
+  {"id":3,"title":"Whey Protein 1kg","brand":"PowerFuel","price":1599.00,"category":"supplements","tags":["nutrients","protein"],"image_url":"https://images.unsplash.com/photo-1615485290830-5654f0cb1b7e?auto=format&fit=crop&w=800&q=80"},
+  {"id":4,"title":"Herbal Green Tea","brand":"Naturale","price":249.00,"category":"supplements","tags":["herbal","drinks"],"image_url":"https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&w=800&q=80"},
+  {"id":5,"title":"Protein Bar 6-Pack","brand":"SnackFit","price":499.00,"category":"snacks","tags":["bars","protein"],"image_url":"https://images.unsplash.com/photo-1590080876351-2c1b3de4d4c5?auto=format&fit=crop&w=800&q=80"},
+  {"id":6,"title":"Dry-Fit Shirt","brand":"AirMove","price":699.00,"category":"apparel","tags":["clothes","running"],"image_url":"https://images.unsplash.com/photo-1526401485004-2aa7d7b07b5a?auto=format&fit=crop&w=800&q=80"},
+
+  {"id":7,"title":"Kettlebell 12kg","brand":"IronCore","price":1299.00,"category":"equipment","tags":["gym","weights"],"image_url":"https://images.unsplash.com/photo-1599058917765-7a1b5c7b05a8?auto=format&fit=crop&w=800&q=80"},
+  {"id":8,"title":"Resistance Bands Set","brand":"FlexLoop","price":349.00,"category":"equipment","tags":["home","strength"],"image_url":"https://images.unsplash.com/photo-1590487988075-7f7c5e6a7c4b?auto=format&fit=crop&w=800&q=80"},
+  {"id":9,"title":"Jump Rope Speed","brand":"CardioX","price":299.00,"category":"equipment","tags":["cardio","home"],"image_url":"https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80"},
+  {"id":10,"title":"Foam Roller","brand":"RecoverMax","price":499.00,"category":"equipment","tags":["recovery","mobility"],"image_url":"https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=800&q=80"},
+  {"id":11,"title":"Smart Water Bottle 600ml","brand":"HydraGo","price":799.00,"category":"equipment","tags":["hydration","daily"],"image_url":"https://images.unsplash.com/photo-1526401485004-2aa7d7b07b5a?auto=format&fit=crop&w=800&q=80"},
+  {"id":12,"title":"Shaker Bottle 700ml","brand":"MixMate","price":229.00,"category":"equipment","tags":["supplements","daily"],"image_url":"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"},
+
+  {"id":13,"title":"Creatine Monohydrate 300g","brand":"PowerFuel","price":899.00,"category":"supplements","tags":["strength","performance"],"image_url":"https://images.unsplash.com/photo-1622480916116-6f3f8e2bff7a?auto=format&fit=crop&w=800&q=80"},
+  {"id":14,"title":"Multivitamin (60 caps)","brand":"VitaDaily","price":549.00,"category":"supplements","tags":["health","vitamins"],"image_url":"https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80"},
+  {"id":15,"title":"Electrolyte Powder (20 servings)","brand":"HydraGo","price":499.00,"category":"supplements","tags":["hydration","cardio"],"image_url":"https://images.unsplash.com/photo-1598515213692-6d6e9d8bca2b?auto=format&fit=crop&w=800&q=80"},
+  {"id":16,"title":"Omega-3 Fish Oil (90 softgels)","brand":"CoreHealth","price":699.00,"category":"supplements","tags":["wellness","heart"],"image_url":"https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80"},
+
+  {"id":17,"title":"Trail Mix 250g","brand":"SnackFit","price":249.00,"category":"snacks","tags":["nuts","energy"],"image_url":"https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=800&q=80"},
+  {"id":18,"title":"Oatmeal Cookies (8 pcs)","brand":"WholeBite","price":199.00,"category":"snacks","tags":["oats","healthy"],"image_url":"https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80"},
+  {"id":19,"title":"Peanut Butter 500g","brand":"WholeBite","price":329.00,"category":"snacks","tags":["spread","protein"],"image_url":"https://images.unsplash.com/photo-1585238342028-4e3efc2b5d8b?auto=format&fit=crop&w=800&q=80"},
+  {"id":20,"title":"Granola 400g","brand":"WholeBite","price":299.00,"category":"snacks","tags":["breakfast","energy"],"image_url":"https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?auto=format&fit=crop&w=800&q=80"},
+
+  {"id":21,"title":"Compression Leggings","brand":"AirMove","price":899.00,"category":"apparel","tags":["clothes","gym"],"image_url":"https://images.unsplash.com/photo-1526401485004-2aa7d7b07b5a?auto=format&fit=crop&w=800&q=80"},
+  {"id":22,"title":"Training Gloves","brand":"IronCore","price":349.00,"category":"apparel","tags":["gym","grip"],"image_url":"https://images.unsplash.com/photo-1517964603305-11c0f6f66012?auto=format&fit=crop&w=800&q=80"},
+  {"id":23,"title":"Running Socks (3 pairs)","brand":"AirMove","price":249.00,"category":"apparel","tags":["running","comfort"],"image_url":"https://images.unsplash.com/photo-1526401485004-2aa7d7b07b5a?auto=format&fit=crop&w=800&q=80"},
+  {"id":24,"title":"Sports Cap","brand":"AirMove","price":299.00,"category":"apparel","tags":["outdoor","running"],"image_url":"https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=800&q=80"}
 ]

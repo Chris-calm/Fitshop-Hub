@@ -46,7 +46,15 @@ $filtered = array_values(array_filter($products, function($p) use ($q,$cat){
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <?php foreach ($filtered as $p): ?>
       <a href="index.php?page=product&id=<?=$p['id']?>" class="group fh-card overflow-hidden hover:border-white/15 transition">
-        <div class="aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));"></div>
+        <div class="aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));">
+          <img
+            src="<?= htmlspecialchars((string)($p['image_url'] ?? '')) ?>"
+            alt="<?= htmlspecialchars((string)($p['title'] ?? 'Product')) ?>"
+            class="w-full h-full object-cover"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='https://via.placeholder.com/600x600.png?text=Fitshop+Hub';"
+          />
+        </div>
         <div class="p-3">
           <div class="text-sm text-neutral-400"><?=htmlspecialchars($p['brand'])?></div>
           <div class="font-semibold group-hover:text-brand"><?=htmlspecialchars($p['title'])?></div>

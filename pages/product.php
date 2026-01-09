@@ -5,7 +5,15 @@ $product = null; foreach ($products as $p) { if ($p['id']===$id) { $product=$p; 
 if (!$product) { echo '<p>Product not found.</p>'; return; }
 ?>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-  <div class="rounded-lg border border-neutral-800 bg-neutral-900 aspect-square"></div>
+  <div class="fh-card overflow-hidden aspect-square" style="background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));">
+    <img
+      src="<?= htmlspecialchars((string)($product['image_url'] ?? '')) ?>"
+      alt="<?= htmlspecialchars((string)($product['title'] ?? 'Product')) ?>"
+      class="w-full h-full object-cover"
+      loading="lazy"
+      onerror="this.onerror=null;this.src='https://via.placeholder.com/900x900.png?text=Fitshop+Hub';"
+    />
+  </div>
   <div>
     <h2 class="text-2xl font-bold mb-2"><?=htmlspecialchars($product['title'])?></h2>
     <div class="text-neutral-400 mb-2"><?=htmlspecialchars($product['brand'])?></div>
