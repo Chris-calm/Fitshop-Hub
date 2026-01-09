@@ -43,6 +43,7 @@
           bg1: '#070a12',
           brandRgb: '99 102 241',
           accentRgb: '34 211 238',
+          warmRgb: '244 114 182',
           ecgA: svgUrl('rgba(99,102,241,0.70)', 6, 'rgba(99,102,241,0.55)'),
           ecgB: svgUrl('rgba(34,211,238,0.50)', 4, 'rgba(34,211,238,0.40)'),
           ecgA2: svgUrl('rgba(99,102,241,0.55)', 6, 'rgba(99,102,241,0.38)'),
@@ -57,6 +58,7 @@
           bg1: '#0a0e18',
           brandRgb: '56 189 248',
           accentRgb: '99 102 241',
+          warmRgb: '251 191 36',
           ecgA: svgUrl('rgba(56,189,248,0.62)', 6, 'rgba(56,189,248,0.48)'),
           ecgB: svgUrl('rgba(99,102,241,0.36)', 4, 'rgba(99,102,241,0.28)'),
           ecgA2: svgUrl('rgba(56,189,248,0.46)', 6, 'rgba(56,189,248,0.32)'),
@@ -71,6 +73,7 @@
           bg1: '#0b0b0b',
           brandRgb: '255 255 255',
           accentRgb: '255 215 0',
+          warmRgb: '34 211 238',
           ecgA: svgUrl('rgba(255,255,255,0.78)', 6, 'rgba(255,255,255,0.70)'),
           ecgB: svgUrl('rgba(255,215,0,0.60)', 4, 'rgba(255,215,0,0.54)'),
           ecgA2: svgUrl('rgba(255,255,255,0.55)', 6, 'rgba(255,255,255,0.46)'),
@@ -88,6 +91,7 @@
       r.style.setProperty('--fh-bg-1', t.bg1);
       r.style.setProperty('--fh-brand-rgb', t.brandRgb);
       r.style.setProperty('--fh-accent-rgb', t.accentRgb);
+      r.style.setProperty('--fh-warm-rgb', t.warmRgb || '244 114 182');
       r.style.setProperty('--fh-ecg-a', t.ecgA);
       r.style.setProperty('--fh-ecg-b', t.ecgB);
       r.style.setProperty('--fh-ecg-a2', t.ecgA2);
@@ -118,10 +122,11 @@
     body {
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       background:
-        radial-gradient(900px 520px at 12% 18%, rgb(var(--fh-brand-rgb) / .22), transparent 62%),
-        radial-gradient(820px 520px at 92% 10%, rgb(var(--fh-accent-rgb) / .18), transparent 64%),
-        radial-gradient(700px 520px at 55% 95%, rgb(var(--fh-warm-rgb) / .12), transparent 66%),
-        radial-gradient(560px 420px at 72% 65%, rgb(var(--fh-accent-rgb) / .10), transparent 66%),
+        radial-gradient(980px 560px at 12% 16%, rgb(var(--fh-brand-rgb) / .26), transparent 62%),
+        radial-gradient(900px 620px at 92% 12%, rgb(var(--fh-accent-rgb) / .22), transparent 64%),
+        radial-gradient(760px 560px at 58% 98%, rgb(var(--fh-warm-rgb) / .18), transparent 66%),
+        radial-gradient(640px 520px at 78% 64%, rgb(var(--fh-accent-rgb) / .12), transparent 66%),
+        radial-gradient(520px 420px at 22% 80%, rgb(var(--fh-warm-rgb) / .10), transparent 70%),
         linear-gradient(180deg, var(--fh-bg-0), var(--fh-bg-1));
     }
 
@@ -222,7 +227,7 @@
       background-repeat: repeat;
       background-size: 200px 110px;
       background-position: 0 0, 0 0, 100px 55px, 100px 55px;
-      opacity:.10;
+      opacity:.08;
       filter: drop-shadow(0 0 10px rgb(var(--fh-brand-rgb) / .08)) drop-shadow(0 0 16px rgb(var(--fh-accent-rgb) / .06));
       transform: translateZ(0) rotate(125deg);
     }
@@ -237,7 +242,7 @@
       background-repeat: repeat;
       background-size: 140px 140px;
       background-position: 0 0;
-      opacity:.05;
+      opacity:.045;
       mix-blend-mode: overlay;
     }
     #fhSplash{
