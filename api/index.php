@@ -106,6 +106,7 @@ $allowed = [
     'register' => 'pages/register.php',
     'profile' => 'pages/profile.php',
     'settings' => 'pages/settings.php',
+    'customize' => 'pages/customize.php',
     'logout' => 'pages/logout.php',
     'post_add_to_cart' => 'pages/post_add_to_cart.php',
     'post_checkout' => 'pages/post_checkout.php',
@@ -126,7 +127,7 @@ $allowed = [
     'guide_session' => 'pages/fitness_guides_session.php',
     'guide_summary' => 'pages/fitness_guides_summary.php',
     'food_scan' => 'pages/food_scan.php',
-    'food_history' => 'pages/food_history.php',
+    'food_history' => 'pages/food_history.php', 
     'fitness_history' => 'pages/fitness_history.php'
 ];
 

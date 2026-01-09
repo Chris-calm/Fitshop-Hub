@@ -50,6 +50,90 @@ $oStmt = $pdo->prepare('SELECT o.id, o.total, o.created_at,
   FROM orders o WHERE o.user_id=? ORDER BY o.id DESC');
 $oStmt->execute([(int)$sessionUser['id']]);
 $userOrders = $oStmt->fetchAll();
+
+$today = date('Y-m-d');
+$start7 = date('Y-m-d', strtotime('-6 days'));
+
+$foodTodayCal = 0;
+$foodWeekCal = 0;
+$pWeek = 0.0;
+$cWeek = 0.0;
+$fWeek = 0.0;
+
+$stepsToday = 0;
+$stepsWeek = 0;
+
+$workoutMinWeek = 0;
+
+try {
+  $stmt = $pdo->prepare("SELECT calories, protein_g, carbs_g, fat_g, created_at FROM food_logs WHERE user_id=? AND created_at >= ? ORDER BY created_at DESC");
+  $stmt->execute([(int)$sessionUser['id'], $start7 . ' 00:00:00']);
+  $rows = $stmt->fetchAll();
+  foreach ($rows as $r) {
+    $cal = (int)($r['calories'] ?? 0);
+    $foodWeekCal += max(0, $cal);
+    $pWeek += (float)($r['protein_g'] ?? 0);
+    $cWeek += (float)($r['carbs_g'] ?? 0);
+    $fWeek += (float)($r['fat_g'] ?? 0);
+    $d = !empty($r['created_at']) ? date('Y-m-d', strtotime((string)$r['created_at'])) : '';
+    if ($d === $today) {
+      $foodTodayCal += max(0, $cal);
+    }
+  }
+} catch (Throwable $e) {
+}
+
+try {
+  $stmt = $pdo->prepare('SELECT step_date, steps FROM steps_logs WHERE user_id=? AND step_date >= ? ORDER BY step_date DESC');
+  $stmt->execute([(int)$sessionUser['id'], $start7]);
+  $rows = $stmt->fetchAll();
+  foreach ($rows as $r) {
+    $steps = (int)($r['steps'] ?? 0);
+    $stepsWeek += max(0, $steps);
+    $d = (string)($r['step_date'] ?? '');
+    if ($d === $today) {
+      $stepsToday += max(0, $steps);
+    }
+  }
+} catch (Throwable $e) {
+}
+
+try {
+  $stmt = $pdo->prepare('SELECT total_duration_sec, started_at FROM workout_sessions WHERE user_id=? AND started_at >= ? ORDER BY started_at DESC');
+  $stmt->execute([(int)$sessionUser['id'], $start7 . ' 00:00:00']);
+  $rows = $stmt->fetchAll();
+  foreach ($rows as $r) {
+    $sec = (int)($r['total_duration_sec'] ?? 0);
+    $workoutMinWeek += max(0, (int)round($sec / 60));
+  }
+} catch (Throwable $e) {
+}
+
+// Simple estimates (adjustable later)
+$calBurnStepsToday = (int)round($stepsToday * 0.04);
+$calBurnStepsWeek = (int)round($stepsWeek * 0.04);
+$calBurnWorkoutsWeek = (int)round($workoutMinWeek * 6);
+$calBurnWorkoutsToday = 0;
+
+// Estimate today's workout burn by reading today's sessions (cheap)
+try {
+  $stmt = $pdo->prepare('SELECT total_duration_sec, started_at FROM workout_sessions WHERE user_id=? AND started_at >= ? ORDER BY started_at DESC');
+  $stmt->execute([(int)$sessionUser['id'], $today . ' 00:00:00']);
+  $rows = $stmt->fetchAll();
+  $minToday = 0;
+  foreach ($rows as $r) {
+    $sec = (int)($r['total_duration_sec'] ?? 0);
+    $minToday += max(0, (int)round($sec / 60));
+  }
+  $calBurnWorkoutsToday = (int)round($minToday * 6);
+} catch (Throwable $e) {
+}
+
+$calBurnToday = $calBurnStepsToday + $calBurnWorkoutsToday;
+$calBurnWeek = $calBurnStepsWeek + $calBurnWorkoutsWeek;
+
+$netToday = $foodTodayCal - $calBurnToday;
+$netWeek = $foodWeekCal - $calBurnWeek;
 ?>
 <section class="max-w-4xl mx-auto">
   <div class="flex items-start justify-between gap-3 mb-4">
@@ -87,6 +171,71 @@ $userOrders = $oStmt->fetchAll();
       <div class="text-neutral-400 text-sm">Orders</div>
       <div class="text-2xl font-bold"><?= is_array($userOrders) ? count($userOrders) : 0 ?></div>
     </div>
+  </div>
+
+  <h3 class="text-xl font-semibold mt-6 mb-3">Analytics</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="fh-card p-4">
+      <div class="text-neutral-400 text-sm">Today calories (eaten)</div>
+      <div class="text-2xl font-bold"><?= (int)$foodTodayCal ?></div>
+      <div class="text-xs text-neutral-500 mt-1">From Food Logs</div>
+    </div>
+    <div class="fh-card p-4">
+      <div class="text-neutral-400 text-sm">Today calories (burned)</div>
+      <div class="text-2xl font-bold text-brand"><?= (int)$calBurnToday ?></div>
+      <div class="text-xs text-neutral-500 mt-1"><?= (int)$stepsToday ?> steps • workouts est.</div>
+    </div>
+    <div class="fh-card p-4">
+      <div class="text-neutral-400 text-sm">Today net calories</div>
+      <div class="text-2xl font-bold"><?= (int)$netToday ?></div>
+      <div class="text-xs text-neutral-500 mt-1">Eaten − Burned</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+    <div class="fh-card p-4">
+      <div class="text-neutral-400 text-sm">7-day calories (eaten)</div>
+      <div class="text-2xl font-bold"><?= (int)$foodWeekCal ?></div>
+      <div class="text-xs text-neutral-500 mt-1">Last 7 days</div>
+    </div>
+    <div class="fh-card p-4">
+      <div class="text-neutral-400 text-sm">7-day calories (burned)</div>
+      <div class="text-2xl font-bold text-brand"><?= (int)$calBurnWeek ?></div>
+      <div class="text-xs text-neutral-500 mt-1"><?= (int)$stepsWeek ?> steps • <?= (int)$workoutMinWeek ?> workout mins</div>
+    </div>
+    <div class="fh-card p-4">
+      <div class="text-neutral-400 text-sm">7-day net calories</div>
+      <div class="text-2xl font-bold"><?= (int)$netWeek ?></div>
+      <div class="text-xs text-neutral-500 mt-1">Eaten − Burned</div>
+    </div>
+  </div>
+
+  <div class="fh-card p-4 mt-4">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <div class="text-neutral-400 text-sm">7-day macros</div>
+        <div class="text-xs text-neutral-500">Totals from Food Logs</div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.php?page=food_history" class="fh-btn fh-btn-ghost">Food History</a>
+        <a href="index.php?page=food_scan" class="fh-btn fh-btn-primary">+ Add Meal</a>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-3 mt-3">
+      <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+        <div class="text-neutral-400 text-xs">Protein</div>
+        <div class="text-lg font-semibold"><?= number_format((float)$pWeek, 1) ?> g</div>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+        <div class="text-neutral-400 text-xs">Carbs</div>
+        <div class="text-lg font-semibold"><?= number_format((float)$cWeek, 1) ?> g</div>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+        <div class="text-neutral-400 text-xs">Fat</div>
+        <div class="text-lg font-semibold"><?= number_format((float)$fWeek, 1) ?> g</div>
+      </div>
+    </div>
+    <div class="mt-3 text-xs text-neutral-500">Calories burned is an estimate: steps×0.04 + workout minutes×6.</div>
   </div>
 
   <h3 class="text-xl font-semibold mt-6 mb-3">Current Programs</h3>
