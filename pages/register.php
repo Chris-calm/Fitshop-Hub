@@ -92,7 +92,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   }
 }
 ?>
-<section class="max-w-md mx-auto">
+<section class="min-h-[calc(100vh-140px)] flex items-center">
+  <div class="w-full max-w-md mx-auto">
   <h2 class="text-2xl font-bold mb-4">Register</h2>
   <?php if ($err): ?><div class="mb-4 p-3 rounded bg-red-500/10 text-red-300 border border-red-500/30"><?=htmlspecialchars($err)?></div><?php endif; ?>
   <?php if ($ok): ?><div class="mb-4 p-3 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"><?=htmlspecialchars($ok)?> <a class="text-brand" href="index.php?page=login">Login</a></div><?php endif; ?>
@@ -190,4 +191,5 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     <button class="w-full px-4 py-2 rounded-lg bg-brand text-white">Create Account</button>
   </form>
   <p class="mt-3 text-sm text-neutral-400">Already have an account? <a class="text-brand" href="index.php?page=login">Login</a></p>
+  </div>
 </section>
