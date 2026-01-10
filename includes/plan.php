@@ -4,6 +4,7 @@ function fh_build_plan(array $profile): array {
   $activity = $profile['activity_level'] ?? 'light';
   $equipment = $profile['equipment'] ?? 'none';
   $diet = $profile['diet'] ?? 'none';
+  $programs = ['steps','nutrition'];
   $minutesBase = [ 'sedentary'=>90, 'light'=>120, 'moderate'=>150, 'active'=>180 ];
   $minutes = $minutesBase[$activity] ?? 120;
   $schedule = [];
@@ -11,19 +12,23 @@ function fh_build_plan(array $profile): array {
     case 'lose_weight':
       $split = [ 'Mon'=>'Cardio 30m', 'Tue'=>'Full-body 30m', 'Wed'=>'Cardio 30m', 'Thu'=>'Core+HIIT 30m', 'Fri'=>'Cardio 30m', 'Sat'=>'Active recovery 20m', 'Sun'=>'Rest' ];
       $modules = ['Guides: Fat loss basics','Choreography: Low-impact','Equipment: Mat, bands'];
+      $programs = array_values(array_unique(array_merge($programs, ['cardio','choreography','guides','recovery'])));
       break;
     case 'build_muscle':
       $split = [ 'Mon'=>'Upper 45m', 'Tue'=>'Lower 45m', 'Wed'=>'Cardio 20m', 'Thu'=>'Push 45m', 'Fri'=>'Pull 45m', 'Sat'=>'Core+Mobility 25m', 'Sun'=>'Rest' ];
       $modules = ['Guides: Hypertrophy','Equipment: Dumbbells','Supplements: Whey protein'];
+      $programs = array_values(array_unique(array_merge($programs, ['strength','guides','recovery'])));
       $minutes += 30;
       break;
     case 'endurance':
       $split = [ 'Mon'=>'Run 30m', 'Tue'=>'Mobility 20m', 'Wed'=>'Run 40m', 'Thu'=>'Strength 30m', 'Fri'=>'Run 30m', 'Sat'=>'Long cardio 60m', 'Sun'=>'Rest' ];
       $modules = ['Choreography: Cardio routines','Guides: Running form'];
+      $programs = array_values(array_unique(array_merge($programs, ['cardio','choreography','guides'])));
       break;
     default:
       $split = [ 'Mon'=>'Full-body 30m', 'Tue'=>'Walk 20m', 'Wed'=>'Core 20m', 'Thu'=>'Mobility 20m', 'Fri'=>'Cardio 25m', 'Sat'=>'Fun activity 30m', 'Sun'=>'Rest' ];
       $modules = ['Guides: Foundations','Choreography: Beginner'];
+      $programs = array_values(array_unique(array_merge($programs, ['choreography','guides','recovery'])));
   }
   // Equipment adaptation
   if ($equipment === 'gym_access') {
@@ -44,6 +49,7 @@ function fh_build_plan(array $profile): array {
     'recommended_minutes_per_week'=>$minutes,
     'weekly_schedule'=>$split,
     'modules'=>$modules,
+    'programs'=>$programs,
     'diet_tips'=>$dietTips,
     'suggested_shop_categories'=>
       ($goal==='build_muscle'?['equipment','supplements','snacks']:['equipment','snacks'])

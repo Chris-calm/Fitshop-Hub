@@ -54,22 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
   $next = array_values(array_unique($next));
 
-  if (empty($next)) {
-    $err = 'Please select at least one program.';
-  } else {
-    try {
-      $plan['programs'] = $next;
-      $encoded = json_encode($plan);
-      if ($encoded === false) {
-        $encoded = '{}';
-      }
-      $up = $pdo->prepare('UPDATE users SET plan_json=? WHERE id=?');
-      $up->execute([$encoded, (int)$u['id']]);
-      $selected = $next;
-      $ok = 'Programs updated.';
-    } catch (Throwable $e) {
-      $err = 'Failed to save programs.';
+  try {
+    // Empty selection means: do not restrict modules (show all)
+    $plan['programs'] = $next;
+    $encoded = json_encode($plan);
+    if ($encoded === false) {
+      $encoded = '{}';
     }
+    $up = $pdo->prepare('UPDATE users SET plan_json=? WHERE id=?');
+    $up->execute([$encoded, (int)$u['id']]);
+    $selected = $next;
+    $ok = 'Programs updated.';
+  } catch (Throwable $e) {
+    $err = 'Failed to save programs.';
   }
 }
 ?>
