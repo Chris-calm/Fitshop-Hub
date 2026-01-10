@@ -301,6 +301,7 @@
     require_once __DIR__ . '/cart_store.php';
     $cart = fh_cart_get();
     $cartCount = fh_cart_count($cart);
+    $defaultAvatar = 'data:image/svg+xml;utf8,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#111827"/><circle cx="40" cy="30" r="14" fill="#374151"/><path d="M16 70c4-16 16-24 24-24s20 8 24 24" fill="#374151"/></svg>');
   ?>
   <header class="fh-header sticky top-0 z-50 relative">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
@@ -319,7 +320,7 @@
           <a href="index.php?page=customize" class="fh-btn fh-btn-ghost">Customize</a>
           <a href="index.php?page=settings" class="fh-btn fh-btn-ghost">Settings</a>
           <a href="index.php?page=profile" class="fh-btn fh-btn-ghost flex items-center gap-2 px-2 py-1">
-            <img src="<?= htmlspecialchars($u['photo_url'] ?? 'https://i.pravatar.cc/40') ?>" class="w-6 h-6 rounded-full" alt="avatar"/>
+            <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: $defaultAvatar) ?>" class="w-6 h-6 rounded-full object-cover" alt="avatar"/>
             <span class="text-sm hidden sm:block"><?= htmlspecialchars($u['name']) ?></span>
           </a>
           <a href="index.php?page=logout" class="fh-btn fh-btn-primary">Logout</a>

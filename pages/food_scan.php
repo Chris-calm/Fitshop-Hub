@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $allowed = ['image/jpeg' => '.jpg', 'image/png' => '.png', 'image/webp'=>'.webp'];
     $mime = fh_detect_upload_mime($_FILES['photo']);
     $ext = $allowed[$mime] ?? null;
+    error_log('FOOD_SCAN photo:present user=' . (string)($u['id'] ?? '') . ' mime=' . (string)$mime . ' use_supabase=' . ($useSupabaseStorage ? '1' : '0'));
     if (!$ext) {
       $err = 'Unsupported image type.';
     } else {
@@ -79,7 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
           $bucket = getenv('SUPABASE_FOOD_BUCKET') ?: 'food';
           $key = 'food_' . $u['id'] . '_' . time() . '_' . bin2hex(random_bytes(6)) . $ext;
+          error_log('FOOD_SCAN upload:begin bucket=' . (string)$bucket . ' key=' . (string)$key);
           $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $mime ?: 'application/octet-stream');
+          error_log('FOOD_SCAN upload:ok url=' . (string)$photoPath);
         } catch (Throwable $e) {
           $warn = 'Photo upload failed. Your meal can still be saved without a photo.';
           error_log('Food upload failed: ' . $e->getMessage());

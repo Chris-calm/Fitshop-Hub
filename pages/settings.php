@@ -11,6 +11,8 @@ $addrErr = '';
 $acctErr = '';
 $acctOk = '';
 
+$defaultAvatar = 'data:image/svg+xml;utf8,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#111827"/><circle cx="40" cy="30" r="14" fill="#374151"/><path d="M16 70c4-16 16-24 24-24s20 8 24 24" fill="#374151"/></svg>');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $accountAction = $_POST['account_action'] ?? '';
   if ($accountAction === 'update_account') {
@@ -117,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $city = trim((string)($_POST['city'] ?? ''));
     $province = trim((string)($_POST['province'] ?? ''));
     $postal = trim((string)($_POST['postal_code'] ?? ''));
-    $makeDefault = !empty($_POST['is_default']) ? 1 : 0;
+    $makeDefault = !empty($_POST['is_default']);
 
     if ($id <= 0) {
       $addrErr = 'Invalid address.';
@@ -127,15 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       try {
         $pdo->beginTransaction();
         if ($makeDefault) {
-          $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([(int)$sessionUser['id']]);
+          $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
         }
-        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, is_default=CASE WHEN ?=1 THEN 1 ELSE is_default END WHERE id=? AND user_id=?')
+        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, is_default=CASE WHEN ? THEN true ELSE is_default END WHERE id=? AND user_id=?')
           ->execute([$fullName, $phone, $line1, ($line2 ?: null), $city, $province, $postal, $makeDefault, $id, (int)$sessionUser['id']]);
         $pdo->commit();
         header('Location: index.php?page=settings');
         exit;
       } catch (Throwable $e) {
         $pdo->rollBack();
+        error_log('Address update failed: ' . $e->getMessage());
         $addrErr = 'Failed to update address.';
       }
     }
@@ -149,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $city = trim((string)($_POST['city'] ?? ''));
     $province = trim((string)($_POST['province'] ?? ''));
     $postal = trim((string)($_POST['postal_code'] ?? ''));
-    $makeDefault = !empty($_POST['is_default']) ? 1 : 0;
+    $makeDefault = !empty($_POST['is_default']);
 
     if ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
       $addrErr = 'Please fill out all required address fields.';
@@ -157,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       try {
         $pdo->beginTransaction();
         if ($makeDefault) {
-          $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([(int)$sessionUser['id']]);
+          $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
         }
         $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, is_default) VALUES (?,?,?,?,?,?,?,?,?)')
           ->execute([(int)$sessionUser['id'], $fullName, $phone, $line1, $line2 ?: null, $city, $province, $postal, $makeDefault]);
@@ -166,6 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
       } catch (Throwable $e) {
         $pdo->rollBack();
+        error_log('Address save failed: ' . $e->getMessage());
         $addrErr = 'Failed to save address.';
       }
     }
@@ -189,13 +193,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id > 0) {
       try {
         $pdo->beginTransaction();
-        $pdo->prepare('UPDATE user_addresses SET is_default=0 WHERE user_id=?')->execute([(int)$sessionUser['id']]);
-        $pdo->prepare('UPDATE user_addresses SET is_default=1 WHERE id=? AND user_id=?')->execute([$id, (int)$sessionUser['id']]);
+        $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
+        $pdo->prepare('UPDATE user_addresses SET is_default=true WHERE id=? AND user_id=?')->execute([$id, (int)$sessionUser['id']]);
         $pdo->commit();
         header('Location: index.php?page=settings');
         exit;
       } catch (Throwable $e) {
         $pdo->rollBack();
+        error_log('Address set default failed: ' . $e->getMessage());
         $addrErr = 'Failed to update default address.';
       }
     }
@@ -228,7 +233,7 @@ try {
     </div>
 
   <div class="fh-card p-4 flex items-center gap-3">
-    <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: 'https://i.pravatar.cc/80') ?>" class="w-12 h-12 rounded-full" alt="avatar"/>
+    <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: $defaultAvatar) ?>" class="w-12 h-12 rounded-full object-cover" alt="avatar"/>
     <div>
       <div class="font-semibold text-lg"><?= htmlspecialchars($u['name']) ?></div>
       <div class="text-neutral-400 text-sm"><?= htmlspecialchars($u['email']) ?></div>

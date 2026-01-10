@@ -38,7 +38,7 @@ if ($userId) {
       <div class="text-neutral-300 font-semibold mb-1">No saved address</div>
       <div class="text-neutral-400 text-sm">You must add a saved address before checkout.</div>
       <div class="mt-3">
-        <a href="index.php?page=profile" class="px-4 py-2 rounded-lg bg-brand text-white inline-block">Go to Profile</a>
+        <a href="index.php?page=settings" class="px-4 py-2 rounded-lg bg-brand text-white inline-block">Go to Settings</a>
       </div>
     </div>
   <?php else: ?>
@@ -57,7 +57,7 @@ if ($userId) {
             <option value="<?= (int)$a['id'] ?>"><?= htmlspecialchars($label) ?></option>
           <?php endforeach; ?>
         </select>
-        <div class="mt-2 text-sm text-neutral-400">Manage addresses in <a class="underline" href="index.php?page=profile">Profile</a>.</div>
+        <div class="mt-2 text-sm text-neutral-400">Manage addresses in <a class="underline" href="index.php?page=settings">Settings</a>.</div>
       </div>
       <div>
         <label class="block text-sm text-neutral-400">Payment Method</label>

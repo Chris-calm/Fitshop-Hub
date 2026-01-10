@@ -134,6 +134,8 @@ $calBurnWeek = $calBurnStepsWeek + $calBurnWorkoutsWeek;
 
 $netToday = $foodTodayCal - $calBurnToday;
 $netWeek = $foodWeekCal - $calBurnWeek;
+
+$defaultAvatar = 'data:image/svg+xml;utf8,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#111827"/><circle cx="40" cy="30" r="14" fill="#374151"/><path d="M16 70c4-16 16-24 24-24s20 8 24 24" fill="#374151"/></svg>');
 ?>
 <section class="max-w-4xl mx-auto">
   <div class="flex items-start justify-between gap-3 mb-4">
@@ -143,7 +145,7 @@ $netWeek = $foodWeekCal - $calBurnWeek;
 
   <div class="fh-card p-4 flex items-center justify-between gap-3">
     <div class="flex items-center gap-3 min-w-0">
-      <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: 'https://i.pravatar.cc/80') ?>" class="w-12 h-12 rounded-full" alt="avatar"/>
+      <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: $defaultAvatar) ?>" class="w-12 h-12 rounded-full object-cover" alt="avatar"/>
       <div class="min-w-0">
         <div class="font-semibold text-lg truncate"><?= htmlspecialchars((string)($u['name'] ?? '')) ?></div>
         <div class="text-neutral-400 text-sm truncate"><?= htmlspecialchars((string)($u['email'] ?? '')) ?></div>
