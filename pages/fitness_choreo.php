@@ -1,8 +1,11 @@
 <?php
 require __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/db.php';
+require __DIR__ . '/../includes/programs.php';
 require_login();
 $u = $_SESSION['user'];
+$selectedPrograms = fh_user_selected_programs($pdo, (int)$u['id']);
+fh_require_any_program($selectedPrograms, ['choreography']);
 $stmt = $pdo->prepare('SELECT plan_json FROM users WHERE id=?');
 $stmt->execute([$u['id']]);
 $plan = json_decode($stmt->fetchColumn() ?: 'null', true);

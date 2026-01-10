@@ -1,8 +1,11 @@
 <?php
 require __DIR__ . '/../includes/auth.php';
 require __DIR__ . '/../includes/db.php';
+require __DIR__ . '/../includes/programs.php';
 require_login();
 $u = $_SESSION['user'];
+$selectedPrograms = fh_user_selected_programs($pdo, (int)$u['id']);
+fh_require_any_program($selectedPrograms, ['strength', 'cardio']);
 $stmt = $pdo->prepare('SELECT plan_json FROM users WHERE id=?');
 $stmt->execute([$u['id']]);
 $plan = json_decode($stmt->fetchColumn() ?: 'null', true);
@@ -10,6 +13,18 @@ $content = json_decode(file_get_contents(__DIR__.'/../storage/fitness_content.js
 $items = $content['gym'] ?? [];
 $equipment = $plan['equipment'] ?? 'none';
 $goal = $plan['goal'] ?? 'general_health';
+// Filter based on selected programs.
+if (!empty($selectedPrograms)) {
+  $allowStrength = in_array('strength', $selectedPrograms, true);
+  $allowCardio = in_array('cardio', $selectedPrograms, true);
+  $items = array_values(array_filter($items, function($g) use ($allowStrength, $allowCardio){
+    $tags = $g['tags'] ?? [];
+    $tagsStr = implode(' ', array_map('strval', is_array($tags) ? $tags : []));
+    $isCardio = stripos($tagsStr, 'endurance') !== false || stripos($tagsStr, 'cardio') !== false;
+    if ($isCardio) return $allowCardio;
+    return $allowStrength;
+  }));
+}
 // Show all programs; mark those that best match the user's equipment/goal
 $recommended = array_map(function($g) use ($equipment,$goal){
   $match = 0;

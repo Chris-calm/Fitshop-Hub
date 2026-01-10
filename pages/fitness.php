@@ -1,3 +1,64 @@
+<?php
+require __DIR__ . '/../includes/auth.php';
+require __DIR__ . '/../includes/db.php';
+require_login();
+
+$u = $_SESSION['user'];
+$stmt = $pdo->prepare('SELECT plan_json FROM users WHERE id=?');
+$stmt->execute([(int)$u['id']]);
+$plan = json_decode($stmt->fetchColumn() ?: 'null', true);
+
+$selected = [];
+if (is_array($plan) && !empty($plan['programs']) && is_array($plan['programs'])) {
+  foreach ($plan['programs'] as $pid) {
+    $pid = (string)$pid;
+    if ($pid !== '') {
+      $selected[] = $pid;
+    }
+  }
+}
+$selected = array_values(array_unique($selected));
+
+// If not set (older users), show all.
+$filterEnabled = !empty($selected);
+
+$tiles = [
+  'choreography' => [
+    'href' => 'index.php?page=choreography',
+    'title' => 'Choreography',
+    'desc' => 'Dance-based workouts',
+  ],
+  'guides' => [
+    'href' => 'index.php?page=guides',
+    'title' => 'Guides',
+    'desc' => 'Step-by-step routines',
+  ],
+  'strength' => [
+    'href' => 'index.php?page=gym',
+    'title' => 'Strength / Gym',
+    'desc' => 'Plans for strength and muscle',
+  ],
+  'cardio' => [
+    'href' => 'index.php?page=gym',
+    'title' => 'Cardio',
+    'desc' => 'Endurance and conditioning plans',
+  ],
+  'nutrition' => [
+    'href' => 'index.php?page=food_scan',
+    'title' => 'Nutrition Tracking',
+    'desc' => 'Log meals and track macros',
+  ],
+  'recovery' => [
+    'href' => 'index.php?page=guides',
+    'title' => 'Recovery / Mobility',
+    'desc' => 'Stretching and mobility guides',
+  ],
+  // steps is already the dashboard itself; we don't add a tile.
+];
+
+$exploreOrder = ['choreography','guides','strength','cardio','nutrition','recovery'];
+?>
+
 <section>
   <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-6">
     <div>
@@ -67,21 +128,33 @@
             <div class="text-sm text-neutral-400">Explore</div>
             <div class="font-semibold">Pick a workout style</div>
           </div>
-          <a href="index.php?page=profile" class="fh-btn fh-btn-ghost">Customize</a>
+          <a href="index.php?page=customize" class="fh-btn fh-btn-ghost">Customize</a>
         </div>
         <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <a href="index.php?page=choreography" class="fh-card p-4 border border-white/10 hover:border-white/15" style="background: rgba(255,255,255,.03);">
-            <div class="font-semibold">Choreography</div>
-            <div class="text-sm text-neutral-400">Dance-based workouts</div>
-          </a>
-          <a href="index.php?page=guides" class="fh-card p-4 border border-white/10 hover:border-white/15" style="background: rgba(255,255,255,.03);">
-            <div class="font-semibold">Guides</div>
-            <div class="text-sm text-neutral-400">Step-by-step routines</div>
-          </a>
-          <a href="index.php?page=gym" class="fh-card p-4 border border-white/10 hover:border-white/15" style="background: rgba(255,255,255,.03);">
-            <div class="font-semibold">Gym Programs</div>
-            <div class="text-sm text-neutral-400">Strength & cardio plans</div>
-          </a>
+          <?php
+            $rendered = 0;
+            foreach ($exploreOrder as $pid) {
+              if (!isset($tiles[$pid])) continue;
+              if ($filterEnabled && !in_array($pid, $selected, true)) continue;
+              $t = $tiles[$pid];
+              $rendered++;
+              ?>
+              <a href="<?= htmlspecialchars($t['href']) ?>" class="fh-card p-4 border border-white/10 hover:border-white/15" style="background: rgba(255,255,255,.03);">
+                <div class="font-semibold"><?= htmlspecialchars($t['title']) ?></div>
+                <div class="text-sm text-neutral-400"><?= htmlspecialchars($t['desc']) ?></div>
+              </a>
+              <?php
+            }
+          ?>
+
+          <?php if ($rendered === 0): ?>
+            <div class="fh-card p-4 border border-white/10" style="background: rgba(255,255,255,.03);">
+              <div class="font-semibold">No programs selected</div>
+              <div class="text-sm text-neutral-400">Choose your programs in Customize to see them here.</div>
+              <div class="mt-3"><a href="index.php?page=customize" class="fh-btn fh-btn-primary">Open Customize</a></div>
+            </div>
+          <?php endif; ?>
+
           <a href="index.php?page=fitness_history" class="fh-card p-4 border border-white/10 hover:border-white/15" style="background: rgba(255,255,255,.03);">
             <div class="font-semibold">My Fitness History</div>
             <div class="text-sm text-neutral-400">Sessions & activity logs</div>
