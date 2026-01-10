@@ -38,6 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $title = trim($_POST['title'] ?? '');
   $ingredients = trim($_POST['ingredients_text'] ?? '');
   $servingSize = trim($_POST['serving_size'] ?? '');
+  $useSupabaseStorage = false;
+  try {
+    $useSupabaseStorage = (supabase_base_url() !== '') && ((getenv('SUPABASE_SERVICE_ROLE_KEY') ?: '') !== '');
+  } catch (Throwable $e) {
+    $useSupabaseStorage = false;
+    error_log('Food upload config invalid: ' . $e->getMessage());
+  }
   // Default macros to 0 if empty; ensure non-negative
   $cal = isset($_POST['calories']) && $_POST['calories'] !== '' ? intval($_POST['calories']) : 0;
   $protein = isset($_POST['protein_g']) && $_POST['protein_g'] !== '' ? floatval($_POST['protein_g']) : 0.0;
@@ -68,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$ext) {
       $err = 'Unsupported image type.';
     } else {
-      if (IS_VERCEL) {
+      if ($useSupabaseStorage) {
         try {
           $bucket = getenv('SUPABASE_FOOD_BUCKET') ?: 'food';
           $key = 'food_' . $u['id'] . '_' . time() . '_' . bin2hex(random_bytes(6)) . $ext;
