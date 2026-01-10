@@ -23,7 +23,8 @@ foreach ($cart as $key=>$qty) {
   }
 }
 ?>
-<section>
+<section class="min-h-[calc(100vh-140px)] flex items-center">
+  <div id="cartContainer" class="w-full max-w-4xl mx-auto">
   <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
   <?php if (!$items): ?>
     <p class="text-neutral-400">Cart is empty.</p>
@@ -61,6 +62,7 @@ foreach ($cart as $key=>$qty) {
     <script>
     (function(){
       const BASE = (typeof window !== 'undefined' && window.__BASE_URL__) ? window.__BASE_URL__ : '';
+      const container = document.getElementById('cartContainer');
       const totalEl = document.getElementById('cartTotal');
       const itemsEl = document.getElementById('cartItems');
       const clearBtn = document.getElementById('btnClearCart');
@@ -117,9 +119,8 @@ foreach ($cart as $key=>$qty) {
       const ensureNotEmpty = (empty) => {
         if (!empty) return;
         if (itemsEl) itemsEl.innerHTML = '';
-        const section = document.querySelector('section');
-        if (section) {
-          section.innerHTML = '<h2 class="text-2xl font-bold mb-4">Your Cart</h2><p class="text-neutral-400">Cart is empty.</p>';
+        if (container) {
+          container.innerHTML = '<h2 class="text-2xl font-bold mb-4">Your Cart</h2><p class="text-neutral-400">Cart is empty.</p>';
         }
         setNavCount(0);
       };
@@ -175,4 +176,5 @@ foreach ($cart as $key=>$qty) {
     })();
     </script>
   <?php endif; ?>
+  </div>
 </section>

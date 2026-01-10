@@ -6,13 +6,14 @@ require_login();
 $u = $_SESSION['user'];
 $selectedPrograms = fh_user_selected_programs($pdo, (int)$u['id']);
 fh_require_any_program($selectedPrograms, ['strength', 'cardio']);
-$stmt = $pdo->prepare('SELECT plan_json FROM users WHERE id=?');
+$stmt = $pdo->prepare('SELECT plan_json, goal, activity_level, equipment, diet FROM users WHERE id=?');
 $stmt->execute([$u['id']]);
-$plan = json_decode($stmt->fetchColumn() ?: 'null', true);
+$row = $stmt->fetch();
+$plan = json_decode(($row['plan_json'] ?? '') ?: 'null', true);
 $content = json_decode(file_get_contents(__DIR__.'/../storage/fitness_content.json'), true);
 $items = $content['gym'] ?? [];
-$equipment = $plan['equipment'] ?? 'none';
-$goal = $plan['goal'] ?? 'general_health';
+$equipment = $plan['equipment'] ?? ($row['equipment'] ?? 'none');
+$goal = $plan['goal'] ?? ($row['goal'] ?? 'general_health');
 // Filter based on selected programs.
 if (!empty($selectedPrograms)) {
   $allowStrength = in_array('strength', $selectedPrograms, true);

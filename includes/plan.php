@@ -46,6 +46,8 @@ function fh_build_plan(array $profile): array {
   return [
     'goal'=>$goal,
     'activity_level'=>$activity,
+    'equipment'=>$equipment,
+    'diet'=>$diet,
     'recommended_minutes_per_week'=>$minutes,
     'weekly_schedule'=>$split,
     'modules'=>$modules,
