@@ -46,6 +46,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($cal < 0 || $protein < 0 || $carbs < 0 || $fat < 0) {
     $err = 'Macros must be non-negative.';
   }
+
+  // Supabase schema uses numeric(6,2) for macros => max abs value is 9999.99
+  $maxMacro = 9999.99;
+  if (!$err) {
+    if ($protein > $maxMacro || $carbs > $maxMacro || $fat > $maxMacro) {
+      $err = 'Macros are too large. Please enter values up to 9999.99g.';
+    }
+  }
+
+  // Normalize for numeric(6,2)
+  $protein = round(max(0.0, $protein), 2);
+  $carbs = round(max(0.0, $carbs), 2);
+  $fat = round(max(0.0, $fat), 2);
   $photoPath = null;
 
   if (!empty($_FILES['photo']['name']) && is_uploaded_file($_FILES['photo']['tmp_name'])) {
