@@ -8,6 +8,8 @@ $u = $_SESSION['user'];
 $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $title = trim($_POST['title'] ?? '');
+  $ingredients = trim($_POST['ingredients_text'] ?? '');
+  $servingSize = trim($_POST['serving_size'] ?? '');
   // Default macros to 0 if empty; ensure non-negative
   $cal = isset($_POST['calories']) && $_POST['calories'] !== '' ? intval($_POST['calories']) : 0;
   $protein = isset($_POST['protein_g']) && $_POST['protein_g'] !== '' ? floatval($_POST['protein_g']) : 0.0;
@@ -49,8 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if (!$err) {
-    $stmt = $pdo->prepare('INSERT INTO food_logs (user_id, title, photo_path, calories, protein_g, carbs_g, fat_g) VALUES (?,?,?,?,?,?,?)');
-    $stmt->execute([$u['id'], $title ?: 'Meal', $photoPath, $cal, $protein, $carbs, $fat]);
+    try {
+      $stmt = $pdo->prepare('INSERT INTO food_logs (user_id, title, photo_path, ingredients_text, serving_size, calories, protein_g, carbs_g, fat_g) VALUES (?,?,?,?,?,?,?,?,?)');
+      $stmt->execute([$u['id'], $title ?: 'Meal', $photoPath, $ingredients ?: null, $servingSize ?: null, $cal, $protein, $carbs, $fat]);
+    } catch (Throwable $e) {
+      // Backward-compatible insert if DB schema is not migrated yet
+      $stmt = $pdo->prepare('INSERT INTO food_logs (user_id, title, photo_path, calories, protein_g, carbs_g, fat_g) VALUES (?,?,?,?,?,?,?)');
+      $stmt->execute([$u['id'], $title ?: 'Meal', $photoPath, $cal, $protein, $carbs, $fat]);
+    }
     header('Location: index.php?page=food_history');
     exit;
   }
@@ -72,25 +80,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <span id="detectMsg" class="text-sm text-neutral-400"></span>
       </div>
     </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <label class="block text-sm text-neutral-300 mb-1">Serving size (optional)</label>
+        <input name="serving_size" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" placeholder="e.g., 1 cup (228g)" />
+      </div>
+      <div>
+        <label class="block text-sm text-neutral-300 mb-1">Ingredients (optional)</label>
+        <input name="ingredients_text" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" placeholder="Auto-filled when detectable" />
+      </div>
+    </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
       <div>
         <label class="block text-sm text-neutral-300 mb-1">Calories</label>
-        <input type="number" name="calories" min="0" step="1" required readonly class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
+        <input type="number" name="calories" min="0" step="1" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
       </div>
       <div>
         <label class="block text-sm text-neutral-300 mb-1">Protein (g)</label>
-        <input type="number" step="0.1" min="0" required readonly name="protein_g" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
+        <input type="number" step="0.1" min="0" name="protein_g" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
       </div>
       <div>
         <label class="block text-sm text-neutral-300 mb-1">Carbs (g)</label>
-        <input type="number" step="0.1" min="0" required readonly name="carbs_g" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
+        <input type="number" step="0.1" min="0" name="carbs_g" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
       </div>
       <div>
         <label class="block text-sm text-neutral-300 mb-1">Fat (g)</label>
-        <input type="number" step="0.1" min="0" required readonly name="fat_g" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
+        <input type="number" step="0.1" min="0" name="fat_g" class="w-full bg-neutral-900 border border-neutral-800 rounded px-3 py-2" />
       </div>
     </div>
-    <button id="btnSave" type="submit" disabled class="px-4 py-2 rounded-lg bg-brand text-white disabled:opacity-60 disabled:cursor-not-allowed">Save</button>
+    <button id="btnSave" type="submit" class="px-4 py-2 rounded-lg bg-brand text-white">Save</button>
   </form>
   <script>
   (function(){
@@ -101,17 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     msg.textContent = 'Select or capture a photo to auto-detect nutrition.';
 
     const fileInput = form.querySelector('input[name="photo"]');
-    const btnSave = document.getElementById('btnSave');
     const cal = form.querySelector('input[name="calories"]');
     const p = form.querySelector('input[name="protein_g"]');
     const c = form.querySelector('input[name="carbs_g"]');
     const f = form.querySelector('input[name="fat_g"]');
     const titleInput = form.querySelector('input[name="title"]');
-
-    const setSaveEnabled = (enabled) => {
-      if (!btnSave) return;
-      btnSave.disabled = !enabled;
-    };
+    const ingredientsInput = form.querySelector('input[name="ingredients_text"]');
+    const servingInput = form.querySelector('input[name="serving_size"]');
 
     const clearValues = () => {
       if (cal) cal.value = '';
@@ -122,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     const detect = async () => {
       msg.textContent = '';
-      setSaveEnabled(false);
       clearValues();
 
       if (!fileInput || !fileInput.files || fileInput.files.length === 0){
@@ -145,19 +158,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (titleInput && data.description) titleInput.value = data.description;
+        if (servingInput && data.serving_size) servingInput.value = data.serving_size;
+        if (ingredientsInput && data.ingredients) ingredientsInput.value = data.ingredients;
         if (cal && typeof data.calories !== 'undefined') cal.value = Math.max(0, parseInt(data.calories||0,10));
         if (p && typeof data.protein_g !== 'undefined') p.value = Math.max(0, parseFloat(data.protein_g||0));
         if (c && typeof data.carbs_g !== 'undefined') c.value = Math.max(0, parseFloat(data.carbs_g||0));
         if (f && typeof data.fat_g !== 'undefined') f.value = Math.max(0, parseFloat(data.fat_g||0));
 
-        const ok = !!(cal && cal.value !== '' && p && p.value !== '' && c && c.value !== '' && f && f.value !== '');
-        if (!ok) {
-          msg.textContent = 'Detection completed, but values were missing. Try another photo.';
-          return;
-        }
-
-        msg.textContent = 'Nutrition detected. You can Save now.';
-        setSaveEnabled(true);
+        msg.textContent = 'Detected fields were filled. Review and Save.';
       } catch (e){
         msg.textContent = 'Network error during detection.';
       } finally {

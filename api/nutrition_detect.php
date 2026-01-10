@@ -101,7 +101,7 @@ try {
                 'content' => [
                     [
                         'type' => 'text',
-                        'text' => 'Analyze the food item in this image. Provide a nutrition estimate in JSON format. The JSON object should only contain these keys: "calories" (number), "protein_g" (number), "carbs_g" (number), "fat_g" (number), and "description" (string, brief name of the food). Do not include any extra text or markdown formatting outside the JSON object itself.'
+                        'text' => 'Extract nutrition facts AND ingredients from the product/package in this image. Return ONLY a single JSON object with these keys: "description" (string), "serving_size" (string or empty), "ingredients" (string or empty; the full ingredients list as seen), "calories" (number), "protein_g" (number), "carbs_g" (number), "fat_g" (number). If a value is not visible, set it to 0 for numbers and empty string for strings. Do not include any extra text or markdown outside the JSON object.'
                     ],
                     [
                         'type' => 'image_url',
@@ -161,7 +161,22 @@ try {
         throw new Exception('Failed to decode nutrition JSON from OpenAI response.');
     }
 
-    echo json_encode($nutritionJson);
+    if (!is_array($nutritionJson)) {
+        throw new Exception('Nutrition JSON is not an object.');
+    }
+
+    $out = [
+        'description' => (string)($nutritionJson['description'] ?? ''),
+        'serving_size' => (string)($nutritionJson['serving_size'] ?? ''),
+        'ingredients' => (string)($nutritionJson['ingredients'] ?? ''),
+        'calories' => (float)($nutritionJson['calories'] ?? 0),
+        'protein_g' => (float)($nutritionJson['protein_g'] ?? 0),
+        'carbs_g' => (float)($nutritionJson['carbs_g'] ?? 0),
+        'fat_g' => (float)($nutritionJson['fat_g'] ?? 0),
+    ];
+
+    echo json_encode($out);
+
 
 } catch (Exception $e) {
     http_response_code(500);

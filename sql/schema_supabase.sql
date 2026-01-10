@@ -146,6 +146,9 @@ create table if not exists public.food_logs (
   title varchar(160) not null,
   photo_path text null,
 
+  ingredients_text text null,
+  serving_size text null,
+
   calories integer not null default 0,
   protein_g numeric(6,2) not null default 0,
   carbs_g numeric(6,2) not null default 0,
@@ -153,6 +156,12 @@ create table if not exists public.food_logs (
 
   created_at timestamptz not null default now()
 );
+
+alter table public.food_logs
+  add column if not exists ingredients_text text null;
+
+alter table public.food_logs
+  add column if not exists serving_size text null;
 
 create index if not exists idx_food_logs_user_id_created_at on public.food_logs(user_id, created_at desc);
 
