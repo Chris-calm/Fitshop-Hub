@@ -11,7 +11,7 @@ function fh_detect_upload_mime(array $file): string {
     $fi = finfo_open(FILEINFO_MIME_TYPE);
     if ($fi) {
       $m = finfo_file($fi, $tmp);
-      finfo_close($fi);
+      $fi = null;
       if (is_string($m) && $m !== '') {
         return $m;
       }
@@ -51,14 +51,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $maxMacro = 9999.99;
   if (!$err) {
     if ($protein > $maxMacro || $carbs > $maxMacro || $fat > $maxMacro) {
-      $err = 'Macros are too large. Please enter values up to 9999.99g.';
+      $warn = 'Some detected macros were too large and were clamped to 9999.99g. Please review before saving.';
     }
   }
 
   // Normalize for numeric(6,2)
-  $protein = round(max(0.0, $protein), 2);
-  $carbs = round(max(0.0, $carbs), 2);
-  $fat = round(max(0.0, $fat), 2);
+  $protein = round(min($maxMacro, max(0.0, $protein)), 2);
+  $carbs = round(min($maxMacro, max(0.0, $carbs)), 2);
+  $fat = round(min($maxMacro, max(0.0, $fat)), 2);
   $photoPath = null;
 
   if (!empty($_FILES['photo']['name']) && is_uploaded_file($_FILES['photo']['tmp_name'])) {
