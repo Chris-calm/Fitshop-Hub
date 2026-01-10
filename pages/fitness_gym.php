@@ -39,14 +39,22 @@ usort($recommended, function($a,$b){ return ($b['score']??0) <=> ($a['score']??0
 <section>
   <h2 class="text-2xl font-bold mb-2">Gym Programs</h2>
   <p class="text-neutral-400 mb-4">Showing all programs. Best matches for your setup (<span class="capitalize"><?= htmlspecialchars(str_replace('_',' ',$equipment)) ?></span>) and goal are highlighted.</p>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <?php foreach ($recommended as $g): ?>
-      <div class="rounded-lg border <?= ($g['score']??0) >= 2 ? 'border-brand/60' : 'border-neutral-800' ?> bg-neutral-900 p-4">
-        <div class="text-sm text-neutral-400">Level: <?= htmlspecialchars($g['level']) ?></div>
-        <div class="font-semibold mb-2"><?= htmlspecialchars($g['title']) ?></div>
-        <?php if (($g['score']??0) >= 2): ?><div class="text-xs inline-block px-2 py-1 rounded bg-brand/20 text-brand mb-2">Best for you</div><?php endif; ?>
-        <a class="text-brand text-sm" href="index.php?page=gym_detail&id=<?= urlencode($g['id']) ?>">View Program →</a>
-      </div>
-    <?php endforeach; ?>
-  </div>
+  <?php if (empty($recommended)): ?>
+    <div class="rounded-xl border border-neutral-800 bg-neutral-900 p-4">
+      <div class="font-semibold mb-1">No programs available</div>
+      <div class="text-sm text-neutral-400">Your current Customize selection filtered out all gym programs. Update your selections to bring programs back.</div>
+      <div class="mt-3"><a class="fh-btn fh-btn-primary" href="index.php?page=customize">Open Customize</a></div>
+    </div>
+  <?php else: ?>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <?php foreach ($recommended as $g): ?>
+        <div class="rounded-lg border <?= ($g['score']??0) >= 2 ? 'border-brand/60' : 'border-neutral-800' ?> bg-neutral-900 p-4">
+          <div class="text-sm text-neutral-400">Level: <?= htmlspecialchars($g['level']) ?></div>
+          <div class="font-semibold mb-2"><?= htmlspecialchars($g['title']) ?></div>
+          <?php if (($g['score']??0) >= 2): ?><div class="text-xs inline-block px-2 py-1 rounded bg-brand/20 text-brand mb-2">Best for you</div><?php endif; ?>
+          <a class="text-brand text-sm" href="index.php?page=gym_detail&id=<?= urlencode($g['id']) ?>">View Program →</a>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 </section>
