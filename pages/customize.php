@@ -71,14 +71,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<section class="max-w-4xl mx-auto">
-  <div class="flex items-end justify-between gap-3 mb-4">
-    <div>
-      <h2 class="text-2xl font-bold">Customize Programs</h2>
-      <div class="text-sm text-neutral-400">Pick the programs you want to focus on. You can change this anytime.</div>
+<section class="min-h-[calc(100vh-140px)] flex items-center">
+  <div class="w-full max-w-4xl mx-auto">
+    <div class="flex items-end justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-2xl font-bold">Customize Programs</h2>
+        <div class="text-sm text-neutral-400">Pick the programs you want to focus on. You can change this anytime.</div>
+      </div>
+      <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Back to Fitness</a>
     </div>
-    <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Back to Fitness</a>
-  </div>
 
   <?php if (!empty($err)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($err) ?></div><?php endif; ?>
   <?php if (!empty($ok)): ?><div class="mb-3 text-emerald-300"><?= htmlspecialchars($ok) ?></div><?php endif; ?>
@@ -100,5 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="mt-4 flex items-center justify-end gap-2">
       <button class="fh-btn fh-btn-primary" type="submit">Save Programs</button>
     </div>
-  </form>
+    </form>
+  </div>
 </section>

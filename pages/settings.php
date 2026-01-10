@@ -217,14 +217,15 @@ try {
 }
 ?>
 
-<section class="max-w-5xl mx-auto">
-  <div class="flex items-end justify-between gap-3 mb-4">
-    <div>
-      <h2 class="text-2xl font-bold">Settings</h2>
-      <div class="text-sm text-neutral-400">Manage your preferences and account details.</div>
+<section class="min-h-[calc(100vh-140px)] flex items-center">
+  <div class="w-full max-w-5xl mx-auto">
+    <div class="flex items-end justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-2xl font-bold">Settings</h2>
+        <div class="text-sm text-neutral-400">Manage your preferences and account details.</div>
+      </div>
+      <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Back to Fitness</a>
     </div>
-    <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Back to Fitness</a>
-  </div>
 
   <div class="fh-card p-4 flex items-center gap-3">
     <img src="<?= htmlspecialchars(($u['photo_url'] ?? '') ?: 'https://i.pravatar.cc/80') ?>" class="w-12 h-12 rounded-full" alt="avatar"/>
@@ -527,4 +528,6 @@ try {
       </div>
     </div>
   </details>
+
+  </div>
 </section>

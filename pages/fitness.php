@@ -63,7 +63,8 @@ $tiles = [
 $exploreOrder = ['steps','choreography','guides','strength','cardio','nutrition','recovery'];
 ?>
 
-<section>
+<section class="min-h-[calc(100vh-140px)] flex items-center">
+  <div class="w-full">
   <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-6">
     <div>
       <h2 class="text-2xl font-bold">Fitness Dashboard</h2>
@@ -169,6 +170,7 @@ $exploreOrder = ['steps','choreography','guides','strength','cardio','nutrition'
   </div>
 
   <div class="mt-8 text-sm text-neutral-400">For your personalized plan, visit <a class="text-brand" href="index.php?page=profile">your Profile</a>.</div>
+  </div>
 </section>
 <script>
 // Steps ring logic
