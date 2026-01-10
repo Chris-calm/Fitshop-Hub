@@ -6,6 +6,7 @@ require_login();
 $u = $_SESSION['user'];
 
 $err = '';
+$warn = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $title = trim($_POST['title'] ?? '');
   $ingredients = trim($_POST['ingredients_text'] ?? '');
@@ -33,8 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $key = 'food_' . $u['id'] . '_' . time() . '_' . bin2hex(random_bytes(6)) . $ext;
           $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $mime ?: 'application/octet-stream');
         } catch (Throwable $e) {
-          $err = 'Failed to save uploaded file.';
+          $warn = 'Photo upload failed. Your meal can still be saved without a photo.';
           error_log('Food upload failed: ' . $e->getMessage());
+          $photoPath = null;
         }
       } else {
         $dir = __DIR__ . '/../uploads/food';
@@ -44,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
           $photoPath = rtrim(BASE_URL, '/') . '/uploads/food/' . $fname;
         } else {
-          $err = 'Failed to save uploaded file.';
+          $warn = 'Photo upload failed. Your meal can still be saved without a photo.';
+          $photoPath = null;
         }
       }
     }
@@ -68,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <h2 class="text-2xl font-bold mb-2">Food Scan</h2>
   <p class="text-neutral-400 mb-4">Capture a meal photo and log basic nutrition. On phones, this will open the camera.</p>
   <?php if (!empty($err)): ?><div class="mb-4 text-red-400"><?= htmlspecialchars($err) ?></div><?php endif; ?>
+  <?php if (!empty($warn)): ?><div class="mb-4 text-amber-300"><?= htmlspecialchars($warn) ?></div><?php endif; ?>
   <form id="foodScanForm" method="post" enctype="multipart/form-data" class="space-y-4 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
     <div>
       <label class="block text-sm text-neutral-300 mb-1">Meal title</label>

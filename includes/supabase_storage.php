@@ -39,6 +39,9 @@ function supabase_storage_upload_tmpfile($bucket, $path, $tmpFilePath, $contentT
 
     $url = $base . '/storage/v1/object/' . rawurlencode($bucket) . '/' . str_replace('%2F', '/', rawurlencode($path));
     $payload = file_get_contents($tmpFilePath);
+    if ($payload === false) {
+        throw new RuntimeException('Supabase upload failed: could not read temp file.');
+    }
 
     $doRequest = function ($method) use ($url, $serviceKey, $contentType, $payload) {
         $ch = curl_init($url);
@@ -51,6 +54,8 @@ function supabase_storage_upload_tmpfile($bucket, $path, $tmpFilePath, $contentT
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, (int)(getenv('SUPABASE_CONNECT_TIMEOUT') ?: 15));
+        curl_setopt($ch, CURLOPT_TIMEOUT, (int)(getenv('SUPABASE_TIMEOUT') ?: 60));
         $resp = curl_exec($ch);
         $err = curl_error($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
