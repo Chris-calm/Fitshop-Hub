@@ -74,6 +74,10 @@
     const id = t.getAttribute('data-target');
     const input = document.getElementById(id);
     if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
+    const nextIsText = input.type === 'password';
+    input.type = nextIsText ? 'text' : 'password';
+    const showText = t.getAttribute('data-show-text') || 'Show';
+    const hideText = t.getAttribute('data-hide-text') || 'Hide';
+    t.textContent = nextIsText ? hideText : showText;
   });
 })();

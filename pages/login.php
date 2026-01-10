@@ -33,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       <div>
         <label class="block text-sm text-neutral-400">Password</label>
         <div class="relative">
-          <input id="login_password" type="password" name="password" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-10" />
-          <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200" data-target="login_password" aria-label="Toggle password">👁</button>
+          <input id="login_password" type="password" name="password" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-16" />
+          <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-200" data-target="login_password" data-show-text="Show" data-hide-text="Hide" aria-label="Toggle password">Show</button>
         </div>
       </div>
       <button class="w-full px-4 py-2 rounded-lg bg-brand text-white">Sign In</button>

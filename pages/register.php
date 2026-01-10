@@ -113,15 +113,15 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     <div>
       <label class="block text-sm text-neutral-400">Password</label>
       <div class="relative">
-        <input id="reg_password" type="password" name="password" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-10" />
-        <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200" data-target="reg_password" aria-label="Toggle password">👁</button>
+        <input id="reg_password" type="password" name="password" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-16" />
+        <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-200" data-target="reg_password" data-show-text="Show" data-hide-text="Hide" aria-label="Toggle password">Show</button>
       </div>
     </div>
     <div>
       <label class="block text-sm text-neutral-400">Confirm Password</label>
       <div class="relative">
-        <input id="reg_password2" type="password" name="password2" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-10" />
-        <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200" data-target="reg_password2" aria-label="Toggle password">👁</button>
+        <input id="reg_password2" type="password" name="password2" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 pr-16" />
+        <button type="button" class="pw-toggle absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-200" data-target="reg_password2" data-show-text="Show" data-hide-text="Hide" aria-label="Toggle password">Show</button>
       </div>
     </div>
     <hr class="my-4 border-neutral-800" />
