@@ -5,9 +5,36 @@ require_once __DIR__ . '/../includes/supabase_storage.php';
 require_login();
 $u = $_SESSION['user'];
 
+function fh_detect_upload_mime(array $file): string {
+  $tmp = (string)($file['tmp_name'] ?? '');
+  if ($tmp !== '' && function_exists('finfo_open')) {
+    $fi = finfo_open(FILEINFO_MIME_TYPE);
+    if ($fi) {
+      $m = finfo_file($fi, $tmp);
+      finfo_close($fi);
+      if (is_string($m) && $m !== '') {
+        return $m;
+      }
+    }
+  }
+
+  $m = (string)($file['type'] ?? '');
+  if ($m !== '') {
+    return $m;
+  }
+
+  $name = strtolower((string)($file['name'] ?? ''));
+  $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+  if ($ext === 'jpg' || $ext === 'jpeg') return 'image/jpeg';
+  if ($ext === 'png') return 'image/png';
+  if ($ext === 'webp') return 'image/webp';
+  return '';
+}
+
 $err = '';
 $warn = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  error_log('FOOD_SCAN post:start user=' . (string)($u['id'] ?? '')); 
   $title = trim($_POST['title'] ?? '');
   $ingredients = trim($_POST['ingredients_text'] ?? '');
   $servingSize = trim($_POST['serving_size'] ?? '');
@@ -23,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if (!empty($_FILES['photo']['name']) && is_uploaded_file($_FILES['photo']['tmp_name'])) {
     $allowed = ['image/jpeg' => '.jpg', 'image/png' => '.png', 'image/webp'=>'.webp'];
-    $mime = mime_content_type($_FILES['photo']['tmp_name']);
+    $mime = fh_detect_upload_mime($_FILES['photo']);
     $ext = $allowed[$mime] ?? null;
     if (!$ext) {
       $err = 'Unsupported image type.';
@@ -55,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if (!$err) {
     try {
+      error_log('FOOD_SCAN insert:start user=' . (string)($u['id'] ?? '') . ' has_photo=' . (!empty($photoPath) ? '1' : '0'));
       $stmt = $pdo->prepare('INSERT INTO food_logs (user_id, title, photo_path, ingredients_text, serving_size, calories, protein_g, carbs_g, fat_g) VALUES (?,?,?,?,?,?,?,?,?)');
       $stmt->execute([$u['id'], $title ?: 'Meal', $photoPath, $ingredients ?: null, $servingSize ?: null, $cal, $protein, $carbs, $fat]);
     } catch (Throwable $e) {
