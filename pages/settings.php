@@ -217,13 +217,13 @@ try {
 }
 ?>
 
-<section class="max-w-4xl mx-auto">
+<section class="max-w-5xl mx-auto">
   <div class="flex items-end justify-between gap-3 mb-4">
     <div>
       <h2 class="text-2xl font-bold">Settings</h2>
       <div class="text-sm text-neutral-400">Manage your preferences and account details.</div>
     </div>
-    <a href="index.php?page=profile" class="fh-btn fh-btn-ghost">Back to Profile</a>
+    <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Back to Fitness</a>
   </div>
 
   <div class="fh-card p-4 flex items-center gap-3">

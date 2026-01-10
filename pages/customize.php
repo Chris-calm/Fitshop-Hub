@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h2 class="text-2xl font-bold">Customize Programs</h2>
       <div class="text-sm text-neutral-400">Pick the programs you want to focus on. You can change this anytime.</div>
     </div>
-    <a href="index.php?page=profile" class="fh-btn fh-btn-ghost">Back to Profile</a>
+    <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Back to Fitness</a>
   </div>
 
   <?php if (!empty($err)): ?><div class="mb-3 text-red-400"><?= htmlspecialchars($err) ?></div><?php endif; ?>

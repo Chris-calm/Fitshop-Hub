@@ -6,7 +6,7 @@ require_login();
 // Load plan
 $u = $_SESSION['user'];
 $selectedPrograms = fh_user_selected_programs($pdo, (int)$u['id']);
-fh_require_any_program($selectedPrograms, ['guides']);
+fh_require_any_program($selectedPrograms, ['guides', 'recovery']);
 $stmt = $pdo->prepare('SELECT plan_json FROM users WHERE id=?');
 $stmt->execute([$u['id']]);
 $plan = json_decode($stmt->fetchColumn() ?: 'null', true);

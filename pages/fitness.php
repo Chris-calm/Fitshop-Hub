@@ -33,6 +33,11 @@ $tiles = [
     'title' => 'Guides',
     'desc' => 'Step-by-step routines',
   ],
+  'steps' => [
+    'href' => 'index.php?page=fitness',
+    'title' => 'Steps Goal',
+    'desc' => 'Daily steps, streak, and consistency',
+  ],
   'strength' => [
     'href' => 'index.php?page=gym',
     'title' => 'Strength / Gym',
@@ -53,10 +58,9 @@ $tiles = [
     'title' => 'Recovery / Mobility',
     'desc' => 'Stretching and mobility guides',
   ],
-  // steps is already the dashboard itself; we don't add a tile.
 ];
 
-$exploreOrder = ['choreography','guides','strength','cardio','nutrition','recovery'];
+$exploreOrder = ['steps','choreography','guides','strength','cardio','nutrition','recovery'];
 ?>
 
 <section>
