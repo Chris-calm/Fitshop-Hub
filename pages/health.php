@@ -1,4 +1,5 @@
-<section>
+<section class="min-h-[calc(100vh-140px)] flex items-center">
+  <div class="w-full">
   <h2 class="text-2xl font-bold mb-4">Health</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <a href="index.php?page=catalog&cat=equipment" class="fh-card p-6 hover:border-white/15 relative overflow-hidden">
@@ -24,5 +25,6 @@
     <a class="fh-btn fh-btn-ghost w-full justify-center" href="index.php?page=catalog&cat=drinks">Drinks</a>
     <a class="fh-btn fh-btn-ghost w-full justify-center" href="index.php?page=food_scan">Food Scan (Camera)</a>
     <a class="fh-btn fh-btn-ghost w-full justify-center" href="index.php?page=food_history">Food History</a>
+  </div>
   </div>
 </section>
