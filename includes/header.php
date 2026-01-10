@@ -315,8 +315,8 @@
       <nav class="hidden md:flex ml-auto items-center gap-2">
         <a href="index.php?page=health" class="fh-btn fh-btn-ghost">Health</a>
         <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost">Fitness</a>
-        <a href="index.php?page=cart" class="fh-btn fh-btn-ghost">Cart<span id="navCartCount" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
         <?php if (!empty($_SESSION['user'])): $u=$_SESSION['user']; ?>
+          <a href="index.php?page=cart" class="fh-btn fh-btn-ghost">Cart<span id="navCartCount" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
           <a href="index.php?page=customize" class="fh-btn fh-btn-ghost">Customize</a>
           <a href="index.php?page=settings" class="fh-btn fh-btn-ghost">Settings</a>
           <a href="index.php?page=profile" class="fh-btn fh-btn-ghost flex items-center gap-2 px-2 py-1">
@@ -336,8 +336,8 @@
         <div class="grid grid-cols-2 gap-2">
           <a href="index.php?page=health" class="fh-btn fh-btn-ghost w-full justify-center">Health</a>
           <a href="index.php?page=fitness" class="fh-btn fh-btn-ghost w-full justify-center">Fitness</a>
-          <a href="index.php?page=cart" class="fh-btn fh-btn-ghost w-full justify-center">Cart<span id="navCartCountMobile" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
           <?php if (!empty($_SESSION['user'])): ?>
+            <a href="index.php?page=cart" class="fh-btn fh-btn-ghost w-full justify-center">Cart<span id="navCartCountMobile" class="ml-1 text-xs bg-brand/20 text-brand px-1.5 py-0.5 rounded"><?= (int)$cartCount ?></span></a>
             <a href="index.php?page=customize" class="fh-btn fh-btn-ghost w-full justify-center">Customize</a>
             <a href="index.php?page=profile" class="fh-btn fh-btn-ghost w-full justify-center">Profile</a>
             <a href="index.php?page=settings" class="fh-btn fh-btn-ghost w-full justify-center">Settings</a>
