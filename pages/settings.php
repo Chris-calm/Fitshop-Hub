@@ -113,7 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($action === 'update_address') {
     $id = (int)($_POST['address_id'] ?? 0);
     $fullName = trim((string)($_POST['full_name'] ?? ''));
-    $phone = trim((string)($_POST['phone'] ?? ''));
+    $phoneCc = trim((string)($_POST['phone_cc'] ?? '+63'));
+    $phoneNational = preg_replace('/\D+/', '', (string)($_POST['phone_national'] ?? ''));
     $line1 = trim((string)($_POST['line1'] ?? ''));
     $line2 = trim((string)($_POST['line2'] ?? ''));
     $city = trim((string)($_POST['city'] ?? ''));
@@ -125,12 +126,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lng = ($lngRaw === '' ? null : (float)$lngRaw);
     $makeDefault = !empty($_POST['is_default']);
 
+    $phoneCc = ($phoneCc !== '' && $phoneCc[0] !== '+') ? ('+' . $phoneCc) : $phoneCc;
+    $rules = [
+      '+63' => 10,
+      '+1' => 10,
+      '+65' => 8,
+      '+44' => 10,
+    ];
+    $expectedDigits = $rules[$phoneCc] ?? 10;
+    $phone = $phoneCc . $phoneNational;
+
     if ($id <= 0) {
       $addrErr = 'Invalid address.';
-    } elseif ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
+    } elseif ($fullName === '' || $phoneNational === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
       $addrErr = 'Please fill out all required address fields.';
-    } elseif (!preg_match('/^\+63\d{10}$/', $phone)) {
-      $addrErr = 'Phone must be in PH format: +63 followed by 10 digits.';
+    } elseif (!isset($rules[$phoneCc])) {
+      $addrErr = 'Please select a valid country code.';
+    } elseif (!preg_match('/^\d+$/', $phoneNational)) {
+      $addrErr = 'Phone number must contain digits only.';
+    } elseif (strlen($phoneNational) !== $expectedDigits) {
+      $addrErr = 'Phone must be ' . $expectedDigits . ' digits for ' . $phoneCc . '.';
     } elseif (!preg_match('/^\d{4}$/', $postal)) {
       $addrErr = 'Postal code must be 4 digits (Philippines).';
     } elseif (($lat !== null && ($lat < -90 || $lat > 90)) || ($lng !== null && ($lng < -180 || $lng > 180))) {
@@ -156,7 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if ($action === 'add_address') {
     $fullName = trim((string)($_POST['full_name'] ?? ''));
-    $phone = trim((string)($_POST['phone'] ?? ''));
+    $phoneCc = trim((string)($_POST['phone_cc'] ?? '+63'));
+    $phoneNational = preg_replace('/\D+/', '', (string)($_POST['phone_national'] ?? ''));
     $line1 = trim((string)($_POST['line1'] ?? ''));
     $line2 = trim((string)($_POST['line2'] ?? ''));
     $city = trim((string)($_POST['city'] ?? ''));
@@ -168,10 +184,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lng = ($lngRaw === '' ? null : (float)$lngRaw);
     $makeDefault = !empty($_POST['is_default']);
 
-    if ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
+    $phoneCc = ($phoneCc !== '' && $phoneCc[0] !== '+') ? ('+' . $phoneCc) : $phoneCc;
+    $rules = [
+      '+63' => 10,
+      '+1' => 10,
+      '+65' => 8,
+      '+44' => 10,
+    ];
+    $expectedDigits = $rules[$phoneCc] ?? 10;
+    $phone = $phoneCc . $phoneNational;
+
+    if ($fullName === '' || $phoneNational === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
       $addrErr = 'Please fill out all required address fields.';
-    } elseif (!preg_match('/^\+63\d{10}$/', $phone)) {
-      $addrErr = 'Phone must be in PH format: +63 followed by 10 digits.';
+    } elseif (!isset($rules[$phoneCc])) {
+      $addrErr = 'Please select a valid country code.';
+    } elseif (!preg_match('/^\d+$/', $phoneNational)) {
+      $addrErr = 'Phone number must contain digits only.';
+    } elseif (strlen($phoneNational) !== $expectedDigits) {
+      $addrErr = 'Phone must be ' . $expectedDigits . ' digits for ' . $phoneCc . '.';
     } elseif (!preg_match('/^\d{4}$/', $postal)) {
       $addrErr = 'Postal code must be 4 digits (Philippines).';
     } elseif (($lat !== null && ($lat < -90 || $lat > 90)) || ($lng !== null && ($lng < -180 || $lng > 180))) {
@@ -341,13 +371,31 @@ try {
                     <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <input type="hidden" name="addr_action" value="update_address" />
                       <input type="hidden" name="address_id" value="<?= (int)$a['id'] ?>" />
+                      <?php
+                        $ph = (string)($a['phone'] ?? '');
+                        $cc = '+63';
+                        $nat = preg_replace('/\D+/', '', $ph);
+                        if (strpos($ph, '+1') === 0) { $cc = '+1'; $nat = substr($ph, 2); }
+                        elseif (strpos($ph, '+65') === 0) { $cc = '+65'; $nat = substr($ph, 3); }
+                        elseif (strpos($ph, '+44') === 0) { $cc = '+44'; $nat = substr($ph, 3); }
+                        elseif (strpos($ph, '+63') === 0) { $cc = '+63'; $nat = substr($ph, 3); }
+                        $nat = preg_replace('/\D+/', '', (string)$nat);
+                      ?>
                       <div>
                         <label class="block text-sm text-neutral-400 mb-1">Full name</label>
                         <input name="full_name" required value="<?= htmlspecialchars((string)$a['full_name']) ?>" class="fh-input w-full" />
                       </div>
                       <div>
                         <label class="block text-sm text-neutral-400 mb-1">Phone</label>
-                        <input name="phone" required value="<?= htmlspecialchars((string)$a['phone']) ?>" class="fh-input w-full" />
+                        <div class="grid grid-cols-3 gap-2">
+                          <select name="phone_cc" class="fh-input w-full">
+                            <option value="+63" <?= $cc === '+63' ? 'selected' : '' ?>>🇵🇭 +63</option>
+                            <option value="+1" <?= $cc === '+1' ? 'selected' : '' ?>>🇺🇸 +1</option>
+                            <option value="+65" <?= $cc === '+65' ? 'selected' : '' ?>>🇸🇬 +65</option>
+                            <option value="+44" <?= $cc === '+44' ? 'selected' : '' ?>>🇬🇧 +44</option>
+                          </select>
+                          <input name="phone_national" required inputmode="numeric" pattern="\d*" value="<?= htmlspecialchars((string)$nat) ?>" class="fh-input w-full col-span-2" />
+                        </div>
                       </div>
                       <div class="md:col-span-2">
                         <label class="block text-sm text-neutral-400 mb-1">Address line 1</label>
@@ -367,16 +415,24 @@ try {
                       </div>
                       <div>
                         <label class="block text-sm text-neutral-400 mb-1">Postal code</label>
-                        <input name="postal_code" required value="<?= htmlspecialchars((string)$a['postal_code']) ?>" class="fh-input w-full" />
+                        <input name="postal_code" required inputmode="numeric" pattern="\d{4}" maxlength="4" value="<?= htmlspecialchars((string)$a['postal_code']) ?>" class="fh-input w-full" />
                       </div>
                       <input type="hidden" name="lat" value="<?= htmlspecialchars((string)($a['lat'] ?? '')) ?>" class="fh-lat" />
                       <input type="hidden" name="lng" value="<?= htmlspecialchars((string)($a['lng'] ?? '')) ?>" class="fh-lng" />
                       <div class="md:col-span-2">
                         <label class="block text-sm text-neutral-400 mb-1">Pinpoint location (optional)</label>
-                        <div class="fh-map" style="height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);" data-lat="<?= htmlspecialchars((string)($a['lat'] ?? '')) ?>" data-lng="<?= htmlspecialchars((string)($a['lng'] ?? '')) ?>"></div>
-                        <div class="mt-2 flex items-center gap-2">
-                          <button type="button" class="fh-btn fh-btn-ghost fh-use-location">Use my location</button>
-                          <div class="text-xs text-neutral-400">Click the map to drop/move the pin.</div>
+                        <button type="button" class="fh-btn fh-btn-ghost fh-toggle-map" aria-label="Set location">
+                          <span class="inline-flex items-center gap-2">
+                            <span>📍</span>
+                            <span>Set / View location</span>
+                          </span>
+                        </button>
+                        <div class="fh-map-wrap hidden mt-2">
+                          <div class="fh-map" style="height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);" data-lat="<?= htmlspecialchars((string)($a['lat'] ?? '')) ?>" data-lng="<?= htmlspecialchars((string)($a['lng'] ?? '')) ?>"></div>
+                          <div class="mt-2 flex items-center gap-2">
+                            <button type="button" class="fh-btn fh-btn-ghost fh-use-location">Use my location</button>
+                            <div class="text-xs text-neutral-400">Click the map to drop/move the pin.</div>
+                          </div>
                         </div>
                       </div>
                       <div class="flex items-end">
@@ -412,7 +468,15 @@ try {
           </div>
           <div>
             <label class="block text-sm text-neutral-400 mb-1">Phone</label>
-            <input name="phone" required class="fh-input w-full" />
+            <div class="grid grid-cols-3 gap-2">
+              <select name="phone_cc" class="fh-input w-full">
+                <option value="+63" selected>🇵🇭 +63</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+65">🇸🇬 +65</option>
+                <option value="+44">🇬🇧 +44</option>
+              </select>
+              <input name="phone_national" required inputmode="numeric" pattern="\d*" class="fh-input w-full col-span-2" />
+            </div>
           </div>
           <div class="md:col-span-2">
             <label class="block text-sm text-neutral-400 mb-1">Address line 1</label>
@@ -432,16 +496,24 @@ try {
           </div>
           <div>
             <label class="block text-sm text-neutral-400 mb-1">Postal code</label>
-            <input name="postal_code" required class="fh-input w-full" />
+            <input name="postal_code" required inputmode="numeric" pattern="\d{4}" maxlength="4" class="fh-input w-full" />
           </div>
           <input type="hidden" name="lat" value="" class="fh-lat" />
           <input type="hidden" name="lng" value="" class="fh-lng" />
           <div class="md:col-span-2">
             <label class="block text-sm text-neutral-400 mb-1">Pinpoint location (optional)</label>
-            <div class="fh-map" style="height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);"></div>
-            <div class="mt-2 flex items-center gap-2">
-              <button type="button" class="fh-btn fh-btn-ghost fh-use-location">Use my location</button>
-              <div class="text-xs text-neutral-400">Click the map to drop/move the pin.</div>
+            <button type="button" class="fh-btn fh-btn-ghost fh-toggle-map" aria-label="Set location">
+              <span class="inline-flex items-center gap-2">
+                <span>📍</span>
+                <span>Set / View location</span>
+              </span>
+            </button>
+            <div class="fh-map-wrap hidden mt-2">
+              <div class="fh-map" style="height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);"></div>
+              <div class="mt-2 flex items-center gap-2">
+                <button type="button" class="fh-btn fh-btn-ghost fh-use-location">Use my location</button>
+                <div class="text-xs text-neutral-400">Click the map to drop/move the pin.</div>
+              </div>
             </div>
           </div>
           <div class="flex items-end">
@@ -532,17 +604,43 @@ try {
     }
 
     function initAllMaps() {
-      document.querySelectorAll('.fh-map').forEach(initMapForBlock);
+      document.querySelectorAll('.fh-map').forEach(function (m) {
+        var wrap = m.closest('.fh-map-wrap');
+        if (wrap && wrap.classList.contains('hidden')) return;
+        initMapForBlock(m);
+      });
+    }
+
+    function bindToggles() {
+      document.querySelectorAll('.fh-toggle-map').forEach(function (btn) {
+        if (btn.dataset.bound === '1') return;
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', function () {
+          var form = btn.closest('form');
+          if (!form) return;
+          var wrap = form.querySelector('.fh-map-wrap');
+          if (!wrap) return;
+          wrap.classList.toggle('hidden');
+          setTimeout(initAllMaps, 50);
+        });
+      });
     }
 
     document.addEventListener('toggle', function (e) {
       if (!e || !e.target || e.target.tagName !== 'DETAILS') return;
-      setTimeout(initAllMaps, 50);
+      setTimeout(function () {
+        bindToggles();
+        initAllMaps();
+      }, 50);
     }, true);
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initAllMaps);
+      document.addEventListener('DOMContentLoaded', function () {
+        bindToggles();
+        initAllMaps();
+      });
     } else {
+      bindToggles();
       initAllMaps();
     }
   })();

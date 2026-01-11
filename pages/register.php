@@ -8,7 +8,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   $email = trim($_POST['email'] ?? '');
   $password = $_POST['password'] ?? '';
   $password2 = $_POST['password2'] ?? '';
-  $phone = trim($_POST['phone'] ?? '');
+  $phoneCc = trim((string)($_POST['phone_cc'] ?? '+63'));
+  $phoneNational = preg_replace('/\D+/', '', (string)($_POST['phone_national'] ?? ''));
   $line1 = trim($_POST['line1'] ?? '');
   $line2 = trim($_POST['line2'] ?? '');
   $city = trim($_POST['city'] ?? '');
@@ -54,8 +55,20 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     }
   }
   $hasAddress = ($line1 !== '' || $city !== '' || $province !== '' || $postal_code !== '');
-  if (!$name || !$email || !$password || !$phone) { $err='Name, email, password, and phone are required.'; }
-  elseif (!preg_match('/^\+63\d{10}$/', $phone)) { $err='Phone must be in PH format: +63 followed by 10 digits.'; }
+  $phoneCc = ($phoneCc !== '' && $phoneCc[0] !== '+') ? ('+' . $phoneCc) : $phoneCc;
+  $rules = [
+    '+63' => 10,
+    '+1' => 10,
+    '+65' => 8,
+    '+44' => 10,
+  ];
+  $expectedDigits = $rules[$phoneCc] ?? 10;
+  $phone = $phoneCc . $phoneNational;
+
+  if (!$name || !$email || !$password || $phoneNational === '') { $err='Name, email, password, and phone are required.'; }
+  elseif (!isset($rules[$phoneCc])) { $err='Please select a valid country code.'; }
+  elseif (!preg_match('/^\d+$/', $phoneNational)) { $err='Phone number must contain digits only.'; }
+  elseif (strlen($phoneNational) !== $expectedDigits) { $err='Phone must be ' . $expectedDigits . ' digits for ' . $phoneCc . '.'; }
   elseif ($password !== $password2) { $err='Passwords do not match.'; }
   elseif ($hasAddress && ($line1 === '' || $city === '' || $province === '' || $postal_code === '')) { $err='If you provide an address, please complete all required address fields.'; }
   elseif ($hasAddress && !preg_match('/^\d{4}$/', $postal_code)) { $err='Postal code must be 4 digits (Philippines).'; }
@@ -132,7 +145,16 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="sm:col-span-2">
         <label class="block text-sm text-neutral-400">Phone</label>
-        <input name="phone" required placeholder="+63XXXXXXXXXX" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <div class="grid grid-cols-3 gap-2">
+          <select name="phone_cc" class="col-span-1 w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
+            <option value="+63" selected>🇵🇭 +63</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+65">🇸🇬 +65</option>
+            <option value="+44">🇬🇧 +44</option>
+          </select>
+          <input name="phone_national" required inputmode="numeric" pattern="\d*" maxlength="10" placeholder="Number" class="col-span-2 w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        </div>
+        <div class="mt-1 text-xs text-neutral-500">PH: 10 digits after +63. Digits only.</div>
       </div>
       <div class="sm:col-span-2">
         <label class="block text-sm text-neutral-400">Address line 1</label>
@@ -152,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       </div>
       <div>
         <label class="block text-sm text-neutral-400">Postal code</label>
-        <input name="postal_code" placeholder="4 digits" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <input name="postal_code" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="4 digits" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
     </div>
     <hr class="my-4 border-neutral-800" />
