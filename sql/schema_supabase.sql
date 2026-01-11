@@ -76,6 +76,35 @@ create table if not exists public.user_addresses (
 create index if not exists idx_user_addresses_user_id on public.user_addresses(user_id);
 
 
+-- AUTH OTPs (email login codes)
+create table if not exists public.auth_otps (
+  id bigserial primary key,
+  user_id bigint not null references public.users(id) on delete cascade,
+  otp_hash text not null,
+  attempts integer not null default 0,
+  expires_at timestamptz not null,
+  consumed_at timestamptz null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_auth_otps_user_created_at on public.auth_otps(user_id, created_at desc);
+create index if not exists idx_auth_otps_expires_at on public.auth_otps(expires_at);
+
+
+-- PASSWORD RESETS
+create table if not exists public.password_resets (
+  id bigserial primary key,
+  user_id bigint not null references public.users(id) on delete cascade,
+  token_hash text not null,
+  expires_at timestamptz not null,
+  used_at timestamptz null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_password_resets_user_created_at on public.password_resets(user_id, created_at desc);
+create index if not exists idx_password_resets_expires_at on public.password_resets(expires_at);
+
+
 -- ORDERS
 create table if not exists public.orders (
   id bigserial primary key,

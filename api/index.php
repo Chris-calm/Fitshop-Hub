@@ -104,6 +104,11 @@ $allowed = [
     'order' => 'pages/order.php',
     'login' => 'pages/login.php',
     'register' => 'pages/register.php',
+    'otp_verify' => 'pages/otp_verify.php',
+    'forgot_password' => 'pages/forgot_password.php',
+    'reset_password' => 'pages/reset_password.php',
+    'about' => 'pages/about.php',
+    'guides_public' => 'pages/guides_public.php',
     'profile' => 'pages/profile.php',
     'settings' => 'pages/settings.php',
     'customize' => 'pages/customize.php',
@@ -139,11 +144,11 @@ if ($page === '' || !isset($allowed[$page])) {
 
 error_log('REQ uri=' . ($_SERVER['REQUEST_URI'] ?? '') . ' page=' . $page . ' user=' . (!empty($_SESSION['user']['id']) ? (string)$_SESSION['user']['id'] : 'guest'));
 
-if (empty($_SESSION['user']) && !in_array($page, ['login', 'register'], true)) {
+if (empty($_SESSION['user']) && !in_array($page, ['login', 'register', 'otp_verify', 'forgot_password', 'reset_password', 'about', 'guides_public'], true)) {
     $page = 'login';
 }
 
-if (!empty($_SESSION['user']) && in_array($page, ['login', 'register'], true)) {
+if (!empty($_SESSION['user']) && in_array($page, ['login', 'register', 'otp_verify', 'forgot_password', 'reset_password'], true)) {
     header('Location: index.php?page=landing', true, 302);
     exit;
 }
