@@ -146,13 +146,35 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       <div class="sm:col-span-2">
         <label class="block text-sm text-neutral-400">Phone</label>
         <div class="grid grid-cols-3 gap-2">
-          <select name="phone_cc" class="col-span-1 w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2">
-            <option value="+63" selected>🇵🇭 +63</option>
-            <option value="+1">🇺🇸 +1</option>
-            <option value="+65">🇸🇬 +65</option>
-            <option value="+44">🇬🇧 +44</option>
-          </select>
-          <input name="phone_national" required inputmode="numeric" pattern="\d*" maxlength="10" placeholder="Number" class="col-span-2 w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+          <div class="relative col-span-1">
+            <input type="hidden" name="phone_cc" value="+63" class="fh-phone-cc" />
+            <button type="button" class="fh-country-btn w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-left flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <img class="fh-country-flag" src="https://flagcdn.com/24x18/ph.png" width="24" height="18" alt="PH" />
+                <span class="fh-country-label">+63</span>
+              </span>
+              <span class="text-neutral-500">▾</span>
+            </button>
+            <div class="fh-country-menu hidden absolute z-20 mt-2 w-full rounded-lg border border-neutral-800 bg-neutral-900 overflow-hidden">
+              <button type="button" class="fh-country-opt w-full px-3 py-2 hover:bg-neutral-800 flex items-center gap-2" data-cc="+63" data-flag="https://flagcdn.com/24x18/ph.png" data-alt="PH" data-max="10">
+                <img src="https://flagcdn.com/24x18/ph.png" width="24" height="18" alt="PH" />
+                <span>PH +63</span>
+              </button>
+              <button type="button" class="fh-country-opt w-full px-3 py-2 hover:bg-neutral-800 flex items-center gap-2" data-cc="+1" data-flag="https://flagcdn.com/24x18/us.png" data-alt="US" data-max="10">
+                <img src="https://flagcdn.com/24x18/us.png" width="24" height="18" alt="US" />
+                <span>US +1</span>
+              </button>
+              <button type="button" class="fh-country-opt w-full px-3 py-2 hover:bg-neutral-800 flex items-center gap-2" data-cc="+65" data-flag="https://flagcdn.com/24x18/sg.png" data-alt="SG" data-max="8">
+                <img src="https://flagcdn.com/24x18/sg.png" width="24" height="18" alt="SG" />
+                <span>SG +65</span>
+              </button>
+              <button type="button" class="fh-country-opt w-full px-3 py-2 hover:bg-neutral-800 flex items-center gap-2" data-cc="+44" data-flag="https://flagcdn.com/24x18/gb.png" data-alt="UK" data-max="10">
+                <img src="https://flagcdn.com/24x18/gb.png" width="24" height="18" alt="UK" />
+                <span>UK +44</span>
+              </button>
+            </div>
+          </div>
+          <input name="phone_national" required inputmode="numeric" pattern="\d*" maxlength="10" placeholder="Number" class="fh-phone-national col-span-2 w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
         </div>
         <div class="mt-1 text-xs text-neutral-500">PH: 10 digits after +63. Digits only.</div>
       </div>
@@ -219,3 +241,56 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   <p class="mt-3 text-sm text-neutral-400">Already have an account? <a class="text-brand" href="index.php?page=login">Login</a></p>
   </div>
 </section>
+
+<script>
+  (function () {
+    function initCountryPickers() {
+      document.querySelectorAll('.fh-country-btn').forEach(function (btn) {
+        if (btn.dataset.bound === '1') return;
+        btn.dataset.bound = '1';
+
+        var wrap = btn.closest('.relative');
+        if (!wrap) return;
+        var menu = wrap.querySelector('.fh-country-menu');
+        var hidden = wrap.querySelector('.fh-phone-cc');
+        var flag = wrap.querySelector('.fh-country-flag');
+        var label = wrap.querySelector('.fh-country-label');
+        var national = wrap.parentElement.querySelector('.fh-phone-national');
+
+        btn.addEventListener('click', function () {
+          if (!menu) return;
+          menu.classList.toggle('hidden');
+        });
+
+        wrap.querySelectorAll('.fh-country-opt').forEach(function (opt) {
+          opt.addEventListener('click', function () {
+            var cc = opt.getAttribute('data-cc') || '+63';
+            var f = opt.getAttribute('data-flag') || '';
+            var alt = opt.getAttribute('data-alt') || '';
+            var mx = parseInt(opt.getAttribute('data-max') || '10', 10);
+            if (hidden) hidden.value = cc;
+            if (label) label.textContent = cc;
+            if (flag && f) { flag.src = f; flag.alt = alt; }
+            if (national && isFinite(mx)) { national.maxLength = mx; }
+            if (menu) menu.classList.add('hidden');
+          });
+        });
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('.fh-country-menu').forEach(function (m) {
+        var parent = m.closest('.relative');
+        if (!parent) return;
+        if (parent.contains(e.target)) return;
+        m.classList.add('hidden');
+      });
+    });
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCountryPickers);
+    } else {
+      initCountryPickers();
+    }
+  })();
+</script>
