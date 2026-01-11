@@ -115,6 +115,7 @@ $allowed = [
     'logout' => 'pages/logout.php',
     'post_add_to_cart' => 'pages/post_add_to_cart.php',
     'post_checkout' => 'pages/post_checkout.php',
+    'cancel_order' => 'pages/cancel_order.php',
     'api_fitness_stats' => 'pages/api_fitness_stats.php',
     'api_steps_save' => 'pages/api_steps_save.php',
     'api_token_create' => 'pages/api_token_create.php',
@@ -164,7 +165,7 @@ if (!file_exists($pageFile)) {
     die('Page not found');
 }
 
-$actionPages = ['logout', 'post_add_to_cart', 'post_checkout', 'api_fitness_stats', 'api_steps_save', 'api_token_create', 'api_token_revoke'];
+$actionPages = ['logout', 'post_add_to_cart', 'post_checkout', 'cancel_order', 'api_fitness_stats', 'api_steps_save', 'api_token_create', 'api_token_revoke'];
 if (in_array($page, $actionPages, true)) {
     require $pageFile;
     exit;
