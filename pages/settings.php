@@ -119,20 +119,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $city = trim((string)($_POST['city'] ?? ''));
     $province = trim((string)($_POST['province'] ?? ''));
     $postal = trim((string)($_POST['postal_code'] ?? ''));
+    $latRaw = trim((string)($_POST['lat'] ?? ''));
+    $lngRaw = trim((string)($_POST['lng'] ?? ''));
+    $lat = ($latRaw === '' ? null : (float)$latRaw);
+    $lng = ($lngRaw === '' ? null : (float)$lngRaw);
     $makeDefault = !empty($_POST['is_default']);
 
     if ($id <= 0) {
       $addrErr = 'Invalid address.';
     } elseif ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
       $addrErr = 'Please fill out all required address fields.';
+    } elseif (!preg_match('/^\+63\d{10}$/', $phone)) {
+      $addrErr = 'Phone must be in PH format: +63 followed by 10 digits.';
+    } elseif (!preg_match('/^\d{4}$/', $postal)) {
+      $addrErr = 'Postal code must be 4 digits (Philippines).';
+    } elseif (($lat !== null && ($lat < -90 || $lat > 90)) || ($lng !== null && ($lng < -180 || $lng > 180))) {
+      $addrErr = 'Invalid map coordinates.';
     } else {
       try {
         $pdo->beginTransaction();
         if ($makeDefault) {
           $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
         }
-        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, is_default=CASE WHEN ? THEN true ELSE is_default END WHERE id=? AND user_id=?')
-          ->execute([$fullName, $phone, $line1, ($line2 ?: null), $city, $province, $postal, $makeDefault, $id, (int)$sessionUser['id']]);
+        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, lat=?, lng=?, is_default=CASE WHEN ? THEN true ELSE is_default END WHERE id=? AND user_id=?')
+          ->execute([$fullName, $phone, $line1, ($line2 ?: null), $city, $province, $postal, $lat, $lng, $makeDefault, $id, (int)$sessionUser['id']]);
         $pdo->commit();
         header('Location: index.php?page=settings');
         exit;
@@ -152,18 +162,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $city = trim((string)($_POST['city'] ?? ''));
     $province = trim((string)($_POST['province'] ?? ''));
     $postal = trim((string)($_POST['postal_code'] ?? ''));
+    $latRaw = trim((string)($_POST['lat'] ?? ''));
+    $lngRaw = trim((string)($_POST['lng'] ?? ''));
+    $lat = ($latRaw === '' ? null : (float)$latRaw);
+    $lng = ($lngRaw === '' ? null : (float)$lngRaw);
     $makeDefault = !empty($_POST['is_default']);
 
     if ($fullName === '' || $phone === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
       $addrErr = 'Please fill out all required address fields.';
+    } elseif (!preg_match('/^\+63\d{10}$/', $phone)) {
+      $addrErr = 'Phone must be in PH format: +63 followed by 10 digits.';
+    } elseif (!preg_match('/^\d{4}$/', $postal)) {
+      $addrErr = 'Postal code must be 4 digits (Philippines).';
+    } elseif (($lat !== null && ($lat < -90 || $lat > 90)) || ($lng !== null && ($lng < -180 || $lng > 180))) {
+      $addrErr = 'Invalid map coordinates.';
     } else {
       try {
         $pdo->beginTransaction();
         if ($makeDefault) {
           $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
         }
-        $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, is_default) VALUES (?,?,?,?,?,?,?,?,?)')
-          ->execute([(int)$sessionUser['id'], $fullName, $phone, $line1, $line2 ?: null, $city, $province, $postal, $makeDefault]);
+        $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, lat, lng, is_default) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+          ->execute([(int)$sessionUser['id'], $fullName, $phone, $line1, $line2 ?: null, $city, $province, $postal, $lat, $lng, $makeDefault]);
         $pdo->commit();
         header('Location: index.php?page=settings');
         exit;
@@ -214,7 +234,7 @@ $tokens = $u ? fh_list_api_tokens($pdo, (int)$u['id']) : [];
 
 $addresses = [];
 try {
-  $aStmt = $pdo->prepare('SELECT id, full_name, phone, line1, line2, city, province, postal_code, is_default FROM user_addresses WHERE user_id=? ORDER BY is_default DESC, id DESC');
+  $aStmt = $pdo->prepare('SELECT id, full_name, phone, line1, line2, city, province, postal_code, lat, lng, is_default FROM user_addresses WHERE user_id=? ORDER BY is_default DESC, id DESC');
   $aStmt->execute([(int)$sessionUser['id']]);
   $addresses = $aStmt->fetchAll();
 } catch (Throwable $e) {
@@ -349,6 +369,16 @@ try {
                         <label class="block text-sm text-neutral-400 mb-1">Postal code</label>
                         <input name="postal_code" required value="<?= htmlspecialchars((string)$a['postal_code']) ?>" class="fh-input w-full" />
                       </div>
+                      <input type="hidden" name="lat" value="<?= htmlspecialchars((string)($a['lat'] ?? '')) ?>" class="fh-lat" />
+                      <input type="hidden" name="lng" value="<?= htmlspecialchars((string)($a['lng'] ?? '')) ?>" class="fh-lng" />
+                      <div class="md:col-span-2">
+                        <label class="block text-sm text-neutral-400 mb-1">Pinpoint location (optional)</label>
+                        <div class="fh-map" style="height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);" data-lat="<?= htmlspecialchars((string)($a['lat'] ?? '')) ?>" data-lng="<?= htmlspecialchars((string)($a['lng'] ?? '')) ?>"></div>
+                        <div class="mt-2 flex items-center gap-2">
+                          <button type="button" class="fh-btn fh-btn-ghost fh-use-location">Use my location</button>
+                          <div class="text-xs text-neutral-400">Click the map to drop/move the pin.</div>
+                        </div>
+                      </div>
                       <div class="flex items-end">
                         <label class="inline-flex items-center gap-2 text-sm text-neutral-300">
                           <input type="checkbox" name="is_default" value="1" class="accent-brand" <?= !empty($a['is_default']) ? 'checked' : '' ?> />
@@ -404,6 +434,16 @@ try {
             <label class="block text-sm text-neutral-400 mb-1">Postal code</label>
             <input name="postal_code" required class="fh-input w-full" />
           </div>
+          <input type="hidden" name="lat" value="" class="fh-lat" />
+          <input type="hidden" name="lng" value="" class="fh-lng" />
+          <div class="md:col-span-2">
+            <label class="block text-sm text-neutral-400 mb-1">Pinpoint location (optional)</label>
+            <div class="fh-map" style="height: 220px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);"></div>
+            <div class="mt-2 flex items-center gap-2">
+              <button type="button" class="fh-btn fh-btn-ghost fh-use-location">Use my location</button>
+              <div class="text-xs text-neutral-400">Click the map to drop/move the pin.</div>
+            </div>
+          </div>
           <div class="flex items-end">
             <label class="inline-flex items-center gap-2 text-sm text-neutral-300">
               <input type="checkbox" name="is_default" value="1" class="accent-brand" />
@@ -420,3 +460,90 @@ try {
 
   </div>
 </section>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  (function () {
+    function initMapForBlock(block) {
+      if (!window.L || !block) return;
+      if (block.dataset.inited === '1') return;
+
+      var form = block.closest('form');
+      if (!form) return;
+
+      var latInput = form.querySelector('.fh-lat');
+      var lngInput = form.querySelector('.fh-lng');
+      var useBtn = form.querySelector('.fh-use-location');
+
+      var lat0 = parseFloat(block.getAttribute('data-lat') || (latInput ? latInput.value : ''));
+      var lng0 = parseFloat(block.getAttribute('data-lng') || (lngInput ? lngInput.value : ''));
+      if (!isFinite(lat0) || !isFinite(lng0)) {
+        lat0 = 14.5995;
+        lng0 = 120.9842;
+      }
+
+      var map = L.map(block, { scrollWheelZoom: false }).setView([lat0, lng0], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: ''
+      }).addTo(map);
+
+      var marker = null;
+      function setPoint(lat, lng) {
+        if (!marker) {
+          marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+          marker.on('dragend', function (e) {
+            var ll = e.target.getLatLng();
+            if (latInput) latInput.value = ll.lat.toFixed(6);
+            if (lngInput) lngInput.value = ll.lng.toFixed(6);
+          });
+        } else {
+          marker.setLatLng([lat, lng]);
+        }
+        if (latInput) latInput.value = lat.toFixed(6);
+        if (lngInput) lngInput.value = lng.toFixed(6);
+      }
+
+      if (isFinite(parseFloat(latInput && latInput.value)) && isFinite(parseFloat(lngInput && lngInput.value))) {
+        setPoint(parseFloat(latInput.value), parseFloat(lngInput.value));
+      } else if (block.getAttribute('data-lat') && block.getAttribute('data-lng')) {
+        setPoint(lat0, lng0);
+      }
+
+      map.on('click', function (e) {
+        setPoint(e.latlng.lat, e.latlng.lng);
+      });
+
+      if (useBtn) {
+        useBtn.addEventListener('click', function () {
+          if (!navigator.geolocation) return;
+          navigator.geolocation.getCurrentPosition(function (pos) {
+            var lat = pos.coords.latitude;
+            var lng = pos.coords.longitude;
+            setPoint(lat, lng);
+            map.setView([lat, lng], 16);
+          });
+        });
+      }
+
+      block.dataset.inited = '1';
+      setTimeout(function () { map.invalidateSize(); }, 250);
+    }
+
+    function initAllMaps() {
+      document.querySelectorAll('.fh-map').forEach(initMapForBlock);
+    }
+
+    document.addEventListener('toggle', function (e) {
+      if (!e || !e.target || e.target.tagName !== 'DETAILS') return;
+      setTimeout(initAllMaps, 50);
+    }, true);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAllMaps);
+    } else {
+      initAllMaps();
+    }
+  })();
+</script>

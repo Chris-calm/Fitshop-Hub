@@ -53,8 +53,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       }
     }
   }
-  if (!$name || !$email || !$password || !$phone || !$line1 || !$city || !$province || !$postal_code) { $err='All fields are required.'; }
+  $hasAddress = ($line1 !== '' || $city !== '' || $province !== '' || $postal_code !== '');
+  if (!$name || !$email || !$password || !$phone) { $err='Name, email, password, and phone are required.'; }
+  elseif (!preg_match('/^\+63\d{10}$/', $phone)) { $err='Phone must be in PH format: +63 followed by 10 digits.'; }
   elseif ($password !== $password2) { $err='Passwords do not match.'; }
+  elseif ($hasAddress && ($line1 === '' || $city === '' || $province === '' || $postal_code === '')) { $err='If you provide an address, please complete all required address fields.'; }
+  elseif ($hasAddress && !preg_match('/^\d{4}$/', $postal_code)) { $err='Postal code must be 4 digits (Philippines).'; }
   else {
     $stmt = $pdo->prepare('SELECT id FROM users WHERE email=? LIMIT 1');
     $stmt->execute([$email]);
@@ -73,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $userId = (int)$pdo->lastInsertId();
       }
 
-      if ($userId > 0) {
+      if ($userId > 0 && $hasAddress) {
         try {
           if (defined('IS_VERCEL') && IS_VERCEL) {
             $aStmt = $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, is_default) VALUES (?,?,?,?,?,?,?,?,?)');
@@ -128,11 +132,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div class="sm:col-span-2">
         <label class="block text-sm text-neutral-400">Phone</label>
-        <input name="phone" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <input name="phone" required placeholder="+63XXXXXXXXXX" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
       <div class="sm:col-span-2">
         <label class="block text-sm text-neutral-400">Address line 1</label>
-        <input name="line1" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <input name="line1" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
       <div class="sm:col-span-2">
         <label class="block text-sm text-neutral-400">Address line 2 (optional)</label>
@@ -140,15 +144,15 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       </div>
       <div>
         <label class="block text-sm text-neutral-400">City</label>
-        <input name="city" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <input name="city" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
       <div>
         <label class="block text-sm text-neutral-400">Province</label>
-        <input name="province" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <input name="province" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
       <div>
         <label class="block text-sm text-neutral-400">Postal code</label>
-        <input name="postal_code" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+        <input name="postal_code" placeholder="4 digits" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
       </div>
     </div>
     <hr class="my-4 border-neutral-800" />

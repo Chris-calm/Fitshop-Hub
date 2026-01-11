@@ -69,6 +69,8 @@ create table if not exists public.user_addresses (
   city varchar(120) not null,
   province varchar(120) not null,
   postal_code varchar(20) not null,
+  lat double precision null,
+  lng double precision null,
   is_default boolean not null default false,
   created_at timestamptz not null default now()
 );
