@@ -32,6 +32,13 @@ function fh_send_mail(string $toEmail, string $toName, string $subject, string $
     $encryption = strtolower(getenv('SMTP_ENCRYPTION') ?: 'tls');
 
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+    $smtpDebug = (string)(getenv('SMTP_DEBUG') ?: '');
+    if ($smtpDebug !== '' && $smtpDebug !== '0') {
+        $mail->SMTPDebug = 2;
+        $mail->Debugoutput = function ($str, $level) {
+            error_log('SMTP[' . $level . '] ' . $str);
+        };
+    }
     $mail->isSMTP();
     $mail->Host = $host;
     $mail->SMTPAuth = true;
@@ -55,5 +62,15 @@ function fh_send_mail(string $toEmail, string $toName, string $subject, string $
     $mail->Body = $htmlBody;
     $mail->AltBody = $textBody ?: strip_tags($htmlBody);
 
-    $mail->send();
+    try {
+        $mail->send();
+    } catch (Throwable $e) {
+        $info = '';
+        try {
+            $info = (string)$mail->ErrorInfo;
+        } catch (Throwable $e2) {
+        }
+        error_log('PHPMailer send failed: ' . $e->getMessage() . ($info ? (' | ErrorInfo=' . $info) : ''));
+        throw $e;
+    }
 }
