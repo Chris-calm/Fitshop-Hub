@@ -5,7 +5,12 @@ require __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/cart_store.php';
 
 $userId = !empty($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
-$orderId = (int)($_POST['id'] ?? ($_GET['id'] ?? 0));
+$orderId = (int)($_POST['id'] ?? 0);
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+  header('Location: index.php?page=profile');
+  exit;
+}
 
 if ($userId <= 0 || $orderId <= 0) {
   header('Location: index.php?page=profile');
@@ -24,7 +29,7 @@ try {
     exit;
   }
 
-  $sStmt = $pdo->prepare('SELECT current_status, history FROM shipments WHERE order_id=? LIMIT 1');
+  $sStmt = $pdo->prepare('SELECT current_status, history FROM shipments WHERE order_id=? LIMIT 1 FOR UPDATE');
   $sStmt->execute([$orderId]);
   $ship = $sStmt->fetch();
   if (!$ship) {
@@ -34,6 +39,11 @@ try {
   }
 
   $currentStatus = (string)($ship['current_status'] ?? '');
+  if ($currentStatus === 'Cancelled') {
+    $pdo->rollBack();
+    header('Location: index.php?page=order&id=' . $orderId);
+    exit;
+  }
   $notCancellable = ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
   if (in_array($currentStatus, $notCancellable, true)) {
     $pdo->rollBack();
@@ -50,8 +60,13 @@ try {
     $history = [];
   }
   $history[] = ['status' => 'Cancelled', 'time' => date('c')];
-  $pdo->prepare('UPDATE shipments SET current_status=?, history=? WHERE order_id=?')
-    ->execute(['Cancelled', json_encode($history), $orderId]);
+  $u = $pdo->prepare('UPDATE shipments SET current_status=?, history=? WHERE order_id=? AND current_status NOT IN (\'Shipped\',\'Out for Delivery\',\'Delivered\',\'Cancelled\')');
+  $u->execute(['Cancelled', json_encode($history), $orderId]);
+  if ((int)$u->rowCount() !== 1) {
+    $pdo->rollBack();
+    header('Location: index.php?page=order&id=' . $orderId);
+    exit;
+  }
 
   $pdo->commit();
 

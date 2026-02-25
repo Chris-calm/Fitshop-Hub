@@ -22,18 +22,6 @@ $shipment = $s->fetch();
 $history = [];
 if ($shipment) {
   $history = json_decode($shipment['history'], true) ?: [];
-  // Auto-advance demo: randomly add next step if not delivered
-  $phases = ['Order Placed','Packed','Shipped','Out for Delivery','Delivered'];
-  $current = array_column($history,'status');
-  if (!in_array((string)($shipment['current_status'] ?? ''), ['Delivered','Cancelled'], true) && count($current) < count($phases)) {
-    if (rand(0,1)) {
-      $history[] = ['status'=>$phases[count($current)],'time'=>date('c')];
-      $nextStatus = $phases[count($current)];
-      $upd = $pdo->prepare('UPDATE shipments SET current_status=?, history=? WHERE order_id=?');
-      $upd->execute([$nextStatus, json_encode($history), $order['id']]);
-      $shipment['current_status'] = $nextStatus;
-    }
-  }
 }
 ?>
 <section>

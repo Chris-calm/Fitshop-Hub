@@ -163,7 +163,7 @@ begin
   ) then
     alter table public.shipments
       add constraint shipments_status_chk
-      check (current_status in ('Order Placed','Packed','Shipped','Out for Delivery','Delivered'));
+      check (current_status in ('Order Placed','Packed','Shipped','Out for Delivery','Delivered','Cancelled'));
   end if;
 end $$;
 
