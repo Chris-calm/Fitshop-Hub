@@ -1,4 +1,15 @@
 <?php
+$apkReleaseUrl = (string)(getenv('APK_RELEASE_URL') ?: getenv('APK_GITHUB_URL') ?: '');
+if ($apkReleaseUrl !== '') {
+  if (!headers_sent()) {
+    header('Location: ' . $apkReleaseUrl, true, 302);
+  } else {
+    echo '<script>window.location.href=' . json_encode($apkReleaseUrl) . ';</script>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($apkReleaseUrl, ENT_QUOTES) . '"></noscript>';
+  }
+  exit;
+}
+
 $apkDir = __DIR__ . '/../downloads';
 if (!is_dir($apkDir)) {
   http_response_code(404);

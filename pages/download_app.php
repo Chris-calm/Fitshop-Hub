@@ -2,22 +2,28 @@
 $apkDir = __DIR__ . '/../downloads';
 $apkUrl = 'index.php?page=download_apk';
 
+$apkReleaseUrl = (string)(getenv('APK_RELEASE_URL') ?: getenv('APK_GITHUB_URL') ?: '');
+
 $apkPath = '';
 $apkName = '';
 $apkSize = 0;
 $apkMtime = 0;
 
-if (is_dir($apkDir)) {
-  $candidates = glob($apkDir . '/*.apk');
-  if ($candidates && is_array($candidates)) {
-    usort($candidates, function ($a, $b) {
-      return filemtime($b) <=> filemtime($a);
-    });
-    $apkPath = (string)$candidates[0];
-    $apkName = basename($apkPath);
-    $apkSize = (int)@filesize($apkPath);
-    $apkMtime = (int)@filemtime($apkPath);
+if ($apkReleaseUrl === '') {
+  if (is_dir($apkDir)) {
+    $candidates = glob($apkDir . '/*.apk');
+    if ($candidates && is_array($candidates)) {
+      usort($candidates, function ($a, $b) {
+        return filemtime($b) <=> filemtime($a);
+      });
+      $apkPath = (string)$candidates[0];
+      $apkName = basename($apkPath);
+      $apkSize = (int)@filesize($apkPath);
+      $apkMtime = (int)@filemtime($apkPath);
+    }
   }
+} else {
+  $apkName = 'FitshopHubMobile.apk';
 }
 
 function fh_human_bytes($bytes) {
@@ -35,7 +41,15 @@ function fh_human_bytes($bytes) {
   <p class="mt-2 text-neutral-400">Install the Android APK directly from our official website.</p>
 
   <div class="mt-6 fh-card p-5">
-    <?php if ($apkPath !== '' && is_file($apkPath)): ?>
+    <?php if ($apkReleaseUrl !== ''): ?>
+      <div class="text-sm text-neutral-400">Latest APK</div>
+      <div class="mt-1 text-lg font-semibold text-neutral-100"><?= htmlspecialchars($apkName) ?></div>
+      <div class="mt-1 text-sm text-neutral-400">Hosted on GitHub Releases</div>
+      <div class="mt-4">
+        <a class="fh-btn fh-btn-primary" href="<?= htmlspecialchars($apkUrl) ?>">Download APK</a>
+      </div>
+      <div class="mt-3 text-xs text-neutral-500">Android may warn about unknown apps. Only install if you trust this website.</div>
+    <?php elseif ($apkPath !== '' && is_file($apkPath)): ?>
       <div class="text-sm text-neutral-400">Latest APK</div>
       <div class="mt-1 text-lg font-semibold text-neutral-100"><?= htmlspecialchars($apkName) ?></div>
       <div class="mt-1 text-sm text-neutral-400">
