@@ -23,9 +23,18 @@ define('IS_VERCEL', $isVercel);
 define('IS_LOCAL', isLocalEnvironment($isVercel));
 
 // Set base URL
-define('BASE_URL', IS_LOCAL 
-    ? 'http://localhost/Health&Fitness' 
-    : 'https://' . ($_SERVER['HTTP_HOST'] ?? getenv('VERCEL_URL')));
+// IMPORTANT: do not hardcode localhost, because mobile devices accessing via LAN IP would break asset URLs.
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = (string)($_SERVER['HTTP_HOST'] ?? getenv('VERCEL_URL') ?? '');
+$scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+$basePath = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+if ($basePath === '.' || $basePath === '/') {
+    $basePath = '';
+}
+if ($basePath !== '' && substr($basePath, -4) === '/api') {
+    $basePath = substr($basePath, 0, -4);
+}
+define('BASE_URL', ($host !== '' ? ($scheme . '://' . $host) : '') . $basePath);
 
 // Set environment-specific database configuration
 if (IS_LOCAL) {
