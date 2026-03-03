@@ -3,7 +3,7 @@
     <h1 class="text-4xl sm:text-5xl font-extrabold">Welcome to <span class="text-brand">Fitshop Hub</span></h1>
     <p class="text-neutral-400 max-w-2xl mx-auto">Your all-in-one health and fitness companion. Choose your path to get started.</p>
     <div id="apkCta" class="hidden">
-      <a href="/assets/apk/" class="fh-btn fh-btn-primary">Download Android App (APK)</a>
+      <a href="index.php?page=download_app" class="fh-btn fh-btn-primary">Download Android App (APK)</a>
       <div class="mt-2 text-xs text-neutral-500">Android only. You may need to allow installs from unknown sources.</div>
     </div>
   </div>

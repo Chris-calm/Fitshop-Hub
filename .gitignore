@@ -11,6 +11,9 @@ config/config.php
 uploads/
 storage/orders.json
 
+# Website downloads (keep folder, ignore large APKs)
+downloads/*.apk
+
 # Node/Composer (if added later)
 node_modules/
 vendor/

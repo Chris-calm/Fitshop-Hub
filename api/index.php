@@ -109,6 +109,8 @@ $allowed = [
     'reset_password' => 'pages/reset_password.php',
     'about' => 'pages/about.php',
     'guides_public' => 'pages/guides_public.php',
+    'download_app' => 'pages/download_app.php',
+    'download_apk' => 'pages/download_apk.php',
     'profile' => 'pages/profile.php',
     'settings' => 'pages/settings.php',
     'customize' => 'pages/customize.php',
@@ -165,7 +167,7 @@ if (!file_exists($pageFile)) {
     die('Page not found');
 }
 
-$actionPages = ['logout', 'post_add_to_cart', 'post_checkout', 'cancel_order', 'api_fitness_stats', 'api_steps_save', 'api_token_create', 'api_token_revoke'];
+$actionPages = ['logout', 'post_add_to_cart', 'post_checkout', 'cancel_order', 'download_apk', 'api_fitness_stats', 'api_steps_save', 'api_token_create', 'api_token_revoke'];
 if (in_array($page, $actionPages, true)) {
     require $pageFile;
     exit;
