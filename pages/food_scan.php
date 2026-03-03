@@ -205,7 +205,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       msg.textContent = 'Detecting...';
 
       try {
-        const resp = await fetch('api/nutrition_detect.php', { method: 'POST', body: fd });
+        const base = (typeof window !== 'undefined' && window.__BASE_URL__) ? window.__BASE_URL__ : '';
+        const resp = await fetch(base + '/api/nutrition_detect.php', { method: 'POST', body: fd });
         const data = await resp.json().catch(() => ({}));
         if (!resp.ok){
           msg.textContent = data && data.error ? data.error : 'Detection failed';
