@@ -43,6 +43,13 @@ function isLocalEnvironment($isVercel) {
 define('IS_VERCEL', $isVercel);
 define('IS_LOCAL', isLocalEnvironment($isVercel));
 
+// Load local (gitignored) config for secrets (SMTP, etc.)
+// Expected to set env vars via putenv() and/or $_ENV.
+$localConfig = __DIR__ . '/../config/config.php';
+if (IS_LOCAL && file_exists($localConfig)) {
+    require_once $localConfig;
+}
+
 // Set base URL
 // IMPORTANT: do not hardcode localhost, because mobile devices accessing via LAN IP would break asset URLs.
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
