@@ -6,7 +6,13 @@ $err = '';
 
 $pending = $_SESSION['pending_otp'] ?? null;
 if (!is_array($pending) || empty($pending['user_id']) || empty($pending['email'])) {
-  header('Location: index.php?page=login');
+  $next = 'index.php?page=login';
+  if (!headers_sent()) {
+    header('Location: ' . $next);
+    exit;
+  }
+  echo '<script>window.location.href=' . json_encode($next) . ';</script>';
+  echo '<noscript><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($next, ENT_QUOTES) . '"></noscript>';
   exit;
 }
 
@@ -45,7 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               ];
               fh_set_auth_cookie($_SESSION['user']);
               unset($_SESSION['pending_otp']);
-              header('Location: index.php?page=landing');
+              $next = 'index.php?page=landing';
+              if (!headers_sent()) {
+                header('Location: ' . $next);
+                exit;
+              }
+              echo '<script>window.location.href=' . json_encode($next) . ';</script>';
+              echo '<noscript><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($next, ENT_QUOTES) . '"></noscript>';
               exit;
             }
           }

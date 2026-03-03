@@ -28,6 +28,11 @@ function fh_auth_sign($data) {
 }
 
 function fh_set_auth_cookie($user) {
+    if (headers_sent()) {
+        error_log('fh_set_auth_cookie skipped: headers already sent');
+        return false;
+    }
+
     $payload = json_encode([
         'id' => $user['id'] ?? null,
         'name' => $user['name'] ?? null,
@@ -58,6 +63,11 @@ function fh_set_auth_cookie($user) {
 }
 
 function fh_clear_auth_cookie() {
+    if (headers_sent()) {
+        error_log('fh_clear_auth_cookie skipped: headers already sent');
+        return false;
+    }
+
     return setcookie('fh_user', '', [
         'expires' => time() - 3600,
         'path' => '/',
