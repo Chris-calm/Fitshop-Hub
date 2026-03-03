@@ -378,5 +378,24 @@
         });
       })();
     </script>
+    <script>
+      (function(){
+        if (document.documentElement && document.documentElement.__fhPwBound) return;
+        if (document.documentElement) document.documentElement.__fhPwBound = true;
+        document.addEventListener('click', function(e){
+          var el = e.target && e.target.closest ? e.target.closest('.pw-toggle') : null;
+          if (!el) return;
+          var id = el.getAttribute('data-target');
+          if (!id) return;
+          var input = document.getElementById(id);
+          if (!input) return;
+          var nextIsText = input.type === 'password';
+          input.type = nextIsText ? 'text' : 'password';
+          var showText = el.getAttribute('data-show-text') || 'Show';
+          var hideText = el.getAttribute('data-hide-text') || 'Hide';
+          el.textContent = nextIsText ? hideText : showText;
+        });
+      })();
+    </script>
   </header>
   <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
