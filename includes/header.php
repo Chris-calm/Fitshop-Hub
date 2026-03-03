@@ -324,7 +324,7 @@
   <header class="fh-header sticky top-0 z-50 relative">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
       <a href="index.php?page=<?= !empty($_SESSION['user']) ? 'landing' : 'login' ?>" class="text-xl font-bold"><span class="text-neutral-300">Fitshop</span> <span class="text-brand">Hub</span></a>
-      <button id="backBtn" type="button" class="ml-2 fh-btn fh-btn-ghost" aria-label="Back">←</button>
+      <button id="backBtn" type="button" class="ml-2 fh-btn fh-btn-ghost hidden md:inline-flex" aria-label="Back">←</button>
       <button id="mobileMenuBtn" type="button" class="ml-auto md:hidden fh-btn fh-btn-ghost" aria-controls="mobileMenu" aria-expanded="false">Menu</button>
       <form action="index.php" method="get" class="hidden md:flex flex-1">
         <input type="hidden" name="page" value="catalog" />
@@ -364,5 +364,19 @@
         </div>
       </div>
     </div>
+    <script>
+      (function(){
+        var btn = document.getElementById('mobileMenuBtn');
+        var menu = document.getElementById('mobileMenu');
+        if (!btn || !menu) return;
+        if (btn.__fhBound) return;
+        btn.__fhBound = true;
+        btn.addEventListener('click', function(){
+          var isHidden = menu.classList.contains('hidden');
+          menu.classList.toggle('hidden');
+          btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        });
+      })();
+    </script>
   </header>
   <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
