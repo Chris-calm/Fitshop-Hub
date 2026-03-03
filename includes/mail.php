@@ -1,7 +1,21 @@
 <?php
 
+function fh_env_get(string $key): string {
+    $v = getenv($key);
+    if ($v !== false && $v !== null && $v !== '') {
+        return (string)$v;
+    }
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+        return (string)$_ENV[$key];
+    }
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+        return (string)$_SERVER[$key];
+    }
+    return '';
+}
+
 function fh_mail_configured(): bool {
-    return (getenv('SMTP_HOST') ?: '') !== '' && (getenv('SMTP_USER') ?: '') !== '' && (getenv('SMTP_PASS') ?: '') !== '';
+    return fh_env_get('SMTP_HOST') !== '' && fh_env_get('SMTP_USER') !== '' && fh_env_get('SMTP_PASS') !== '';
 }
 
 function fh_send_mail(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody = ''): void {
@@ -23,16 +37,16 @@ function fh_send_mail(string $toEmail, string $toName, string $subject, string $
         throw new RuntimeException('SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_EMAIL, SMTP_FROM_NAME.');
     }
 
-    $host = getenv('SMTP_HOST') ?: '';
-    $port = (int)(getenv('SMTP_PORT') ?: 587);
-    $user = getenv('SMTP_USER') ?: '';
-    $pass = getenv('SMTP_PASS') ?: '';
-    $fromEmail = getenv('SMTP_FROM_EMAIL') ?: $user;
-    $fromName = getenv('SMTP_FROM_NAME') ?: 'Fitshop Hub';
-    $encryption = strtolower(getenv('SMTP_ENCRYPTION') ?: 'tls');
+    $host = fh_env_get('SMTP_HOST');
+    $port = (int)(fh_env_get('SMTP_PORT') ?: 587);
+    $user = fh_env_get('SMTP_USER');
+    $pass = fh_env_get('SMTP_PASS');
+    $fromEmail = fh_env_get('SMTP_FROM_EMAIL') ?: $user;
+    $fromName = fh_env_get('SMTP_FROM_NAME') ?: 'Fitshop Hub';
+    $encryption = strtolower(fh_env_get('SMTP_ENCRYPTION') ?: 'tls');
 
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
-    $smtpDebug = (string)(getenv('SMTP_DEBUG') ?: '');
+    $smtpDebug = (string)(fh_env_get('SMTP_DEBUG') ?: '');
     if ($smtpDebug !== '' && $smtpDebug !== '0') {
         $mail->SMTPDebug = 2;
         $mail->Debugoutput = function ($str, $level) {
