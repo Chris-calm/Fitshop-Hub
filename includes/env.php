@@ -2,6 +2,26 @@
 // Environment detection
 $isVercel = (getenv('VERCEL') === '1') || (getenv('VERCEL_ENV') !== false) || (getenv('VERCEL_URL') !== false);
 
+function fh_is_private_ip($ip) {
+    $ip = (string)$ip;
+    if ($ip === '') {
+        return false;
+    }
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+        return false;
+    }
+    if (strpos($ip, '10.') === 0) {
+        return true;
+    }
+    if (strpos($ip, '192.168.') === 0) {
+        return true;
+    }
+    if (preg_match('/^172\.(1[6-9]|2\d|3[0-1])\./', $ip)) {
+        return true;
+    }
+    return false;
+}
+
 function isLocalEnvironment($isVercel) {
     if ($isVercel) {
         return false;
@@ -14,6 +34,7 @@ function isLocalEnvironment($isVercel) {
     return 
         $serverName === 'localhost' || 
         in_array($remoteAddr, ['127.0.0.1', '::1'], true) ||
+        fh_is_private_ip($remoteAddr) ||
         strpos($httpHost, '.local') !== false ||
         getenv('LOCAL_DEVELOPMENT') === 'true';
 }
