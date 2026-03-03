@@ -18,6 +18,17 @@ function fh_mail_configured(): bool {
     return fh_env_get('SMTP_HOST') !== '' && fh_env_get('SMTP_USER') !== '' && fh_env_get('SMTP_PASS') !== '';
 }
 
+function fh_mail_missing_keys(): array {
+    $keys = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM_EMAIL', 'SMTP_FROM_NAME', 'SMTP_ENCRYPTION'];
+    $missing = [];
+    foreach ($keys as $k) {
+        if (fh_env_get($k) === '') {
+            $missing[] = $k;
+        }
+    }
+    return $missing;
+}
+
 function fh_send_mail(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody = ''): void {
     $phpmailerBase = __DIR__ . '/phpmailer/src';
     $req = [
@@ -34,7 +45,15 @@ function fh_send_mail(string $toEmail, string $toName, string $subject, string $
     }
 
     if (!fh_mail_configured()) {
-        throw new RuntimeException('SMTP is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM_EMAIL, SMTP_FROM_NAME.');
+        $missing = fh_mail_missing_keys();
+        $ctx = [
+            'missing' => $missing,
+            'is_local' => defined('IS_LOCAL') ? (IS_LOCAL ? 1 : 0) : null,
+            'local_config_exists' => defined('LOCAL_CONFIG_EXISTS') ? (LOCAL_CONFIG_EXISTS ? 1 : 0) : null,
+            'local_config_path' => defined('LOCAL_CONFIG_PATH') ? (string)LOCAL_CONFIG_PATH : null,
+        ];
+        error_log('SMTP config missing | ctx=' . json_encode($ctx));
+        throw new RuntimeException('SMTP is not configured. Missing: ' . implode(', ', $missing));
     }
 
     $host = fh_env_get('SMTP_HOST');

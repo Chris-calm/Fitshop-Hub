@@ -46,8 +46,14 @@ define('IS_LOCAL', isLocalEnvironment($isVercel));
 // Load local (gitignored) config for secrets (SMTP, etc.)
 // Expected to set env vars via putenv() and/or $_ENV.
 $localConfig = __DIR__ . '/../config/config.php';
+define('LOCAL_CONFIG_PATH', $localConfig);
+define('LOCAL_CONFIG_EXISTS', file_exists($localConfig));
+define('LOCAL_CONFIG_LOADED', false);
 if (IS_LOCAL && file_exists($localConfig)) {
     require_once $localConfig;
+    if (defined('LOCAL_CONFIG_LOADED')) {
+        // no-op
+    }
 }
 
 // Set base URL
