@@ -40,7 +40,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $text = "Your one-time login code is: $otp\nThis code expires in 10 minutes.";
         fh_send_mail((string)$u['email'], (string)($u['name'] ?? ''), $subject, $html, $text);
 
-        header('Location: index.php?page=otp_verify');
+        $next = 'index.php?page=otp_verify';
+        if (!headers_sent()) {
+          header('Location: ' . $next);
+          exit;
+        }
+
+        echo '<script>window.location.href=' . json_encode($next) . ';</script>';
+        echo '<noscript><meta http-equiv="refresh" content="0;url=' . htmlspecialchars($next, ENT_QUOTES) . '"></noscript>';
         exit;
       } catch (Throwable $e) {
         error_log('Login OTP send failed: ' . $e->getMessage());
