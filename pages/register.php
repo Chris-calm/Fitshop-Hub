@@ -21,36 +21,20 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   $diet = $_POST['diet'] ?? 'none';
   // handle photo upload (optional)
   $photoPath = null;
-  if (!empty($_FILES['photo']['name']) && is_uploaded_file($_FILES['photo']['tmp_name'])) {
+  if (!IS_VERCEL && !empty($_FILES['photo']['name']) && is_uploaded_file($_FILES['photo']['tmp_name'])) {
     $allowed = ['jpg','jpeg','png','gif','webp'];
     $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
     if (!in_array($ext,$allowed)) {
       $err = 'Invalid image type. Allowed: jpg, png, gif, webp.';
     } else {
-      if (IS_VERCEL) {
-        try {
-          $bucket = getenv('SUPABASE_AVATAR_BUCKET') ?: 'avatars';
-          $key = 'avatar_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
-          $photoPath = supabase_storage_upload_tmpfile($bucket, $key, $_FILES['photo']['tmp_name'], $_FILES['photo']['type'] ?? 'application/octet-stream');
-        } catch (Throwable $e) {
-          $msg = $e->getMessage();
-          error_log('Avatar upload failed: ' . $msg);
-          if (strpos($msg, 'Supabase Storage not configured') !== false) {
-            $err = 'Avatar upload is not configured on Vercel. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (and ensure the "avatars" bucket exists).';
-          } else {
-            $err = 'Failed to upload image. Please try again (or register without a photo).';
-          }
-        }
+      $targetDir = __DIR__ . '/../uploads/avatars/';
+      if (!is_dir($targetDir)) { @mkdir($targetDir, 0777, true); }
+      $filename = 'avatar_'.time().'_'.bin2hex(random_bytes(3)).'.'.$ext;
+      $dest = $targetDir.$filename;
+      if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+        $photoPath = rtrim(BASE_URL, '/') . '/uploads/avatars/'.$filename;
       } else {
-        $targetDir = __DIR__ . '/../uploads/avatars/';
-        if (!is_dir($targetDir)) { @mkdir($targetDir, 0777, true); }
-        $filename = 'avatar_'.time().'_'.bin2hex(random_bytes(3)).'.'.$ext;
-        $dest = $targetDir.$filename;
-        if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
-          $photoPath = rtrim(BASE_URL, '/') . '/uploads/avatars/'.$filename;
-        } else {
-          $err = 'Failed to upload image.';
-        }
+        $err = 'Failed to upload image.';
       }
     }
   }
@@ -114,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
   <h2 class="text-2xl font-bold mb-4">Register</h2>
   <?php if ($err): ?><div class="mb-4 p-3 rounded bg-red-500/10 text-red-300 border border-red-500/30"><?=htmlspecialchars($err)?></div><?php endif; ?>
   <?php if ($ok): ?><div class="mb-4 p-3 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"><?=htmlspecialchars($ok)?> <a class="text-brand" href="index.php?page=login">Login</a></div><?php endif; ?>
-  <form method="post" enctype="multipart/form-data" class="space-y-3">
+  <form method="post"<?= IS_VERCEL ? '' : ' enctype="multipart/form-data"' ?> class="space-y-3">
     <div>
       <label class="block text-sm text-neutral-400">Full Name</label>
       <input name="name" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
@@ -123,10 +107,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       <label class="block text-sm text-neutral-400">Email</label>
       <input type="email" name="email" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
     </div>
-    <div>
-      <label class="block text-sm text-neutral-400">Profile Photo (optional)</label>
-      <input type="file" name="photo" accept="image/*" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
-    </div>
+    <?php if (!IS_VERCEL): ?>
+      <div>
+        <label class="block text-sm text-neutral-400">Profile Photo (optional)</label>
+        <input type="file" name="photo" accept="image/*" class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" />
+      </div>
+    <?php else: ?>
+      <div class="text-xs text-neutral-500">Profile photo upload is disabled on this hosted version.</div>
+    <?php endif; ?>
     <div>
       <label class="block text-sm text-neutral-400">Password</label>
       <div class="relative">

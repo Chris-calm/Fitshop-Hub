@@ -85,3 +85,27 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     </div>
   </div>
 </section>
+
+<script>
+  (function(){
+    function bind(){
+      if (document.body && document.body.dataset && document.body.dataset.fhPwBound === '1') return;
+      if (document.body && document.body.dataset) document.body.dataset.fhPwBound = '1';
+      document.addEventListener('click', function(e){
+        var el = e.target && e.target.closest ? e.target.closest('.pw-toggle') : null;
+        if (!el) return;
+        var id = el.getAttribute('data-target');
+        if (!id) return;
+        var input = document.getElementById(id);
+        if (!input) return;
+        var nextIsText = input.type === 'password';
+        input.type = nextIsText ? 'text' : 'password';
+        var showText = el.getAttribute('data-show-text') || 'Show';
+        var hideText = el.getAttribute('data-hide-text') || 'Hide';
+        el.textContent = nextIsText ? hideText : showText;
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+    else bind();
+  })();
+</script>
