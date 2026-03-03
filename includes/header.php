@@ -297,6 +297,24 @@
       <div class="fh-loader" aria-hidden="true"><span></span></div>
     </div>
   </div>
+  <script>
+    (function(){
+      function hide(){
+        try {
+          var el = document.getElementById('fhSplash');
+          if (el) el.classList.add('fh-hide');
+        } catch(e) {}
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hide, { once: true });
+      } else {
+        hide();
+      }
+      window.addEventListener('load', hide);
+      window.addEventListener('pageshow', hide);
+      setTimeout(hide, 1500);
+    })();
+  </script>
   <?php
     require_once __DIR__ . '/cart_store.php';
     $cart = fh_cart_get();
