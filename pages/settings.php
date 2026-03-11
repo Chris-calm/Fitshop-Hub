@@ -151,6 +151,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $expectedDigits = $rules[$phoneCc] ?? 10;
     $phone = $phoneCc . $phoneNational;
 
+    $postalIsValid = false;
+    if ($phoneCc === '+63') {
+      $postalIsValid = (bool)preg_match('/^\d{4}$/', $postal);
+    } else {
+      $postalIsValid = (bool)preg_match('/^[0-9A-Za-z\-\s]{3,10}$/', $postal);
+    }
+
     if ($id <= 0) {
       $addrErr = 'Invalid address.';
     } elseif ($fullName === '' || $phoneNational === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
@@ -161,8 +168,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $addrErr = 'Phone number must contain digits only.';
     } elseif (strlen($phoneNational) !== $expectedDigits) {
       $addrErr = 'Phone must be ' . $expectedDigits . ' digits for ' . $phoneCc . '.';
-    } elseif (!preg_match('/^\d{4}$/', $postal)) {
-      $addrErr = 'Postal code must be 4 digits (Philippines).';
+    } elseif (!$postalIsValid) {
+      $addrErr = ($phoneCc === '+63')
+        ? 'Postal code must be 4 digits (Philippines).'
+        : 'Postal code is invalid.';
     } elseif (($lat !== null && ($lat < -90 || $lat > 90)) || ($lng !== null && ($lng < -180 || $lng > 180))) {
       $addrErr = 'Invalid map coordinates.';
     } else {
@@ -209,6 +218,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $expectedDigits = $rules[$phoneCc] ?? 10;
     $phone = $phoneCc . $phoneNational;
 
+    $postalIsValid = false;
+    if ($phoneCc === '+63') {
+      $postalIsValid = (bool)preg_match('/^\d{4}$/', $postal);
+    } else {
+      $postalIsValid = (bool)preg_match('/^[0-9A-Za-z\-\s]{3,10}$/', $postal);
+    }
+
     if ($fullName === '' || $phoneNational === '' || $line1 === '' || $city === '' || $province === '' || $postal === '') {
       $addrErr = 'Please fill out all required address fields.';
     } elseif (!isset($rules[$phoneCc])) {
@@ -217,8 +233,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $addrErr = 'Phone number must contain digits only.';
     } elseif (strlen($phoneNational) !== $expectedDigits) {
       $addrErr = 'Phone must be ' . $expectedDigits . ' digits for ' . $phoneCc . '.';
-    } elseif (!preg_match('/^\d{4}$/', $postal)) {
-      $addrErr = 'Postal code must be 4 digits (Philippines).';
+    } elseif (!$postalIsValid) {
+      $addrErr = ($phoneCc === '+63')
+        ? 'Postal code must be 4 digits (Philippines).'
+        : 'Postal code is invalid.';
     } elseif (($lat !== null && ($lat < -90 || $lat > 90)) || ($lng !== null && ($lng < -180 || $lng > 180))) {
       $addrErr = 'Invalid map coordinates.';
     } else {
