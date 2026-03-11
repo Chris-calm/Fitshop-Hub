@@ -246,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
         }
         $pdo->prepare('INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, province, postal_code, lat, lng, is_default) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
-          ->execute([(int)$sessionUser['id'], $fullName, $phone, $line1, $line2 ?: null, $city, $province, $postal, $lat, $lng, $makeDefault]);
+          ->execute([(int)$sessionUser['id'], $fullName, $phone, $line1, $line2 ?: null, $city, $province, $postal, $lat, $lng, $makeDefault ? 1 : 0]);
         $pdo->commit();
         header('Location: index.php?page=settings');
         exit;
