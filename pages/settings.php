@@ -38,21 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
               $acctErr = 'Failed to upload image. Please try again.';
             }
-
-  if ($accountAction === 'update_steps_goal') {
-    $goalRaw = (string)($_POST['steps_goal'] ?? '');
-    $goal = (int)preg_replace('/[^0-9]/', '', $goalRaw);
-    if ($goal < 1000 || $goal > 100000) {
-      $acctErr = 'Steps goal must be between 1,000 and 100,000.';
-    } else {
-      try {
-        $pdo->prepare('UPDATE users SET steps_goal=? WHERE id=?')->execute([$goal, (int)$sessionUser['id']]);
-        $acctOk = 'Steps goal updated.';
-      } catch (Throwable $e) {
-        $acctErr = 'Failed to update steps goal.';
-      }
-    }
-  }
           }
         } else {
           $targetDir = __DIR__ . '/../uploads/avatars/';
@@ -119,6 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
       } catch (Throwable $e) {
         $acctErr = 'Failed to update password.';
+      }
+    }
+  }
+
+  if ($accountAction === 'update_steps_goal') {
+    $goalRaw = (string)($_POST['steps_goal'] ?? '');
+    $goal = (int)preg_replace('/[^0-9]/', '', $goalRaw);
+    if ($goal < 1000 || $goal > 100000) {
+      $acctErr = 'Steps goal must be between 1,000 and 100,000.';
+    } else {
+      try {
+        $pdo->prepare('UPDATE users SET steps_goal=? WHERE id=?')->execute([$goal, (int)$sessionUser['id']]);
+        $acctOk = 'Steps goal updated.';
+      } catch (Throwable $e) {
+        $acctErr = 'Failed to update steps goal.';
       }
     }
   }
