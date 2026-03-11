@@ -5,6 +5,30 @@ require_once __DIR__ . '/../includes/auth_cookie.php';
 $err = '';
 
 $pending = $_SESSION['pending_otp'] ?? null;
+
+if (!is_array($pending) || empty($pending['user_id']) || empty($pending['email'])) {
+  $emailParam = trim((string)($_GET['email'] ?? $_POST['email'] ?? ''));
+  if ($emailParam !== '') {
+    try {
+      $stmt = $pdo->prepare('SELECT id, name, email, photo_url FROM users WHERE email=? LIMIT 1');
+      $stmt->execute([$emailParam]);
+      $u = $stmt->fetch();
+      if ($u && !empty($u['id']) && !empty($u['email'])) {
+        $pending = [
+          'user_id' => (int)$u['id'],
+          'name' => (string)($u['name'] ?? ''),
+          'email' => (string)($u['email'] ?? ''),
+          'photo_url' => $u['photo_url'] ?? null,
+          'issued_at' => time(),
+        ];
+        $_SESSION['pending_otp'] = $pending;
+      }
+    } catch (Throwable $e) {
+      error_log('OTP pending lookup failed: ' . $e->getMessage());
+    }
+  }
+}
+
 if (!is_array($pending) || empty($pending['user_id']) || empty($pending['email'])) {
   $next = 'index.php?page=login';
   if (!headers_sent()) {
@@ -18,6 +42,10 @@ if (!is_array($pending) || empty($pending['user_id']) || empty($pending['email']
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $code = preg_replace('/\s+/', '', (string)($_POST['otp'] ?? ''));
+  $postedEmail = trim((string)($_POST['email'] ?? ''));
+  if ($postedEmail !== '' && strcasecmp($postedEmail, (string)$pending['email']) !== 0) {
+    $err = 'Email mismatch. Please login again.';
+  }
   if (!preg_match('/^\d{6}$/', $code)) {
     $err = 'Invalid code format.';
   } else {
@@ -76,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="text-sm text-neutral-400 mb-4">We sent a 6-digit code to <?= htmlspecialchars((string)$pending['email']) ?>.</div>
     <?php if ($err): ?><div class="mb-4 p-3 rounded bg-red-500/10 text-red-300 border border-red-500/30"><?=htmlspecialchars($err)?></div><?php endif; ?>
     <form method="post" class="space-y-3">
+      <input type="hidden" name="email" value="<?= htmlspecialchars((string)$pending['email']) ?>" />
       <div>
         <label class="block text-sm text-neutral-400">OTP code</label>
         <input name="otp" inputmode="numeric" pattern="\d{6}" maxlength="6" required class="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2" placeholder="123456" />

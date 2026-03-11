@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $text = "Your one-time login code is: $otp\nThis code expires in 10 minutes.";
         fh_send_mail((string)$u['email'], (string)($u['name'] ?? ''), $subject, $html, $text);
 
-        $next = 'index.php?page=otp_verify';
+        $next = 'index.php?page=otp_verify&email=' . rawurlencode((string)$u['email']);
         if (!headers_sent()) {
           header('Location: ' . $next);
           exit;
