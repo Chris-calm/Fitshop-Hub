@@ -180,8 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($makeDefault) {
           $pdo->prepare('UPDATE user_addresses SET is_default=false WHERE user_id=?')->execute([(int)$sessionUser['id']]);
         }
-        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, lat=?, lng=?, is_default=CASE WHEN ? THEN true ELSE is_default END WHERE id=? AND user_id=?')
-          ->execute([$fullName, $phone, $line1, ($line2 ?: null), $city, $province, $postal, $lat, $lng, $makeDefault, $id, (int)$sessionUser['id']]);
+        $pdo->prepare('UPDATE user_addresses SET full_name=?, phone=?, line1=?, line2=?, city=?, province=?, postal_code=?, lat=?, lng=?, is_default=? WHERE id=? AND user_id=?')
+          ->execute([$fullName, $phone, $line1, ($line2 ?: null), $city, $province, $postal, $lat, $lng, $makeDefault ? 1 : 0, $id, (int)$sessionUser['id']]);
         $pdo->commit();
         header('Location: index.php?page=settings');
         exit;
