@@ -16,6 +16,9 @@ function fh_auth_secret() {
     if (!$secret && defined('IS_LOCAL') && IS_LOCAL) {
         $secret = 'dev-secret-change-me';
     }
+    if (!$secret && (!defined('IS_LOCAL') || !IS_LOCAL)) {
+        error_log('AUTH: FH_AUTH_SECRET is not set; signed login cookies will not work reliably on serverless.');
+    }
     return $secret;
 }
 
