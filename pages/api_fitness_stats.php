@@ -26,10 +26,18 @@ try {
   if ($s !== false) { $stepsToday = (int)$s; }
 
   try {
-    $stmt = $pdo->prepare('SELECT syncing FROM steps_sync_state WHERE user_id=? AND step_date=?');
+    $stmt = $pdo->prepare('SELECT syncing, updated_at FROM steps_sync_state WHERE user_id=? AND step_date=?');
     $stmt->execute([$user_id, $today]);
-    $sv = $stmt->fetchColumn();
-    if ($sv !== false) { $syncing = ((int)$sv) ? 1 : 0; }
+    $row = $stmt->fetch();
+    if ($row) {
+      $syncing = !empty($row['syncing']) ? 1 : 0;
+      if ($syncing === 1 && !empty($row['updated_at'])) {
+        $ts = strtotime((string)$row['updated_at']);
+        if ($ts && (time() - $ts) > (15 * 60)) {
+          $syncing = 0;
+        }
+      }
+    }
   } catch (Throwable $e2) {
     $syncing = 0;
   }
