@@ -54,6 +54,7 @@ function fh_set_auth_cookie($user) {
     $b64 = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
     $sig = fh_auth_sign($b64);
     if (!$sig) {
+        error_log('AUTH: unable to sign fh_user cookie (missing/invalid FH_AUTH_SECRET?)');
         return false;
     }
 
