@@ -29,6 +29,7 @@ try {
   [$plain, $tokenId] = fh_issue_api_token($pdo, $user_id, $name);
   echo json_encode(['ok' => true, 'token' => $plain, 'token_id' => $tokenId]);
 } catch (Throwable $e) {
+  error_log('api_token_create failed user_id=' . $user_id . ' msg=' . $e->getMessage());
   http_response_code(500);
   echo json_encode(['ok'=>false,'error'=>$e->getMessage()]);
 }
