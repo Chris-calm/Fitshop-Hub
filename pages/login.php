@@ -91,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     function bind(){
       if (document.body && document.body.dataset && document.body.dataset.fhPwBound === '1') return;
       if (document.body && document.body.dataset) document.body.dataset.fhPwBound = '1';
-      document.addEventListener('click', function(e){
-        var el = e.target && e.target.closest ? e.target.closest('.pw-toggle') : null;
+
+      function toggleFromEl(el){
         if (!el) return;
         var id = el.getAttribute('data-target');
         if (!id) return;
@@ -103,6 +103,22 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         var showText = el.getAttribute('data-show-text') || 'Show';
         var hideText = el.getAttribute('data-hide-text') || 'Hide';
         el.textContent = nextIsText ? hideText : showText;
+      }
+
+      var direct = document.querySelector('.pw-toggle');
+      if (direct && !direct.__fhDirectBound) {
+        direct.__fhDirectBound = true;
+        direct.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFromEl(direct);
+        });
+      }
+
+      document.addEventListener('click', function(e){
+        var el = e.target && e.target.closest ? e.target.closest('.pw-toggle') : null;
+        if (!el) return;
+        toggleFromEl(el);
       });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);

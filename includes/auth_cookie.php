@@ -33,6 +33,9 @@ function fh_set_auth_cookie($user) {
         return false;
     }
 
+    $isHttps = fh_is_https();
+    $sameSite = $isHttps ? 'None' : 'Lax';
+
     $payload = json_encode([
         'id' => $user['id'] ?? null,
         'name' => $user['name'] ?? null,
@@ -56,9 +59,9 @@ function fh_set_auth_cookie($user) {
     return setcookie('fh_user', $value, [
         'expires' => time() + 60 * 60 * 24 * 7,
         'path' => '/',
-        'secure' => fh_is_https(),
+        'secure' => $isHttps,
         'httponly' => true,
-        'samesite' => 'Lax',
+        'samesite' => $sameSite,
     ]);
 }
 
@@ -68,12 +71,15 @@ function fh_clear_auth_cookie() {
         return false;
     }
 
+    $isHttps = fh_is_https();
+    $sameSite = $isHttps ? 'None' : 'Lax';
+
     return setcookie('fh_user', '', [
         'expires' => time() - 3600,
         'path' => '/',
-        'secure' => fh_is_https(),
+        'secure' => $isHttps,
         'httponly' => true,
-        'samesite' => 'Lax',
+        'samesite' => $sameSite,
     ]);
 }
 
