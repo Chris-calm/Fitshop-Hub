@@ -289,7 +289,7 @@
     }
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
   <div id="fhSplash" aria-hidden="true">
     <div class="fh-splash-card" role="status" aria-live="polite">
       <div class="fh-logo"><span style="color:rgba(255,255,255,.75)">Fitshop</span> <span style="color:rgb(var(--fh-brand-rgb))">Hub</span></div>
@@ -398,4 +398,4 @@
       })();
     </script>
   </header>
-  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+  <main class="mx-auto max-w-7xl w-full flex-1 px-4 sm:px-6 lg:px-8 py-8">

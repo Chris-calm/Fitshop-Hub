@@ -38,6 +38,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
               $acctErr = 'Failed to upload image. Please try again.';
             }
+
+  if ($accountAction === 'update_steps_goal') {
+    $goalRaw = (string)($_POST['steps_goal'] ?? '');
+    $goal = (int)preg_replace('/[^0-9]/', '', $goalRaw);
+    if ($goal < 1000 || $goal > 100000) {
+      $acctErr = 'Steps goal must be between 1,000 and 100,000.';
+    } else {
+      try {
+        $pdo->prepare('UPDATE users SET steps_goal=? WHERE id=?')->execute([$goal, (int)$sessionUser['id']]);
+        $acctOk = 'Steps goal updated.';
+      } catch (Throwable $e) {
+        $acctErr = 'Failed to update steps goal.';
+      }
+    }
+  }
           }
         } else {
           $targetDir = __DIR__ . '/../uploads/avatars/';
@@ -257,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-$stmt = $pdo->prepare('SELECT id,name,email,photo_url,goal,activity_level,equipment,diet,plan_json FROM users WHERE id=? LIMIT 1');
+$stmt = $pdo->prepare('SELECT id,name,email,photo_url,goal,activity_level,equipment,diet,plan_json,steps_goal FROM users WHERE id=? LIMIT 1');
 $stmt->execute([$sessionUser['id']]);
 $u = $stmt->fetch();
 $tokens = $u ? fh_list_api_tokens($pdo, (int)$u['id']) : [];
@@ -315,6 +330,34 @@ try {
           <button class="fh-btn fh-btn-primary">Save Changes</button>
         </div>
       </form>
+
+      <div class="border-t border-white/10 pt-4">
+        <div class="font-semibold mb-2">Steps goal</div>
+        <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input type="hidden" name="account_action" value="update_steps_goal" />
+          <div>
+            <label class="block text-sm text-neutral-400 mb-1">Daily steps goal</label>
+            <select name="steps_goal" class="fh-input w-full">
+              <?php
+                $curGoal = (int)($u['steps_goal'] ?? 10000);
+                $opts = [10000, 20000, 30000];
+                if (!in_array($curGoal, $opts, true)) {
+                  $opts[] = $curGoal;
+                }
+                sort($opts);
+                foreach ($opts as $g) {
+                  $sel = ($g === $curGoal) ? 'selected' : '';
+                  echo '<option value="' . (int)$g . '" ' . $sel . '>' . number_format((int)$g) . '</option>';
+                }
+              ?>
+            </select>
+            <div class="mt-2 text-xs text-neutral-500">You can set this to 10,000, 20,000, or 30,000.</div>
+          </div>
+          <div class="flex items-end">
+            <button class="fh-btn fh-btn-ghost w-full md:w-auto">Save Goal</button>
+          </div>
+        </form>
+      </div>
 
       <div class="border-t border-white/10 pt-4">
         <div class="font-semibold mb-2">Change Password</div>

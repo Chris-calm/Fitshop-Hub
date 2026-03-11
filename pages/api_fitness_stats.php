@@ -34,9 +34,9 @@ try {
     $syncing = 0;
   }
 
-  // If steps are still syncing (no steps yet for today), keep derived stats at 0.
+  // If steps are still syncing, keep derived stats at 0.
   // This avoids showing stale streak/minutes until the mobile sync has written data.
-  if ($syncing === 1 || $stepsToday <= 0) {
+  if ($syncing === 1) {
     echo json_encode([
       'ok' => true,
       'today_steps' => 0,

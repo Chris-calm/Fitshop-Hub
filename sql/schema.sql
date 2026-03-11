@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   equipment ENUM('none','home_minimal','gym_access') DEFAULT 'none',
   diet ENUM('none','vegetarian','keto') DEFAULT 'none',
   plan_json JSON NULL,
+  steps_goal INT NOT NULL DEFAULT 10000,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

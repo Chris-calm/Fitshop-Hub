@@ -23,6 +23,9 @@ $history = [];
 if ($shipment) {
   $history = json_decode($shipment['history'], true) ?: [];
 }
+
+$etaMinDays = 3;
+$etaMaxDays = 7;
 ?>
 <section>
   <h2 class="text-2xl font-bold mb-2">Order #<?= (int)$order['id'] ?></h2>
@@ -30,6 +33,7 @@ if ($shipment) {
   <?php if ($shipment): ?>
     <div class="text-neutral-400 mb-6">Tracking: <span class="text-neutral-200 font-mono"><?= htmlspecialchars($shipment['tracking_no']) ?></span> • Status: <span class="text-neutral-200"><?= htmlspecialchars($shipment['current_status']) ?></span></div>
   <?php endif; ?>
+  <div class="text-neutral-400 mb-6">Estimated delivery: <span class="text-neutral-200"><?= (int)$etaMinDays ?>–<?= (int)$etaMaxDays ?> days</span></div>
   <?php
     $cancellable = false;
     if ($shipment) {
